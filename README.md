@@ -13,6 +13,10 @@ sommeil. Interface en français, pensée pour le téléphone.
 - **Grignotage et boissons** — ajout en un geste de ce qui se prend entre les
   repas (café, soda, bière, chips, chocolat…), ou description libre analysée par
   l'IA.
+- **Liste de courses** — construite automatiquement à partir des menus des 3, 7
+  ou 14 prochains jours : quantités cumulées, classement par rayon, date à
+  laquelle acheter chaque produit (les produits frais s'achètent au dernier
+  moment), cases à cocher pour ce qui est déjà acheté, et ajouts manuels.
 - **Planning** — heures de coucher et de lever, heures des repas, créneaux
   d'entraînement de la semaine.
 - **Sommeil** — durée, qualité, dette de sommeil sur 14 jours.
@@ -75,14 +79,15 @@ npx convex dev  # dans un autre, pour synchroniser les fonctions Convex
 
 ```
 app/
-  (app)/          pages connectées : aujourd'hui, séance, repas, planning,
-                  sommeil, progression, profil
+  (app)/          pages connectées : aujourd'hui, séance, repas, courses,
+                  planning, sommeil, progression, profil
   bienvenue/      questionnaire d'installation (profil et cibles)
   connexion/      inscription et connexion
 composants/       interface : jauges, feuille glissante, analyseur de repas…
 convex/
   data/           programme d'entraînement et banque de repas
   lib/            calculs (nutrition, dates, menus) et validateurs
+  courses.ts      liste de courses construite depuis les menus
   ia.ts           actions OpenAI : photo, texte, menus, programme
   schema.ts       modèle de données
 lib/              utilitaires côté client

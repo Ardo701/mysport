@@ -191,3 +191,13 @@ export function IconeBalance(p: Props) {
     </Svg>
   );
 }
+
+export function IconePanier(p: Props) {
+  return (
+    <Svg {...p}>
+      <path d="M3.5 7.5h17l-1.7 10a2 2 0 0 1-2 1.7H7.2a2 2 0 0 1-2-1.7Z" />
+      <path d="M8.5 7.5 10 3.5M15.5 7.5 14 3.5" />
+      <path d="M9.5 11.5v4M14.5 11.5v4" />
+    </Svg>
+  );
+}

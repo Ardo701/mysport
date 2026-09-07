@@ -141,6 +141,22 @@ export default defineSchema({
     .index("by_user_date", ["userId", "date"])
     .index("by_user", ["userId"]),
 
+  /** Liste de courses construite à partir des menus à venir. */
+  courses: defineTable({
+    userId: v.id("users"),
+    cle: v.string(), // identifiant stable de l'ingrédient
+    nom: v.string(),
+    quantite: v.string(),
+    rayon: v.string(),
+    dateBesoin: v.string(), // premier jour où l'ingrédient est nécessaire
+    dateAchatConseillee: v.string(),
+    achete: v.boolean(),
+    dateAchat: v.optional(v.string()),
+    source: v.string(), // menu | manuel
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_cle", ["userId", "cle"]),
+
   /** Suivi du poids et du tour de taille. */
   mesures: defineTable({
     userId: v.id("users"),

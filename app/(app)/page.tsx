@@ -13,6 +13,7 @@ import {
   IconeFleche,
   IconeHaltere,
   IconeLune,
+  IconePanier,
 } from "@/composants/icones";
 import { aujourdhuiISO, libelleDate, minutesEnHeures } from "@/lib/dates";
 import { libelleTypeRepas } from "@/lib/repas";
@@ -35,6 +36,7 @@ export default function PageAujourdhui() {
   const nuit = useQuery(api.sommeil.nuitDuJour, date ? { date } : "skip");
   const planning = useQuery(api.planning.monPlanning);
   const mesures = useQuery(api.mesures.historiqueMesures, { limite: 90 });
+  const courses = useQuery(api.courses.maListe);
 
   if (!date || !profil || journal === undefined) return <Chargement />;
 
@@ -233,6 +235,26 @@ export default function PageAujourdhui() {
           })}
         </div>
       </section>
+
+      {/* Courses */}
+      <Link href="/courses" className="block">
+        <div className="flex items-center gap-3.5 rounded-net border border-trait bg-nuit px-4 py-3.5 transition hover:border-trait-clair">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-trait text-jaune">
+            <IconePanier className="h-4.5 w-4.5" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[14px] font-medium">Liste de courses</span>
+            <span className="mt-0.5 block text-[12px] text-brume-sombre">
+              {courses === undefined
+                ? "Chargement…"
+                : courses.filter((l) => !l.achete).length === 0
+                  ? "Rien à acheter pour le moment"
+                  : `${courses.filter((l) => !l.achete).length} produits à prendre`}
+            </span>
+          </span>
+          <IconeFleche className="h-4 w-4 shrink-0 text-brume-sombre" />
+        </div>
+      </Link>
 
       {/* Sommeil */}
       <section>

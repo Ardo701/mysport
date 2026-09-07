@@ -4,6 +4,7 @@ import { useAction, useMutation, useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 import { api } from "@/convex/_generated/api";
 import type { Doc } from "@/convex/_generated/dataModel";
+import Link from "next/link";
 import { AjoutRapide } from "@/composants/ajout-rapide";
 import { AnalyseurRepas } from "@/composants/analyseur-repas";
 import { BarreMacro } from "@/composants/jauges";
@@ -22,6 +23,7 @@ import {
   IconeCorbeille,
   IconeEclair,
   IconeHorloge,
+  IconePanier,
   IconePlus,
   IconeTexte,
 } from "@/composants/icones";
@@ -150,6 +152,22 @@ export default function PageRepas() {
           />
         </div>
       </Carte>
+
+      {/* Liste de courses */}
+      <Link href="/courses" className="block">
+        <div className="flex items-center gap-3.5 rounded-net border border-trait bg-nuit px-4 py-3.5 transition hover:border-trait-clair">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-trait text-jaune">
+            <IconePanier className="h-4.5 w-4.5" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[14px] font-medium">Liste de courses</span>
+            <span className="mt-0.5 block text-[12px] text-brume-sombre">
+              Construite depuis tes menus, avec les dates d'achat
+            </span>
+          </span>
+          <IconeChevronDroite className="h-4 w-4 shrink-0 text-brume-sombre" />
+        </div>
+      </Link>
 
       {/* Le déjeuner : photo ou description */}
       <section>
