@@ -103,176 +103,183 @@ export default function PageCourses() {
 
   return (
     <div className="space-y-5">
-      <header className="pt-2">
+      <header className="pt-2 lg:pt-0">
         <Link
           href="/repas"
-          className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-brume transition hover:text-craie"
+          className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-brume transition hover:text-craie lg:hidden"
         >
           <IconeChevronGauche className="h-4 w-4" />
           Repas
         </Link>
         <p className="surtitre mb-2.5">D'après tes menus à venir</p>
-        <h1 className="titre text-[28px] font-bold leading-none">
+        <h1 className="titre text-[28px] font-bold leading-none lg:text-[34px]">
           Liste de courses
         </h1>
       </header>
 
-      {/* Période et avancement */}
-      <Carte>
-        <div className="mb-4 flex gap-1 rounded-lg border border-trait bg-ardoise p-1">
-          {[3, 7, 14].map((n) => (
-            <button
-              key={n}
-              onClick={() => setJours(n)}
-              className={`flex-1 rounded-md py-2.5 text-[13px] font-medium transition ${
-                jours === n ? "bg-jaune text-noir" : "text-brume"
-              }`}
-            >
-              {n} jours
-            </button>
-          ))}
-        </div>
-
-        <div className="mb-2 flex items-baseline justify-between">
-          <span className="surtitre">Avancement</span>
-          <span className="chiffres text-[12px] text-brume">
-            {achetes.length} / {lignes.length} achetés
-          </span>
-        </div>
-        <Jauge pourcent={progression} />
-        <p className="mt-3 text-[12px] leading-relaxed text-brume-sombre">
-          Du {libelleDateCourt(date)} au {libelleDateCourt(ajouterJours(date, jours - 1))}.
-          Le déjeuner n'y figure pas : c'est ton repas libre.
-        </p>
-      </Carte>
-
-      {/* Ajout manuel */}
-      {formulaireOuvert ? (
-        <Carte className="apparition">
-          <TitreSection surtitre="Ajout" titre="Autre chose à prendre" />
-          <div className="space-y-3">
-            <input
-              value={nom}
-              onChange={(e) => setNom(e.target.value)}
-              placeholder="Produit (lessive, sac poubelle, café…)"
-              className="champ !font-sans !text-[14px]"
-            />
-            <input
-              value={quantite}
-              onChange={(e) => setQuantite(e.target.value)}
-              placeholder="Quantité (facultatif)"
-              className="champ !font-sans !text-[14px]"
-            />
-            <div className="flex gap-2">
-              <Bouton
-                variante="secondaire"
-                onClick={() => {
-                  setFormulaireOuvert(false);
-                  setNom("");
-                  setQuantite("");
-                }}
-              >
-                Annuler
-              </Bouton>
-              <Bouton
-                className="flex-1"
-                disabled={nom.trim() === ""}
-                onClick={async () => {
-                  await ajouterLigne({ nom, quantite, dateBesoin: date });
-                  setNom("");
-                  setQuantite("");
-                  setFormulaireOuvert(false);
-                }}
-              >
-                Ajouter
-              </Bouton>
+      {/* Les réglages restent sous les yeux pendant qu'on coche la liste. */}
+      <div className="grid items-start gap-5 lg:grid-cols-[320px_minmax(0,1fr)]">
+        <div className="space-y-5 lg:sticky lg:top-9">
+          {/* Période et avancement */}
+          <Carte>
+            <div className="mb-4 flex gap-1 rounded-lg border border-trait bg-ardoise p-1">
+              {[3, 7, 14].map((n) => (
+                <button
+                  key={n}
+                  onClick={() => setJours(n)}
+                  className={`flex-1 rounded-md py-2.5 text-[13px] font-medium transition ${
+                    jours === n ? "bg-jaune text-noir" : "text-brume"
+                  }`}
+                >
+                  {n} jours
+                </button>
+              ))}
             </div>
-          </div>
-        </Carte>
-      ) : (
-        <button
-          onClick={() => setFormulaireOuvert(true)}
-          className="flex w-full items-center gap-3 rounded-net border border-dashed border-trait bg-nuit px-4 py-3.5 text-left transition hover:border-jaune"
-        >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-trait text-brume-sombre">
-            <IconePlus className="h-4 w-4" />
-          </span>
-          <span className="text-[14px] text-brume">
-            Ajouter un produit à la main
-          </span>
-        </button>
-      )}
 
-      {/* Ce qu'il reste à acheter */}
-      {aAcheter.length === 0 ? (
-        <EtatVide
-          titre="Tout est coché"
-          detail="Rien à acheter pour la période choisie. La liste se remplira à nouveau quand de nouveaux menus arriveront."
-        />
-      ) : (
-        groupes.map((groupe) => (
-          <section key={groupe.niveau}>
-            <TitreSection
-              surtitre={`${groupe.lignes.length} produit${groupe.lignes.length > 1 ? "s" : ""}`}
-              titre={groupe.titre}
-              action={
-                groupe.niveau === 0 ? <Etiquette ton="jaune">Priorité</Etiquette> : null
-              }
-            />
-            <p className="mb-3 -mt-1 text-[12px] text-brume-sombre">
-              {groupe.detail}
+            <div className="mb-2 flex items-baseline justify-between">
+              <span className="surtitre">Avancement</span>
+              <span className="chiffres text-[12px] text-brume">
+                {achetes.length} / {lignes.length} achetés
+              </span>
+            </div>
+            <Jauge pourcent={progression} />
+            <p className="mt-3 text-[12px] leading-relaxed text-brume-sombre">
+              Du {libelleDateCourt(date)} au {libelleDateCourt(ajouterJours(date, jours - 1))}.
+              Le déjeuner n'y figure pas : c'est ton repas libre.
             </p>
-            <ul className="divide-y divide-trait overflow-hidden rounded-net border border-trait">
-              {groupe.lignes.map((ligne) => (
-                <LigneCourse
-                  key={ligne._id}
-                  ligne={ligne}
-                  onBasculer={() => basculer({ id: ligne._id, date })}
-                  onSupprimer={
-                    ligne.source === "manuel"
-                      ? () => supprimer({ id: ligne._id })
-                      : undefined
-                  }
-                />
-              ))}
-            </ul>
-          </section>
-        ))
-      )}
+          </Carte>
 
-      {/* Déjà acheté */}
-      {achetes.length > 0 && (
-        <section>
-          <TitreSection
-            surtitre={`${achetes.length} produit${achetes.length > 1 ? "s" : ""}`}
-            titre="Déjà acheté"
-            action={
-              <button
-                onClick={() => decocherTout({})}
-                className="text-[12px] text-brume transition hover:text-jaune"
-              >
-                Tout décocher
-              </button>
-            }
-          />
-          <ul className="divide-y divide-trait overflow-hidden rounded-net border border-trait opacity-60">
-            {achetes
-              .sort((a, b) => a.nom.localeCompare(b.nom))
-              .map((ligne) => (
-                <LigneCourse
-                  key={ligne._id}
-                  ligne={ligne}
-                  onBasculer={() => basculer({ id: ligne._id, date })}
-                  onSupprimer={
-                    ligne.source === "manuel"
-                      ? () => supprimer({ id: ligne._id })
-                      : undefined
+          {/* Ajout manuel */}
+          {formulaireOuvert ? (
+            <Carte className="apparition">
+              <TitreSection surtitre="Ajout" titre="Autre chose à prendre" />
+              <div className="space-y-3">
+                <input
+                  value={nom}
+                  onChange={(e) => setNom(e.target.value)}
+                  placeholder="Produit (lessive, sac poubelle, café…)"
+                  className="champ !font-sans !text-[14px]"
+                />
+                <input
+                  value={quantite}
+                  onChange={(e) => setQuantite(e.target.value)}
+                  placeholder="Quantité (facultatif)"
+                  className="champ !font-sans !text-[14px]"
+                />
+                <div className="flex gap-2">
+                  <Bouton
+                    variante="secondaire"
+                    onClick={() => {
+                      setFormulaireOuvert(false);
+                      setNom("");
+                      setQuantite("");
+                    }}
+                  >
+                    Annuler
+                  </Bouton>
+                  <Bouton
+                    className="flex-1"
+                    disabled={nom.trim() === ""}
+                    onClick={async () => {
+                      await ajouterLigne({ nom, quantite, dateBesoin: date });
+                      setNom("");
+                      setQuantite("");
+                      setFormulaireOuvert(false);
+                    }}
+                  >
+                    Ajouter
+                  </Bouton>
+                </div>
+              </div>
+            </Carte>
+          ) : (
+            <button
+              onClick={() => setFormulaireOuvert(true)}
+              className="flex w-full items-center gap-3 rounded-net border border-dashed border-trait bg-nuit px-4 py-3.5 text-left transition hover:border-jaune"
+            >
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-trait text-brume-sombre">
+                <IconePlus className="h-4 w-4" />
+              </span>
+              <span className="text-[14px] text-brume">
+                Ajouter un produit à la main
+              </span>
+            </button>
+          )}
+        </div>
+
+        <div className="space-y-5">
+          {/* Ce qu'il reste à acheter */}
+          {aAcheter.length === 0 ? (
+            <EtatVide
+              titre="Tout est coché"
+              detail="Rien à acheter pour la période choisie. La liste se remplira à nouveau quand de nouveaux menus arriveront."
+            />
+          ) : (
+            groupes.map((groupe) => (
+              <section key={groupe.niveau}>
+                <TitreSection
+                  surtitre={`${groupe.lignes.length} produit${groupe.lignes.length > 1 ? "s" : ""}`}
+                  titre={groupe.titre}
+                  action={
+                    groupe.niveau === 0 ? <Etiquette ton="jaune">Priorité</Etiquette> : null
                   }
                 />
-              ))}
-          </ul>
-        </section>
-      )}
+                <p className="mb-3 -mt-1 text-[12px] text-brume-sombre">
+                  {groupe.detail}
+                </p>
+                <ul className="divide-y divide-trait overflow-hidden rounded-net border border-trait">
+                  {groupe.lignes.map((ligne) => (
+                    <LigneCourse
+                      key={ligne._id}
+                      ligne={ligne}
+                      onBasculer={() => basculer({ id: ligne._id, date })}
+                      onSupprimer={
+                        ligne.source === "manuel"
+                          ? () => supprimer({ id: ligne._id })
+                          : undefined
+                      }
+                    />
+                  ))}
+                </ul>
+              </section>
+            ))
+          )}
+
+          {/* Déjà acheté */}
+          {achetes.length > 0 && (
+            <section>
+              <TitreSection
+                surtitre={`${achetes.length} produit${achetes.length > 1 ? "s" : ""}`}
+                titre="Déjà acheté"
+                action={
+                  <button
+                    onClick={() => decocherTout({})}
+                    className="text-[12px] text-brume transition hover:text-jaune"
+                  >
+                    Tout décocher
+                  </button>
+                }
+              />
+              <ul className="divide-y divide-trait overflow-hidden rounded-net border border-trait opacity-60">
+                {achetes
+                  .sort((a, b) => a.nom.localeCompare(b.nom))
+                  .map((ligne) => (
+                    <LigneCourse
+                      key={ligne._id}
+                      ligne={ligne}
+                      onBasculer={() => basculer({ id: ligne._id, date })}
+                      onSupprimer={
+                        ligne.source === "manuel"
+                          ? () => supprimer({ id: ligne._id })
+                          : undefined
+                      }
+                    />
+                  ))}
+              </ul>
+            </section>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

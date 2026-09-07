@@ -34,7 +34,7 @@ export default function PageConnexion() {
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-[560px] flex-col px-6 pb-10 pt-[max(3rem,env(safe-area-inset-top))]">
+    <main className="mx-auto flex min-h-dvh max-w-[560px] flex-col px-6 pb-10 pt-[max(3rem,env(safe-area-inset-top))] lg:justify-center lg:pb-16 lg:pt-16">
       <header>
         <div className="mb-6 h-1 w-14 rounded-full bg-jaune" />
         <h1 className="titre text-[44px] font-bold leading-[0.95] tracking-tight">
@@ -76,7 +76,7 @@ export default function PageConnexion() {
         </Bouton>
       </form>
 
-      <footer className="mt-auto pt-12 text-[11px] leading-relaxed text-brume-sombre">
+      <footer className="mt-auto pt-12 text-[11px] leading-relaxed text-brume-sombre lg:mt-14 lg:pt-0">
         Application privée, sans inscription. Les photos de repas servent
         uniquement à l&apos;estimation nutritionnelle.
       </footer>

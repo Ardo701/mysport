@@ -1,7 +1,8 @@
 # Cadence
 
 Application de suivi quotidien : séances de musculation, repas, grignotage et
-sommeil. Interface en français, pensée pour le téléphone.
+sommeil. Interface en français : colonne unique et barre d'onglets en bas sur
+téléphone, barre latérale et mise en page sur deux colonnes à partir de 1024 px.
 
 - **Séances** — programme de 12 semaines, 4 séances par semaine, orienté haut du
   corps. Chaque exercice existe en version **salle** (machines, charges libres)

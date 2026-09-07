@@ -343,7 +343,7 @@ export default function PageBienvenue() {
   const derniere = etape === etapes.length - 1;
 
   return (
-    <main className="mx-auto min-h-dvh max-w-[560px] px-6 pb-10 pt-[max(2rem,env(safe-area-inset-top))]">
+    <main className="mx-auto min-h-dvh max-w-[560px] px-6 pb-10 pt-[max(2rem,env(safe-area-inset-top))] lg:pb-16 lg:pt-16">
       <div className="mb-8 flex gap-1.5">
         {etapes.map((_, i) => (
           <span

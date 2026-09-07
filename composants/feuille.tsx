@@ -34,7 +34,7 @@ export function Feuille({
   if (!ouverte) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end">
+    <div className="fixed inset-0 z-50 flex flex-col justify-end lg:justify-center lg:p-8">
       <button
         aria-label="Fermer"
         onClick={onFermer}
@@ -44,7 +44,7 @@ export function Feuille({
         role="dialog"
         aria-modal="true"
         aria-label={titre}
-        className="apparition relative mx-auto flex max-h-[92dvh] w-full max-w-[560px] flex-col rounded-t-2xl border-x border-t border-trait bg-nuit"
+        className="apparition relative mx-auto flex max-h-[92dvh] w-full max-w-[560px] flex-col rounded-t-2xl border-x border-t border-trait bg-nuit lg:max-h-[84dvh] lg:rounded-2xl lg:border"
       >
         <div className="flex items-start justify-between gap-4 border-b border-trait px-5 py-4">
           <div>

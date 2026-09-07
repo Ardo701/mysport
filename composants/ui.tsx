@@ -174,13 +174,17 @@ export function EtatVide({
   titre,
   detail,
   action,
+  className = "",
 }: {
   titre: string;
   detail?: string;
   action?: ReactNode;
+  className?: string;
 }) {
   return (
-    <div className="rounded-net border border-dashed border-trait px-4 py-8 text-center">
+    <div
+      className={`rounded-net border border-dashed border-trait px-4 py-8 text-center ${className}`}
+    >
       <p className="titre text-[15px] font-medium">{titre}</p>
       {detail && (
         <p className="mx-auto mt-1.5 max-w-[34ch] text-[13px] leading-relaxed text-brume-sombre">
@@ -194,9 +198,11 @@ export function EtatVide({
 
 export function Message({
   ton = "info",
+  className = "",
   children,
 }: {
   ton?: "info" | "erreur" | "succes";
+  className?: string;
   children: ReactNode;
 }) {
   const tons = {
@@ -205,8 +211,76 @@ export function Message({
     succes: "border-vert/40 bg-vert/10 text-vert",
   };
   return (
-    <p className={`rounded-lg border px-3.5 py-3 text-[13px] leading-relaxed ${tons[ton]}`}>
+    <p
+      className={`rounded-lg border px-3.5 py-3 text-[13px] leading-relaxed ${tons[ton]} ${className}`}
+    >
       {children}
     </p>
+  );
+}
+
+/**
+ * Répartit une page en deux colonnes à partir du format ordinateur.
+ *
+ * `items-start` est essentiel : sans lui, les deux colonnes prendraient la
+ * hauteur de la plus longue et les cartes s'étireraient dans le vide.
+ */
+export function Colonnes({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`grid items-start gap-5 lg:grid-cols-2 ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+/** Pile verticale de sections, destinée à remplir une colonne. */
+export function Colonne({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <div className={`space-y-5 ${className}`}>{children}</div>;
+}
+
+/** En-tête de page : même respiration partout, plus généreuse sur ordinateur. */
+export function EnTetePage({
+  surtitre,
+  titre,
+  detail,
+  action,
+  avant,
+}: {
+  surtitre?: string;
+  titre: ReactNode;
+  detail?: ReactNode;
+  action?: ReactNode;
+  avant?: ReactNode;
+}) {
+  return (
+    <header className="pt-2 lg:pt-0">
+      {avant}
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          {surtitre && <p className="surtitre mb-2.5">{surtitre}</p>}
+          <h1 className="titre text-[28px] font-bold leading-none lg:text-[34px]">
+            {titre}
+          </h1>
+          {detail && (
+            <p className="mt-2.5 max-w-[62ch] text-[14px] leading-relaxed text-brume">
+              {detail}
+            </p>
+          )}
+        </div>
+        {action}
+      </div>
+    </header>
   );
 }

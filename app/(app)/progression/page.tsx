@@ -10,6 +10,8 @@ import {
   Carte,
   Champ,
   Chargement,
+  Colonne,
+  Colonnes,
   Message,
   TitreSection,
 } from "@/composants/ui";
@@ -79,19 +81,21 @@ export default function PageProgression() {
 
   return (
     <div className="space-y-5">
-      <header className="pt-2">
+      <header className="pt-2 lg:pt-0">
         <Link
           href="/"
-          className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-brume transition hover:text-craie"
+          className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-brume transition hover:text-craie lg:hidden"
         >
           <IconeChevronGauche className="h-4 w-4" />
           Aujourd'hui
         </Link>
         <p className="surtitre mb-2.5">Sur la durée</p>
-        <h1 className="titre text-[28px] font-bold leading-none">Progression</h1>
+        <h1 className="titre text-[28px] font-bold leading-none lg:text-[34px]">
+          Progression
+        </h1>
       </header>
 
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2 lg:grid-cols-4 lg:gap-3">
         <Stat
           libelle="Poids"
           valeur={derniere?.poidsKg ?? profil.poidsKg}
@@ -119,114 +123,120 @@ export default function PageProgression() {
         />
       </div>
 
-      {/* Courbe de poids */}
-      <Carte>
-        <TitreSection
-          surtitre="Poids"
-          titre="Évolution"
-          action={<IconeBalance className="h-5 w-5 text-jaune" />}
-        />
-        {mesures.length < 2 ? (
-          <p className="py-6 text-center text-[13px] text-brume-sombre">
-            Ajoute au moins deux pesées pour voir la courbe. Pèse-toi le matin, à
-            jeun, deux fois par semaine.
-          </p>
-        ) : (
-          <CourbePoids
-            points={mesures.map((m) => ({ date: m.date, valeur: m.poidsKg }))}
-          />
-        )}
-
-        <div className="mt-5 border-t border-trait pt-4">
-          <p className="surtitre mb-3">Nouvelle pesée</p>
-          <div className="grid grid-cols-2 gap-3">
-            <Champ
-              type="number"
-              inputMode="decimal"
-              step="0.1"
-              suffixe="kg"
-              placeholder="Poids"
-              value={poids}
-              onChange={(e) => {
-                setPoids(e.target.value);
-                setEtat("repos");
-              }}
+      <Colonnes>
+        <Colonne>
+          {/* Courbe de poids */}
+          <Carte>
+            <TitreSection
+              surtitre="Poids"
+              titre="Évolution"
+              action={<IconeBalance className="h-5 w-5 text-jaune" />}
             />
-            <Champ
-              type="number"
-              inputMode="decimal"
-              step="0.5"
-              suffixe="cm"
-              placeholder="Tour de taille"
-              value={taille}
-              onChange={(e) => {
-                setTaille(e.target.value);
-                setEtat("repos");
-              }}
-            />
-          </div>
-          <div className="mt-3">
-            <Bouton
-              taille="large"
-              disabled={poids === "" || etat === "envoi"}
-              onClick={ajouterMesure}
-            >
-              {etat === "envoi" ? "Enregistrement…" : "Enregistrer"}
-            </Bouton>
-          </div>
-          {etat === "ok" && (
-            <div className="mt-3">
-              <Message ton="succes">Pesée enregistrée.</Message>
-            </div>
-          )}
-          <p className="mt-3 text-[11px] leading-relaxed text-brume-sombre">
-            Le tour de taille est le meilleur indicateur pour le ventre et les
-            poignées d'amour : il bouge même quand la balance stagne.
-          </p>
-        </div>
-      </Carte>
+            {mesures.length < 2 ? (
+              <p className="py-6 text-center text-[13px] text-brume-sombre">
+                Ajoute au moins deux pesées pour voir la courbe. Pèse-toi le matin, à
+                jeun, deux fois par semaine.
+              </p>
+            ) : (
+              <CourbePoids
+                points={mesures.map((m) => ({ date: m.date, valeur: m.poidsKg }))}
+              />
+            )}
 
-      {/* Assiduité */}
-      <Carte>
-        <TitreSection surtitre="Régularité" titre="Séances par semaine" />
-        <AssiduiteHebdo
-          dateReference={date}
-          dates={terminees.map((s) => s.date)}
-          objectif={profil.joursParSemaine}
-        />
-      </Carte>
-
-      {/* Dernières séances */}
-      <section>
-        <TitreSection surtitre="Historique" titre="Dernières séances" />
-        {terminees.length === 0 ? (
-          <p className="rounded-net border border-dashed border-trait px-4 py-7 text-center text-[13px] text-brume-sombre">
-            Aucune séance terminée pour l'instant.
-          </p>
-        ) : (
-          <ul className="divide-y divide-trait overflow-hidden rounded-net border border-trait">
-            {terminees.slice(0, 10).map((s) => (
-              <li
-                key={s._id}
-                className="flex items-center gap-3 bg-nuit px-4 py-3"
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-[14px]">{s.seanceNom}</p>
-                  <p className="chiffres mt-0.5 text-[11px] text-brume-sombre">
-                    {libelleDateCourt(s.date)} · {s.series.filter((x) => x.fait).length}{" "}
-                    séries · {s.dureeMin ?? "?"} min
-                  </p>
+            <div className="mt-5 border-t border-trait pt-4">
+              <p className="surtitre mb-3">Nouvelle pesée</p>
+              <div className="grid grid-cols-2 gap-3">
+                <Champ
+                  type="number"
+                  inputMode="decimal"
+                  step="0.1"
+                  suffixe="kg"
+                  placeholder="Poids"
+                  value={poids}
+                  onChange={(e) => {
+                    setPoids(e.target.value);
+                    setEtat("repos");
+                  }}
+                />
+                <Champ
+                  type="number"
+                  inputMode="decimal"
+                  step="0.5"
+                  suffixe="cm"
+                  placeholder="Tour de taille"
+                  value={taille}
+                  onChange={(e) => {
+                    setTaille(e.target.value);
+                    setEtat("repos");
+                  }}
+                />
+              </div>
+              <div className="mt-3">
+                <Bouton
+                  taille="large"
+                  disabled={poids === "" || etat === "envoi"}
+                  onClick={ajouterMesure}
+                >
+                  {etat === "envoi" ? "Enregistrement…" : "Enregistrer"}
+                </Bouton>
+              </div>
+              {etat === "ok" && (
+                <div className="mt-3">
+                  <Message ton="succes">Pesée enregistrée.</Message>
                 </div>
-                {s.ressenti && (
-                  <span className="chiffres shrink-0 rounded-full border border-trait px-2.5 py-1 text-[11px] text-brume">
-                    RPE {s.ressenti}
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+              )}
+              <p className="mt-3 text-[11px] leading-relaxed text-brume-sombre">
+                Le tour de taille est le meilleur indicateur pour le ventre et les
+                poignées d'amour : il bouge même quand la balance stagne.
+              </p>
+            </div>
+          </Carte>
+
+          {/* Assiduité */}
+          <Carte>
+            <TitreSection surtitre="Régularité" titre="Séances par semaine" />
+            <AssiduiteHebdo
+              dateReference={date}
+              dates={terminees.map((s) => s.date)}
+              objectif={profil.joursParSemaine}
+            />
+          </Carte>
+        </Colonne>
+
+        <Colonne>
+          {/* Dernières séances */}
+          <section>
+            <TitreSection surtitre="Historique" titre="Dernières séances" />
+            {terminees.length === 0 ? (
+              <p className="rounded-net border border-dashed border-trait px-4 py-7 text-center text-[13px] text-brume-sombre">
+                Aucune séance terminée pour l'instant.
+              </p>
+            ) : (
+              <ul className="divide-y divide-trait overflow-hidden rounded-net border border-trait">
+                {terminees.slice(0, 10).map((s) => (
+                  <li
+                    key={s._id}
+                    className="flex items-center gap-3 bg-nuit px-4 py-3"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[14px]">{s.seanceNom}</p>
+                      <p className="chiffres mt-0.5 text-[11px] text-brume-sombre">
+                        {libelleDateCourt(s.date)} · {s.series.filter((x) => x.fait).length}{" "}
+                        séries · {s.dureeMin ?? "?"} min
+                      </p>
+                    </div>
+                    {s.ressenti && (
+                      <span className="chiffres shrink-0 rounded-full border border-trait px-2.5 py-1 text-[11px] text-brume">
+                        RPE {s.ressenti}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </Colonne>
+      </Colonnes>
     </div>
   );
 }

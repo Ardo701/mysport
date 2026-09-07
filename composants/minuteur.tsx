@@ -34,7 +34,7 @@ export function MinuteurRepos({
 
   return (
     <div
-      className="fixed inset-x-0 bottom-[76px] z-50 px-5"
+      className="fixed inset-x-0 bottom-[76px] z-50 px-5 lg:bottom-8 lg:left-[248px] lg:px-10"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       role="status"
       aria-live="polite"

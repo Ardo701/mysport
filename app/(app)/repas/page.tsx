@@ -12,6 +12,8 @@ import {
   Bouton,
   Carte,
   Chargement,
+  Colonne,
+  Colonnes,
   Etiquette,
   Message,
   TitreSection,
@@ -92,7 +94,7 @@ export default function PageRepas() {
   return (
     <div className="space-y-5">
       {/* Navigation par jour */}
-      <header className="flex items-center justify-between pt-2">
+      <header className="flex items-center justify-between pt-2 lg:pt-0">
         <button
           onClick={() => setDate(ajouterJours(date, -1))}
           aria-label="Jour précédent"
@@ -100,9 +102,9 @@ export default function PageRepas() {
         >
           <IconeChevronGauche className="h-4 w-4" />
         </button>
-        <div className="text-center">
+        <div className="text-center lg:order-first lg:mr-auto lg:text-left">
           <p className="surtitre mb-1.5">Journal alimentaire</p>
-          <h1 className="titre text-[20px] font-bold leading-none">
+          <h1 className="titre text-[20px] font-bold leading-none lg:text-[34px]">
             {libelleRelatif(date)}
           </h1>
         </div>
@@ -116,191 +118,197 @@ export default function PageRepas() {
         </button>
       </header>
 
-      {/* Bilan du jour */}
-      <Carte>
-        <div className="mb-4 flex items-end justify-between">
-          <div>
-            <p className="surtitre mb-2">Consommé</p>
-            <p className="chiffres titre text-[30px] font-bold leading-none">
-              {Math.round(totaux.kcal)}
-              <span className="ml-1.5 text-[13px] font-normal text-brume-sombre">
-                / {profil.kcalCible} kcal
-              </span>
-            </p>
-          </div>
-          <Etiquette ton={restantes > 0 ? "jaune" : "rouge"}>
-            {restantes > 0 ? `${restantes} restantes` : "Cible atteinte"}
-          </Etiquette>
-        </div>
-        <div className="space-y-3">
-          <BarreMacro
-            libelle="Protéines"
-            valeur={totaux.proteines}
-            cible={profil.proteinesCible}
-          />
-          <BarreMacro
-            libelle="Glucides"
-            valeur={totaux.glucides}
-            cible={profil.glucidesCible}
-            couleur="var(--color-brume)"
-          />
-          <BarreMacro
-            libelle="Lipides"
-            valeur={totaux.lipides}
-            cible={profil.lipidesCible}
-            couleur="var(--color-brume)"
-          />
-        </div>
-      </Carte>
-
-      {/* Liste de courses */}
-      <Link href="/courses" className="block">
-        <div className="flex items-center gap-3.5 rounded-net border border-trait bg-nuit px-4 py-3.5 transition hover:border-trait-clair">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-trait text-jaune">
-            <IconePanier className="h-4.5 w-4.5" />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block text-[14px] font-medium">Liste de courses</span>
-            <span className="mt-0.5 block text-[12px] text-brume-sombre">
-              Construite depuis tes menus, avec les dates d'achat
-            </span>
-          </span>
-          <IconeChevronDroite className="h-4 w-4 shrink-0 text-brume-sombre" />
-        </div>
-      </Link>
-
-      {/* Le déjeuner : photo ou description */}
-      <section>
-        <TitreSection surtitre="Le midi" titre="Repas libre" />
-        <Carte className="!border-jaune/30 !bg-jaune-voile">
-          <p className="text-[13px] leading-relaxed text-brume">
-            Tu ne suis pas de menu à midi. Prends une photo de ton assiette, ou
-            décris-la en une phrase : l'IA estime les calories et les macros, et le
-            reste de la journée s'ajuste autour.
-          </p>
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            <Bouton onClick={() => ouvrirAnalyseur("dejeuner")}>
-              <IconeAppareilPhoto className="h-4 w-4" />
-              Photo
-            </Bouton>
-            <Bouton variante="secondaire" onClick={() => ouvrirAnalyseur("dejeuner")}>
-              <IconeTexte className="h-4 w-4" />
-              Décrire
-            </Bouton>
-          </div>
-        </Carte>
-      </section>
-
-      {/* Grignotage et boissons */}
-      <section>
-        <TitreSection
-          surtitre="Entre les repas"
-          titre="Grignotage et boissons"
-          action={
-            <span className="chiffres text-[12px] text-brume-sombre">
-              {extras.reduce((s, r) => s + r.kcal, 0)} kcal
-            </span>
-          }
-        />
-        <button
-          onClick={() => setAjoutOuvert(true)}
-          className="flex w-full items-center gap-3.5 rounded-net border border-trait bg-nuit px-4 py-4 text-left transition hover:border-trait-clair"
-        >
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-jaune text-jaune">
-            <IconePlus className="h-4.5 w-4.5" />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block text-[14px] font-medium">
-              Ajouter ce que tu as pris à côté
-            </span>
-            <span className="mt-0.5 block text-[12px] leading-snug text-brume-sombre">
-              Café, soda, bière, chips, chocolat… tout ce qui n'est pas de l'eau
-              compte dans la journée.
-            </span>
-          </span>
-        </button>
-      </section>
-
-      {/* Menu programmé */}
-      <section>
-        <TitreSection
-          surtitre={menu.source === "ia" ? "Menu généré par l'IA" : "Menu programmé"}
-          titre="Matin, collation, soir"
-          action={
-            <button
-              onClick={regenerer}
-              disabled={generation}
-              className="flex items-center gap-1.5 text-[12px] text-brume transition hover:text-jaune disabled:opacity-50"
-            >
-              <IconeEclair className="h-3.5 w-3.5" />
-              {generation ? "Génération…" : "Régénérer"}
-            </button>
-          }
-        />
-
-        {erreur && <div className="mb-3"><Message ton="erreur">{erreur}</Message></div>}
-
-        <div className="space-y-3">
-          {TYPES_PROGRAMMES.map((type) => {
-            const plat = menu.repas.find((r) => r.type === type);
-            const dejaMange = journal.some((r) => r.type === type);
-            if (!plat) return null;
-            return (
-              <CartePlat
-                key={type}
-                plat={plat}
-                dejaMange={dejaMange}
-                onManger={async () => {
-                  await enregistrer({
-                    date,
-                    type,
-                    source: "menu",
-                    nom: plat.nom,
-                    kcal: plat.kcal,
-                    proteines: plat.proteines,
-                    glucides: plat.glucides,
-                    lipides: plat.lipides,
-                    heure: heureCourante(),
-                  });
-                }}
-                onAutre={() => ouvrirAnalyseur(type)}
+      <Colonnes>
+        <Colonne>
+          {/* Bilan du jour */}
+          <Carte>
+            <div className="mb-4 flex items-end justify-between">
+              <div>
+                <p className="surtitre mb-2">Consommé</p>
+                <p className="chiffres titre text-[30px] font-bold leading-none">
+                  {Math.round(totaux.kcal)}
+                  <span className="ml-1.5 text-[13px] font-normal text-brume-sombre">
+                    / {profil.kcalCible} kcal
+                  </span>
+                </p>
+              </div>
+              <Etiquette ton={restantes > 0 ? "jaune" : "rouge"}>
+                {restantes > 0 ? `${restantes} restantes` : "Cible atteinte"}
+              </Etiquette>
+            </div>
+            <div className="space-y-3">
+              <BarreMacro
+                libelle="Protéines"
+                valeur={totaux.proteines}
+                cible={profil.proteinesCible}
               />
-            );
-          })}
-        </div>
+              <BarreMacro
+                libelle="Glucides"
+                valeur={totaux.glucides}
+                cible={profil.glucidesCible}
+                couleur="var(--color-brume)"
+              />
+              <BarreMacro
+                libelle="Lipides"
+                valeur={totaux.lipides}
+                cible={profil.lipidesCible}
+                couleur="var(--color-brume)"
+              />
+            </div>
+          </Carte>
 
-        {menu.source === "ia" && (
-          <button
-            onClick={() => reinitialiserMenu({ date })}
-            className="mt-3 text-[12px] text-brume-sombre transition hover:text-craie"
-          >
-            Revenir au menu par défaut
-          </button>
-        )}
-      </section>
+          {/* Le déjeuner : photo ou description */}
+          <section>
+            <TitreSection surtitre="Le midi" titre="Repas libre" />
+            <Carte className="!border-jaune/30 !bg-jaune-voile">
+              <p className="text-[13px] leading-relaxed text-brume">
+                Tu ne suis pas de menu à midi. Prends une photo de ton assiette, ou
+                décris-la en une phrase : l'IA estime les calories et les macros, et le
+                reste de la journée s'ajuste autour.
+              </p>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <Bouton onClick={() => ouvrirAnalyseur("dejeuner")}>
+                  <IconeAppareilPhoto className="h-4 w-4" />
+                  Photo
+                </Bouton>
+                <Bouton variante="secondaire" onClick={() => ouvrirAnalyseur("dejeuner")}>
+                  <IconeTexte className="h-4 w-4" />
+                  Décrire
+                </Bouton>
+              </div>
+            </Carte>
+          </section>
 
-      {/* Journal */}
-      <section>
-        <TitreSection surtitre="Enregistré" titre="Journal du jour" />
-        {journal.length === 0 ? (
-          <p className="rounded-net border border-dashed border-trait px-4 py-7 text-center text-[13px] text-brume-sombre">
-            Rien d'enregistré pour l'instant.
-          </p>
-        ) : (
-          <ul className="space-y-2">
-            {journal
-              .slice()
-              .sort((a, b) => a.heure.localeCompare(b.heure))
-              .map((ligne) => (
-                <LigneJournal
-                  key={ligne._id}
-                  ligne={ligne}
-                  onSupprimer={() => supprimer({ id: ligne._id })}
-                />
-              ))}
-          </ul>
-        )}
-      </section>
+          {/* Grignotage et boissons */}
+          <section>
+            <TitreSection
+              surtitre="Entre les repas"
+              titre="Grignotage et boissons"
+              action={
+                <span className="chiffres text-[12px] text-brume-sombre">
+                  {extras.reduce((s, r) => s + r.kcal, 0)} kcal
+                </span>
+              }
+            />
+            <button
+              onClick={() => setAjoutOuvert(true)}
+              className="flex w-full items-center gap-3.5 rounded-net border border-trait bg-nuit px-4 py-4 text-left transition hover:border-trait-clair"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-jaune text-jaune">
+                <IconePlus className="h-4.5 w-4.5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[14px] font-medium">
+                  Ajouter ce que tu as pris à côté
+                </span>
+                <span className="mt-0.5 block text-[12px] leading-snug text-brume-sombre">
+                  Café, soda, bière, chips, chocolat… tout ce qui n'est pas de l'eau
+                  compte dans la journée.
+                </span>
+              </span>
+            </button>
+          </section>
+        </Colonne>
+
+        <Colonne>
+          {/* Menu programmé */}
+          <section>
+            <TitreSection
+              surtitre={menu.source === "ia" ? "Menu généré par l'IA" : "Menu programmé"}
+              titre="Matin, collation, soir"
+              action={
+                <button
+                  onClick={regenerer}
+                  disabled={generation}
+                  className="flex items-center gap-1.5 text-[12px] text-brume transition hover:text-jaune disabled:opacity-50"
+                >
+                  <IconeEclair className="h-3.5 w-3.5" />
+                  {generation ? "Génération…" : "Régénérer"}
+                </button>
+              }
+            />
+
+            {erreur && <div className="mb-3"><Message ton="erreur">{erreur}</Message></div>}
+
+            <div className="space-y-3">
+              {TYPES_PROGRAMMES.map((type) => {
+                const plat = menu.repas.find((r) => r.type === type);
+                const dejaMange = journal.some((r) => r.type === type);
+                if (!plat) return null;
+                return (
+                  <CartePlat
+                    key={type}
+                    plat={plat}
+                    dejaMange={dejaMange}
+                    onManger={async () => {
+                      await enregistrer({
+                        date,
+                        type,
+                        source: "menu",
+                        nom: plat.nom,
+                        kcal: plat.kcal,
+                        proteines: plat.proteines,
+                        glucides: plat.glucides,
+                        lipides: plat.lipides,
+                        heure: heureCourante(),
+                      });
+                    }}
+                    onAutre={() => ouvrirAnalyseur(type)}
+                  />
+                );
+              })}
+            </div>
+
+            {menu.source === "ia" && (
+              <button
+                onClick={() => reinitialiserMenu({ date })}
+                className="mt-3 text-[12px] text-brume-sombre transition hover:text-craie"
+              >
+                Revenir au menu par défaut
+              </button>
+            )}
+          </section>
+
+          {/* Journal */}
+          <section>
+            <TitreSection surtitre="Enregistré" titre="Journal du jour" />
+            {journal.length === 0 ? (
+              <p className="rounded-net border border-dashed border-trait px-4 py-7 text-center text-[13px] text-brume-sombre">
+                Rien d'enregistré pour l'instant.
+              </p>
+            ) : (
+              <ul className="space-y-2">
+                {journal
+                  .slice()
+                  .sort((a, b) => a.heure.localeCompare(b.heure))
+                  .map((ligne) => (
+                    <LigneJournal
+                      key={ligne._id}
+                      ligne={ligne}
+                      onSupprimer={() => supprimer({ id: ligne._id })}
+                    />
+                  ))}
+              </ul>
+            )}
+          </section>
+
+          {/* Liste de courses */}
+          <Link href="/courses" className="block">
+            <div className="flex items-center gap-3.5 rounded-net border border-trait bg-nuit px-4 py-3.5 transition hover:border-trait-clair">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-trait text-jaune">
+                <IconePanier className="h-4.5 w-4.5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[14px] font-medium">Liste de courses</span>
+                <span className="mt-0.5 block text-[12px] text-brume-sombre">
+                  Construite depuis tes menus, avec les dates d'achat
+                </span>
+              </span>
+              <IconeChevronDroite className="h-4 w-4 shrink-0 text-brume-sombre" />
+            </div>
+          </Link>
+        </Colonne>
+      </Colonnes>
 
       <AjoutRapide
         ouvert={ajoutOuvert}

@@ -47,15 +47,18 @@ export default function PageSeance() {
   if (!donnees?.seance) {
     return (
       <div className="space-y-5">
-        <header className="pt-2">
+        <header className="pt-2 lg:pt-0">
           <p className="surtitre mb-2.5">{libelleRelatif(date)}</p>
-          <h1 className="titre text-[28px] font-bold leading-none">Jour de repos</h1>
+          <h1 className="titre text-[28px] font-bold leading-none lg:text-[34px]">
+            Jour de repos
+          </h1>
         </header>
         <EtatVide
+          className="lg:max-w-[640px]"
           titre="Aucune séance programmée aujourd'hui"
           detail="La récupération fait partie du programme : c'est pendant le repos que le muscle se construit. Une marche de 30 minutes reste une bonne idée."
         />
-        <Carte>
+        <Carte className="lg:max-w-[640px]">
           <TitreSection surtitre="Rappel" titre="Ta semaine" />
           <p className="text-[13px] leading-relaxed text-brume">
             Tu peux déplacer tes créneaux d'entraînement depuis l'onglet Planning.
@@ -74,28 +77,30 @@ export default function PageSeance() {
 
   return (
     <div className="space-y-5">
-      <header className="pt-2">
-        <div className="mb-2.5 flex items-center justify-between">
+      <header className="pt-2 lg:pt-0">
+        <div className="mb-2.5 flex items-center justify-between lg:max-w-[640px]">
           <p className="surtitre">{libelleRelatif(date)}</p>
           <Etiquette ton="jaune">Semaine {semaine} / 12</Etiquette>
         </div>
-        <h1 className="titre text-[28px] font-bold leading-none">{seance.nom}</h1>
+        <h1 className="titre text-[28px] font-bold leading-none lg:text-[34px]">
+          {seance.nom}
+        </h1>
         <p className="mt-2 text-[14px] text-brume">{seance.focus}</p>
       </header>
 
       {log?.statut === "terminee" && (
-        <Message ton="succes">
+        <Message ton="succes" className="lg:max-w-[640px]">
           Séance validée : {seriesFaites} séries en {log.dureeMin} minutes. Bien joué.
         </Message>
       )}
       {log?.statut === "sautee" && (
-        <Message ton="erreur">
+        <Message ton="erreur" className="lg:max-w-[640px]">
           Séance marquée comme sautée. Rattrape-la demain si tu peux.
         </Message>
       )}
 
       {blocCourant && (
-        <Carte className="!border-jaune/25 !bg-jaune-voile">
+        <Carte className="!border-jaune/25 !bg-jaune-voile lg:max-w-[640px]">
           <div className="flex items-start gap-3">
             <IconeEclair className="mt-0.5 h-4 w-4 shrink-0 text-jaune" />
             <div>
@@ -109,7 +114,7 @@ export default function PageSeance() {
       )}
 
       {!log && (
-        <Carte>
+        <Carte className="lg:max-w-[640px]">
           <TitreSection surtitre="Avant de commencer" titre="Tu t'entraînes où ?" />
           <div className="mb-4 grid grid-cols-2 gap-2">
             {(
@@ -173,7 +178,7 @@ export default function PageSeance() {
 
       {log && log.statut !== "sautee" && (
         <>
-          <div className="sticky top-0 z-30 -mx-5 border-b border-trait bg-noir/90 px-5 py-3 backdrop-blur-xl">
+          <div className="sticky top-0 z-30 -mx-5 border-b border-trait bg-noir/90 px-5 py-3 backdrop-blur-xl lg:-mx-10 lg:px-10 xl:-mx-14 xl:px-14">
             <div className="mb-2 flex items-baseline justify-between">
               <span className="surtitre">Avancement</span>
               <span className="chiffres text-[12px] text-brume">
@@ -183,7 +188,7 @@ export default function PageSeance() {
             <Jauge pourcent={(seriesFaites / Math.max(1, seriesTotal)) * 100} />
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3 lg:grid lg:grid-cols-2 lg:items-start lg:gap-4 lg:space-y-0">
             {seance.exercices.map((exercice, i) => (
               <BlocExercice
                 key={exercice.id}
@@ -198,7 +203,7 @@ export default function PageSeance() {
           </div>
 
           {seance.finisher && (
-            <Carte>
+            <Carte className="lg:max-w-[640px]">
               <TitreSection surtitre="Pour finir" titre="Finisher" />
               <p className="text-[13px] leading-relaxed text-brume">
                 {seance.finisher}
@@ -210,7 +215,11 @@ export default function PageSeance() {
             (finalisation ? (
               <FormulaireFin logId={log._id} onAnnuler={() => setFinalisation(false)} />
             ) : (
-              <Bouton taille="large" onClick={() => setFinalisation(true)}>
+              <Bouton
+                taille="large"
+                className="lg:max-w-[640px]"
+                onClick={() => setFinalisation(true)}
+              >
                 Terminer la séance
               </Bouton>
             ))}
@@ -438,7 +447,7 @@ function FormulaireFin({
   const [notes, setNotes] = useState("");
 
   return (
-    <Carte className="apparition">
+    <Carte className="apparition lg:max-w-[640px]">
       <TitreSection surtitre="Bilan" titre="Comment c'était ?" />
       <div className="space-y-4">
         <label className="block">
