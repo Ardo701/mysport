@@ -32,12 +32,8 @@ export default function PageConnexion() {
     try {
       await signIn("password", { email, password: motDePasse, flow: mode });
       router.replace("/");
-    } catch {
-      setErreur(
-        mode === "signIn"
-          ? "Email ou mot de passe incorrect."
-          : "Impossible de créer le compte. Cet email est peut-être déjà utilisé.",
-      );
+    } catch (e) {
+      setErreur(messageErreur(e));
       setEnCours(false);
     }
   }
@@ -118,4 +114,37 @@ export default function PageConnexion() {
       </footer>
     </main>
   );
+}
+
+/**
+ * Traduit l'erreur remontée par Convex Auth. Les cas connus deviennent une
+ * phrase utile ; le reste est affiché tel quel, parce qu'un message générique
+ * envoie chercher au mauvais endroit — un compte peut très bien avoir été créé
+ * avant que la génération du jeton n'échoue.
+ */
+function messageErreur(erreur: unknown): string {
+  const brut = erreur instanceof Error ? erreur.message : String(erreur);
+
+  if (brut.includes("already exists")) {
+    return "Un compte existe déjà avec cet email. Utilise « Se connecter ».";
+  }
+  if (brut.includes("InvalidAccountId")) {
+    return "Aucun compte n'existe avec cet email.";
+  }
+  if (brut.includes("InvalidSecret")) {
+    return "Mot de passe incorrect.";
+  }
+  if (brut.includes("TooManyFailedAttempts")) {
+    return "Trop de tentatives. Attends quelques minutes avant de réessayer.";
+  }
+
+  const variable = brut.match(/Missing environment variable `?([A-Z_]+)`?/);
+  if (variable) {
+    return `Le serveur n'est pas configuré : la variable ${variable[1]} manque côté Convex. Lance « npx @convex-dev/auth » sur le déploiement concerné.`;
+  }
+  if (brut.includes("Server Error")) {
+    return "Erreur côté serveur. Le message exact est dans les logs du tableau de bord Convex.";
+  }
+
+  return brut || "Erreur inconnue.";
 }
