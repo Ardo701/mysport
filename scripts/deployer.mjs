@@ -66,9 +66,17 @@ function variablesExistantes() {
 }
 
 function definir(nom, valeur) {
-  // Les valeurs ne transitent jamais par un shell : pas de guillemets à gérer,
-  // et rien de secret dans les logs de build.
-  convex(["env", "set", nom, valeur], { silencieux: true });
+  try {
+    // Le séparateur « -- » est indispensable : une clé privée PKCS#8 commence
+    // par « -----BEGIN », que l'analyseur d'options prendrait pour un drapeau.
+    convex(["env", "set", "--", nom, valeur], { silencieux: true });
+  } catch (erreur) {
+    // L'erreur d'execFileSync contient la ligne de commande, donc la valeur.
+    // On ne la laisse jamais atteindre le journal de build.
+    throw new Error(
+      `Échec de l'écriture de ${nom} côté Convex (code ${erreur.status ?? "inconnu"}).`,
+    );
+  }
   journal(`${nom} définie.`);
 }
 
