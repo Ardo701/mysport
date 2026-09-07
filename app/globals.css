@@ -1,0 +1,156 @@
+@import "tailwindcss";
+
+@theme {
+  --color-noir: #08080a;
+  --color-nuit: #0e0e11;
+  --color-ardoise: #16161a;
+  --color-ardoise-clair: #1e1e24;
+  --color-trait: #26262e;
+  --color-trait-clair: #33333d;
+  --color-craie: #f4f4f2;
+  --color-brume: #9a9aa6;
+  --color-brume-sombre: #6b6b78;
+  --color-jaune: #ffdd00;
+  --color-jaune-sombre: #d9bb00;
+  --color-jaune-voile: #ffdd0014;
+  --color-vert: #6ee7a8;
+  --color-rouge: #ff6b5e;
+
+  --font-titre: var(--police-titre), "Helvetica Neue", Arial, sans-serif;
+  --font-sans: var(--police-corps), "Helvetica Neue", Arial, sans-serif;
+
+  --radius-net: 10px;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background-color: var(--color-noir);
+  color: var(--color-craie);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior-y: none;
+}
+
+/* Rien en serif nulle part, y compris dans les champs natifs. */
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+}
+
+/* Chiffres alignés : les compteurs ne sautent pas quand la valeur change. */
+.chiffres {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.titre {
+  font-family: var(--font-titre);
+  letter-spacing: -0.02em;
+}
+
+.surtitre {
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-brume-sombre);
+  font-weight: 600;
+}
+
+/* Trame discrète en fond de page, pour casser l'aplat noir. */
+.grain {
+  background-image:
+    radial-gradient(
+      120% 80% at 50% -10%,
+      rgba(255, 221, 0, 0.07) 0%,
+      rgba(255, 221, 0, 0) 60%
+    ),
+    linear-gradient(var(--color-noir), var(--color-noir));
+}
+
+.carte {
+  background-color: var(--color-nuit);
+  border: 1px solid var(--color-trait);
+  border-radius: var(--radius-net);
+}
+
+.champ {
+  width: 100%;
+  background-color: var(--color-ardoise);
+  border: 1px solid var(--color-trait);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 16px; /* évite le zoom automatique sur iOS */
+  color: var(--color-craie);
+  outline: none;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease;
+}
+
+.champ::placeholder {
+  color: var(--color-brume-sombre);
+}
+
+.champ:focus {
+  border-color: var(--color-jaune);
+  background-color: var(--color-ardoise-clair);
+}
+
+/* Champs heure et date : on garde l'indicateur natif lisible sur fond sombre. */
+input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(0.7);
+  cursor: pointer;
+}
+
+@keyframes pulsation {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.pulsation {
+  animation: pulsation 1.4s ease-in-out infinite;
+}
+
+@keyframes apparition {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.apparition {
+  animation: apparition 260ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .apparition,
+  .pulsation {
+    animation: none;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}

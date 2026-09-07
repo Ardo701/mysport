@@ -1,0 +1,14 @@
+{
+  "name": "Cadence — sport, repas et sommeil",
+  "short_name": "Cadence",
+  "description": "Suivi quotidien des séances, des repas et du sommeil.",
+  "lang": "fr",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#08080a",
+  "theme_color": "#08080a",
+  "icons": [
+    { "src": "/icone.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
