@@ -47,6 +47,18 @@ button {
   font-family: inherit;
 }
 
+/* Pas de fonte à empattements, même pour le code : on garde la police du texte
+   et on distingue par la couleur et le fond. */
+code {
+  font-family: inherit;
+  font-size: 0.94em;
+  background-color: var(--color-ardoise);
+  border: 1px solid var(--color-trait);
+  border-radius: 5px;
+  padding: 1px 5px;
+  white-space: nowrap;
+}
+
 /* Chiffres alignés : les compteurs ne sautent pas quand la valeur change. */
 .chiffres {
   font-variant-numeric: tabular-nums;
