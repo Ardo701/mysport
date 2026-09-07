@@ -11,7 +11,6 @@ export default function PageConnexion() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const router = useRouter();
 
-  const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
   const [email, setEmail] = useState("");
   const [motDePasse, setMotDePasse] = useState("");
   const [erreur, setErreur] = useState<string | null>(null);
@@ -24,13 +23,9 @@ export default function PageConnexion() {
   async function envoyer(e: React.FormEvent) {
     e.preventDefault();
     setErreur(null);
-    if (mode === "signUp" && motDePasse.length < 8) {
-      setErreur("Le mot de passe doit faire au moins 8 caractères.");
-      return;
-    }
     setEnCours(true);
     try {
-      await signIn("password", { email, password: motDePasse, flow: mode });
+      await signIn("password", { email, password: motDePasse, flow: "signIn" });
       router.replace("/");
     } catch (e) {
       setErreur(messageErreur(e));
@@ -51,31 +46,8 @@ export default function PageConnexion() {
         </p>
       </header>
 
-      <form onSubmit={envoyer} className="mt-9 space-y-3.5">
-        <div className="mb-5 flex gap-1 rounded-lg border border-trait bg-ardoise p-1">
-          {(
-            [
-              ["signIn", "Se connecter"],
-              ["signUp", "Créer un compte"],
-            ] as const
-          ).map(([cle, libelle]) => (
-            <button
-              key={cle}
-              type="button"
-              onClick={() => {
-                setMode(cle);
-                setErreur(null);
-              }}
-              className={`flex-1 rounded-md py-2.5 text-[13px] font-medium transition ${
-                mode === cle
-                  ? "bg-jaune text-noir"
-                  : "text-brume hover:text-craie"
-              }`}
-            >
-              {libelle}
-            </button>
-          ))}
-        </div>
+      <form onSubmit={envoyer} className="mt-10 space-y-3.5">
+        <p className="surtitre mb-5">Connexion</p>
 
         <Champ
           libelle="Email"
@@ -90,27 +62,23 @@ export default function PageConnexion() {
         <Champ
           libelle="Mot de passe"
           type="password"
-          autoComplete={mode === "signIn" ? "current-password" : "new-password"}
+          autoComplete="current-password"
           required
           value={motDePasse}
           onChange={(e) => setMotDePasse(e.target.value)}
-          placeholder={mode === "signUp" ? "8 caractères minimum" : "••••••••"}
+          placeholder="••••••••"
         />
 
         {erreur && <Message ton="erreur">{erreur}</Message>}
 
         <Bouton type="submit" taille="large" disabled={enCours} className="mt-2">
-          {enCours
-            ? "Un instant…"
-            : mode === "signIn"
-              ? "Entrer"
-              : "Créer mon compte"}
+          {enCours ? "Un instant…" : "Entrer"}
         </Bouton>
       </form>
 
       <footer className="mt-auto pt-12 text-[11px] leading-relaxed text-brume-sombre">
-        Tes données restent sur ton compte. Les photos de repas servent uniquement
-        à l'estimation nutritionnelle.
+        Application privée, sans inscription. Les photos de repas servent
+        uniquement à l&apos;estimation nutritionnelle.
       </footer>
     </main>
   );
@@ -119,14 +87,13 @@ export default function PageConnexion() {
 /**
  * Traduit l'erreur remontée par Convex Auth. Les cas connus deviennent une
  * phrase utile ; le reste est affiché tel quel, parce qu'un message générique
- * envoie chercher au mauvais endroit — un compte peut très bien avoir été créé
- * avant que la génération du jeton n'échoue.
+ * envoie chercher au mauvais endroit.
  */
 function messageErreur(erreur: unknown): string {
   const brut = erreur instanceof Error ? erreur.message : String(erreur);
 
-  if (brut.includes("already exists")) {
-    return "Un compte existe déjà avec cet email. Utilise « Se connecter ».";
+  if (brut.includes("InscriptionsFermees")) {
+    return "Les inscriptions sont fermées : seuls les comptes existants peuvent se connecter.";
   }
   if (brut.includes("InvalidAccountId")) {
     return "Aucun compte n'existe avec cet email.";
@@ -140,7 +107,7 @@ function messageErreur(erreur: unknown): string {
 
   const variable = brut.match(/Missing environment variable `?([A-Z_]+)`?/);
   if (variable) {
-    return `Le serveur n'est pas configuré : la variable ${variable[1]} manque côté Convex. Lance « npx @convex-dev/auth » sur le déploiement concerné.`;
+    return `Le serveur n'est pas configuré : la variable ${variable[1]} manque côté Convex.`;
   }
   if (brut.includes("Server Error")) {
     return "Erreur côté serveur. Le message exact est dans les logs du tableau de bord Convex.";

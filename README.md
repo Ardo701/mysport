@@ -30,7 +30,7 @@ sommeil. Interface en français, pensée pour le téléphone.
 | Application | Next.js 16 (App Router, React 19) |
 | Styles | Tailwind CSS 4, palette noir et jaune, tout en sans-serif |
 | Base de données et temps réel | Convex |
-| Authentification | Convex Auth (email et mot de passe) |
+| Authentification | Convex Auth (email et mot de passe), inscriptions fermées |
 | IA | OpenAI (vision pour les photos, texte pour les descriptions et la génération de programmes et de menus) |
 | Hébergement | Vercel |
 
@@ -112,6 +112,15 @@ convex/
   schema.ts       modèle de données
 lib/              utilitaires côté client
 ```
+
+## Accès
+
+L'application est privée : il n'y a pas d'écran d'inscription, et la création de
+compte est refusée côté serveur par le point d'entrée `createOrUpdateUser` de
+`convex/auth.ts` — retirer le formulaire seul aurait laissé l'API ouverte.
+
+Pour créer le premier compte d'un déploiement neuf, ou en ouvrir un autre,
+retirer temporairement ce point d'entrée, se connecter, puis le remettre.
 
 ## Précision
 
