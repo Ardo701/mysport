@@ -58,6 +58,13 @@ npx convex env set OPENAI_MODEL gpt-4o
 
 En production, `SITE_URL` vaut l'URL Vercel du projet.
 
+`JWT_PRIVATE_KEY` et `JWKS` ne se récupèrent nulle part : ce sont une clé privée
+et sa clé publique, créées à la volée par `npx @convex-dev/auth`, qui les écrit
+directement dans le déploiement Convex. Une paire distincte par déploiement.
+Si cette commande ne peut pas tourner, `node scripts/generer-cles-auth.mjs`
+produit exactement les mêmes valeurs, à coller dans les variables
+d'environnement du déploiement depuis le tableau de bord Convex.
+
 ### Lancer l'application
 
 ```bash
