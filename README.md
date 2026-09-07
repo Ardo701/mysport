@@ -74,17 +74,26 @@ npx convex dev  # dans un autre, pour synchroniser les fonctions Convex
 
 ## Déploiement sur Vercel
 
-1. Importer le dépôt dans Vercel.
-2. Ajouter `CONVEX_DEPLOY_KEY` aux variables d'environnement du projet, avec la
-   clé de production générée depuis le tableau de bord Convex.
-3. La commande de build est déjà fixée par `vercel.json` :
-   `npx convex deploy --cmd 'npm run build'`. Elle déploie les fonctions Convex,
-   puis construit l'application en lui injectant `NEXT_PUBLIC_CONVEX_URL`.
-4. Après le premier déploiement, pointer `SITE_URL` sur l'URL Vercel :
-   `npx convex env set SITE_URL https://mon-app.vercel.app --prod`
+La commande de build est fixée par `vercel.json` : `node scripts/deployer.mjs`.
+Ce script fait tout le travail de configuration à chaque déploiement, sans rien
+écraser de ce qui existe déjà :
 
-La clé OpenAI ne va **pas** dans Vercel : les appels partent des actions Convex,
-jamais du serveur Next.
+1. génère la paire `JWT_PRIVATE_KEY` / `JWKS` de Convex Auth si elle manque ;
+2. cale `SITE_URL` sur l'URL du déploiement Vercel ;
+3. recopie `OPENAI_API_KEY` des variables Vercel vers Convex ;
+4. déploie les fonctions Convex, puis construit l'application en lui injectant
+   `NEXT_PUBLIC_CONVEX_URL`.
+
+Deux valeurs seulement sont à saisir une fois dans Vercel (Settings →
+Environment Variables), parce qu'elles n'existent que dans tes comptes :
+
+| Variable | Où la prendre |
+| --- | --- |
+| `CONVEX_DEPLOY_KEY` | tableau de bord Convex → Settings → Deploy keys |
+| `OPENAI_API_KEY` | tableau de bord OpenAI |
+
+Tout le reste est posé par le script. Si l'une des deux manque, le journal de
+build de Vercel le dit explicitement.
 
 ## Organisation du code
 

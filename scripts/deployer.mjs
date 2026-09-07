@@ -1,0 +1,124 @@
+/**
+ * Commande de build exécutée par Vercel.
+ *
+ * Elle prépare le déploiement Convex avant de construire l'application, pour
+ * qu'aucune configuration ne reste à faire à la main :
+ *
+ *   1. génère la paire de clés de Convex Auth si elle manque ;
+ *   2. cale SITE_URL sur l'URL du déploiement Vercel ;
+ *   3. recopie OPENAI_API_KEY depuis les variables Vercel vers Convex ;
+ *   4. déploie les fonctions Convex, puis lance le build Next.
+ *
+ * Rien n'est écrasé : chaque variable déjà présente côté Convex est laissée
+ * telle quelle. Regénérer les clés déconnecterait tous les comptes.
+ */
+
+import { execFileSync } from "node:child_process";
+import { exportJWK, exportPKCS8, generateKeyPair } from "jose";
+
+const journal = (message) => console.log(`[deploiement] ${message}`);
+
+function convex(args, { silencieux = false } = {}) {
+  return execFileSync("npx", ["convex", ...args], {
+    encoding: "utf8",
+    stdio: silencieux ? ["ignore", "pipe", "pipe"] : ["ignore", "pipe", "inherit"],
+  });
+}
+
+if (!process.env.CONVEX_DEPLOY_KEY) {
+  console.error(
+    "\n[deploiement] CONVEX_DEPLOY_KEY est absente des variables d'environnement.\n" +
+      "Sans elle, impossible de savoir vers quel déploiement Convex publier.\n" +
+      "Ajoute-la dans Vercel : Settings > Environment Variables.\n" +
+      "La clé se génère dans le tableau de bord Convex : Settings > Deploy keys.\n",
+  );
+  process.exit(1);
+}
+
+/**
+ * Noms des variables déjà définies sur le déploiement Convex ciblé.
+ *
+ * Un déploiement neuf répond une liste vide, ce qui est légitime. En revanche
+ * un échec de la commande n'est jamais interprété comme « aucune variable » :
+ * on s'arrêterait sinon à regénérer des clés déjà en place, ce qui
+ * déconnecterait tous les comptes existants.
+ */
+function variablesExistantes() {
+  let sortie;
+  try {
+    sortie = convex(["env", "list"], { silencieux: true });
+  } catch (erreur) {
+    console.error(
+      "\n[deploiement] Impossible de lire les variables du déploiement Convex.\n" +
+        "La clé CONVEX_DEPLOY_KEY est peut-être invalide, ou le déploiement " +
+        "injoignable.\n" +
+        (erreur.stderr ? `\n${erreur.stderr}\n` : ""),
+    );
+    process.exit(1);
+  }
+
+  const noms = new Set();
+  for (const ligne of sortie.split("\n")) {
+    const separateur = ligne.indexOf("=");
+    if (separateur > 0) noms.add(ligne.slice(0, separateur).trim());
+  }
+  return noms;
+}
+
+function definir(nom, valeur) {
+  // Les valeurs ne transitent jamais par un shell : pas de guillemets à gérer,
+  // et rien de secret dans les logs de build.
+  convex(["env", "set", nom, valeur], { silencieux: true });
+  journal(`${nom} définie.`);
+}
+
+const existantes = variablesExistantes();
+
+// 1. Clés de signature des sessions. Les deux vont ensemble : si l'une manque,
+//    la paire entière est régénérée, sinon les jetons seraient invérifiables.
+if (!existantes.has("JWT_PRIVATE_KEY") || !existantes.has("JWKS")) {
+  journal("Clés de Convex Auth absentes, génération d'une paire RS256.");
+  const paire = await generateKeyPair("RS256", { extractable: true });
+  const clePrivee = await exportPKCS8(paire.privateKey);
+  const clePublique = await exportJWK(paire.publicKey);
+
+  definir("JWT_PRIVATE_KEY", clePrivee.trimEnd().replace(/\n/g, " "));
+  definir("JWKS", JSON.stringify({ keys: [{ use: "sig", ...clePublique }] }));
+} else {
+  journal("Clés de Convex Auth déjà en place.");
+}
+
+// 2. Adresse publique de l'application, utilisée par Convex Auth.
+const domaine =
+  process.env.VERCEL_ENV === "production"
+    ? process.env.VERCEL_PROJECT_PRODUCTION_URL
+    : process.env.VERCEL_URL;
+
+if (domaine && (process.env.VERCEL_ENV === "production" || !existantes.has("SITE_URL"))) {
+  definir("SITE_URL", `https://${domaine}`);
+} else if (!existantes.has("SITE_URL")) {
+  journal("SITE_URL inconnue : ni URL Vercel ni valeur déjà définie.");
+}
+
+// 3. La clé OpenAI est saisie dans Vercel ; les actions Convex la lisent depuis
+//    leur propre environnement, il faut donc la recopier.
+if (process.env.OPENAI_API_KEY && !existantes.has("OPENAI_API_KEY")) {
+  definir("OPENAI_API_KEY", process.env.OPENAI_API_KEY);
+} else if (existantes.has("OPENAI_API_KEY")) {
+  journal("OPENAI_API_KEY déjà présente côté Convex, laissée telle quelle.");
+} else {
+  journal(
+    "OPENAI_API_KEY absente : l'application fonctionnera, mais l'analyse des " +
+      "repas par photo ou par description restera en erreur.",
+  );
+}
+
+if (process.env.OPENAI_MODEL && !existantes.has("OPENAI_MODEL")) {
+  definir("OPENAI_MODEL", process.env.OPENAI_MODEL);
+}
+
+// 4. Publication des fonctions Convex, puis build de l'application.
+journal("Déploiement des fonctions Convex et build de l'application.");
+execFileSync("npx", ["convex", "deploy", "--cmd", "npm run build"], {
+  stdio: "inherit",
+});
