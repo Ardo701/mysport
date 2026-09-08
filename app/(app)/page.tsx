@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 import { api } from "@/convex/_generated/api";
-import { Anneau, BarreMacro, Jauge, Stat } from "@/composants/jauges";
+import { BarreMacro, Compteur, Jauge, Stat } from "@/composants/jauges";
 import {
   Bouton,
   Carte,
@@ -76,10 +76,10 @@ export default function PageAujourdhui() {
       : null;
 
   return (
-    <div className="space-y-5">
-      <header className="pt-2 lg:pt-0">
+    <div className="space-y-8">
+      <header className="mb-10 pt-1 lg:mb-12 lg:pt-0">
         <p className="surtitre mb-2.5">{libelleDate(date)}</p>
-        <h1 className="titre text-[28px] font-bold leading-none lg:text-[34px]">
+        <h1 className="titre text-[30px] font-bold leading-[0.95] tracking-[-0.03em] lg:text-[38px]">
           {salutation()}, {profil.prenom}.
         </h1>
       </header>
@@ -89,35 +89,33 @@ export default function PageAujourdhui() {
       <Colonnes>
         <Colonne>
           {/* Calories et macros */}
-          <Carte className="!p-5">
-            <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-center sm:gap-6">
-              <Anneau valeur={totaux.kcal} cible={effort.kcalCible} />
-              <div className="w-full flex-1 space-y-3.5">
-                <BarreMacro
-                  libelle="Protéines"
-                  valeur={totaux.proteines}
-                  cible={profil.proteinesCible}
-                />
-                <BarreMacro
-                  libelle="Glucides"
-                  valeur={totaux.glucides}
-                  cible={profil.glucidesCible}
-                  couleur="var(--color-brume)"
-                />
-                <BarreMacro
-                  libelle="Lipides"
-                  valeur={totaux.lipides}
-                  cible={profil.lipidesCible}
-                  couleur="var(--color-brume)"
-                />
-              </div>
+          <section>
+            <TitreSection titre="Énergie" />
+            <Compteur valeur={totaux.kcal} cible={effort.kcalCible} />
+            <div className="mt-6 space-y-2.5">
+              <BarreMacro
+                libelle="Protéines"
+                valeur={totaux.proteines}
+                cible={profil.proteinesCible}
+              />
+              <BarreMacro
+                libelle="Glucides"
+                valeur={totaux.glucides}
+                cible={profil.glucidesCible}
+                couleur="var(--color-brume)"
+              />
+              <BarreMacro
+                libelle="Lipides"
+                valeur={totaux.lipides}
+                cible={profil.lipidesCible}
+                couleur="var(--color-brume)"
+              />
             </div>
-          </Carte>
+          </section>
 
           {/* Séance du jour */}
           <section>
             <TitreSection
-              surtitre="Entraînement"
               titre="Séance du jour"
               action={
                 seance?.semaine ? (
@@ -127,7 +125,7 @@ export default function PageAujourdhui() {
             />
             {seance?.seance ? (
               <Link href="/seance" className="block">
-                <Carte className="transition hover:border-trait-vif">
+                <Carte className="border-t border-trait px-1 py-3.5 transition-colors hover:border-trait-vif">
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
                       <div className="mb-2 flex items-center gap-2">
@@ -194,12 +192,11 @@ export default function PageAujourdhui() {
           {/* Repas */}
           <section>
             <TitreSection
-              surtitre="Nutrition"
               titre="Repas du jour"
               action={
                 <Link
                   href="/repas"
-                  className="text-[13px] text-brume transition hover:text-jaune"
+                  className="text-[13px] text-brume transition-colors hover:text-jaune"
                 >
                   Tout voir
                 </Link>
@@ -214,16 +211,16 @@ export default function PageAujourdhui() {
 
                 return (
                   <Link key={type} href="/repas" className="block">
-                    <div className="flex items-center gap-3.5 rounded-net border border-trait bg-surface px-4 py-3.5 transition hover:border-trait-vif">
+                    <div className="flex items-center gap-3.5 border-t border-trait px-4 py-3.5 transition-colors hover:border-trait-vif">
+                      {/* Repas pris ou non : un carré plein suffit, l'icône
+                          d'assiette se répétait sur chaque ligne sans rien
+                          distinguer. */}
                       <span
-                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border ${
-                          fait
-                            ? "border-jaune bg-jaune-vif text-sur-jaune"
-                            : "border-trait text-brume-faible"
+                        aria-hidden="true"
+                        className={`h-1.5 w-1.5 shrink-0 ${
+                          fait ? "bg-jaune-vif" : "border border-trait-vif"
                         }`}
-                      >
-                        <IconeAssiette className="h-4 w-4" />
-                      </span>
+                      />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-baseline gap-2">
                           <p className="text-[14px] font-medium leading-tight">
@@ -268,10 +265,7 @@ export default function PageAujourdhui() {
 
           {/* Courses */}
           <Link href="/courses" className="block">
-            <div className="flex items-center gap-3.5 rounded-net border border-trait bg-surface px-4 py-3.5 transition hover:border-trait-vif">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-trait text-jaune">
-                <IconePanier className="h-4.5 w-4.5" />
-              </span>
+            <div className="flex items-center gap-3.5 border-t border-trait px-4 py-3.5 transition-colors hover:border-trait-vif">
               <span className="min-w-0 flex-1">
                 <span className="block text-[14px] font-medium">Liste de courses</span>
                 <span className="mt-0.5 block text-[12px] text-brume-faible">
@@ -290,9 +284,9 @@ export default function PageAujourdhui() {
         <Colonne>
           {/* Sommeil */}
           <section>
-            <TitreSection surtitre="Récupération" titre="Nuit dernière" />
+            <TitreSection titre="Nuit dernière" />
             <Link href="/sommeil" className="block">
-              <Carte className="transition hover:border-trait-vif">
+              <Carte className="border-t border-trait px-1 py-3.5 transition-colors hover:border-trait-vif">
                 {nuit ? (
                   <>
                     <div className="flex items-end justify-between">
@@ -349,7 +343,7 @@ export default function PageAujourdhui() {
                 }
               />
               <Link href="/progression" className="block">
-                <div className="flex h-full items-center justify-between rounded-net border border-trait bg-creux px-3.5 py-3 transition hover:border-trait-vif">
+                <div className="flex h-full items-center justify-between border-t border-trait px-3.5 py-3 transition-colors hover:border-trait-vif">
                   <div>
                     <p className="surtitre mb-2">Suivi</p>
                     <p className="titre text-[15px] font-semibold leading-none">

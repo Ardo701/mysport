@@ -4,7 +4,7 @@ import { useAction, useMutation } from "convex/react";
 import { useRef, useState } from "react";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
-import { Bouton, Etiquette, Message } from "./ui";
+import { Bouton, Etiquette, Message, Onglets } from "./ui";
 import { Feuille } from "./feuille";
 import { IconeAppareilPhoto, IconeEclair, IconeTexte } from "./icones";
 import { heureCourante } from "@/lib/dates";
@@ -163,28 +163,17 @@ export function AnalyseurRepas({
     >
       {!analyse && (
         <div className="space-y-5">
-          <div className="flex gap-1 rounded-lg border border-trait bg-creux p-1">
-            {(
-              [
-                ["photo", "Photo", IconeAppareilPhoto],
-                ["texte", "Décrire", IconeTexte],
-              ] as const
-            ).map(([cle, libelle, Icone]) => (
-              <button
-                key={cle}
-                onClick={() => {
-                  setOnglet(cle);
-                  setErreur(null);
-                }}
-                className={`flex flex-1 items-center justify-center gap-2 rounded-md py-2.5 text-[13px] font-medium transition ${
-                  onglet === cle ? "bg-jaune-vif text-sur-jaune" : "text-brume"
-                }`}
-              >
-                <Icone className="h-4 w-4" />
-                {libelle}
-              </button>
-            ))}
-          </div>
+          <Onglets
+            options={[
+              { cle: "photo", libelle: "Photo", Icone: IconeAppareilPhoto },
+              { cle: "texte", libelle: "Décrire", Icone: IconeTexte },
+            ]}
+            valeur={onglet}
+            onChange={(cle) => {
+              setOnglet(cle);
+              setErreur(null);
+            }}
+          />
 
           <div>
             <span className="surtitre mb-2 block">Quel repas ?</span>
@@ -193,7 +182,7 @@ export function AnalyseurRepas({
                 <button
                   key={t.cle}
                   onClick={() => setType(t.cle)}
-                  className={`rounded-lg border px-1 py-2.5 text-[11px] leading-tight transition ${
+                  className={`rounded-doux border px-1 py-2.5 text-[11px] leading-tight transition-colors ${
                     type === t.cle
                       ? "border-jaune bg-jaune-voile text-encre"
                       : "border-trait bg-creux text-brume-faible"
@@ -220,14 +209,14 @@ export function AnalyseurRepas({
               />
               <button
                 onClick={() => champFichier.current?.click()}
-                className="flex w-full flex-col items-center justify-center gap-3 rounded-net border border-dashed border-trait bg-creux px-4 py-10 transition hover:border-jaune"
+                className="flex w-full flex-col items-center justify-center gap-3 border border-dashed border-trait px-4 py-10 transition-colors hover:border-jaune"
               >
                 {apercu ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={apercu}
                     alt="Aperçu du repas"
-                    className="max-h-56 w-full rounded-lg object-cover"
+                    className="max-h-56 w-full rounded-doux object-cover"
                   />
                 ) : (
                   <>
@@ -244,7 +233,7 @@ export function AnalyseurRepas({
               {apercu && (
                 <button
                   onClick={() => champFichier.current?.click()}
-                  className="text-[12px] text-brume transition hover:text-jaune"
+                  className="text-[12px] text-brume transition-colors hover:text-jaune"
                 >
                   Reprendre la photo
                 </button>
@@ -314,7 +303,7 @@ export function AnalyseurRepas({
             ].map(([libelle, valeur, unite]) => (
               <div
                 key={libelle as string}
-                className="rounded-lg border border-trait bg-creux px-2 py-3 text-center"
+                className="rounded-doux border border-trait bg-creux px-2 py-3 text-center"
               >
                 <p className="chiffres titre text-[19px] font-semibold leading-none">
                   {valeur}
@@ -329,7 +318,7 @@ export function AnalyseurRepas({
 
           <div>
             <p className="surtitre mb-2.5">Ce que l'IA a reconnu</p>
-            <ul className="divide-y divide-trait overflow-hidden rounded-net border border-trait">
+            <ul className="divide-y divide-trait overflow-hidden border-t border-trait">
               {analyse.aliments.map((a, i) => (
                 <li
                   key={i}

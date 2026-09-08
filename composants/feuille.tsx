@@ -44,7 +44,7 @@ export function Feuille({
         role="dialog"
         aria-modal="true"
         aria-label={titre}
-        className="apparition relative mx-auto flex max-h-[92dvh] w-full max-w-[560px] flex-col rounded-t-2xl border-x border-t border-trait bg-surface lg:max-h-[84dvh] lg:rounded-2xl lg:border"
+        className="apparition relative mx-auto flex max-h-[92dvh] w-full max-w-[560px] flex-col rounded-none border-x border-t border-trait bg-surface lg:max-h-[84dvh] lg:rounded-doux lg:border"
       >
         <div className="flex items-start justify-between gap-4 border-b border-trait px-5 py-4">
           <div>
@@ -54,7 +54,7 @@ export function Feuille({
           <button
             onClick={onFermer}
             aria-label="Fermer"
-            className="-mr-1 -mt-1 p-1 text-brume transition hover:text-encre"
+            className="-mr-1 -mt-1 p-1 text-brume transition-colors hover:text-encre"
           >
             <IconeCroix className="h-5 w-5" />
           </button>

@@ -133,6 +133,29 @@ lib/              utilitaires côté client
 scripts/          déploiement Vercel et génération des icônes
 ```
 
+## Parti pris visuel
+
+L'application se tient au vocabulaire d'un instrument de mesure : ce sont les
+chiffres qui portent la page, tout le reste s'efface.
+
+- **Deux rayons, pas plus.** `rounded-net` vaut 0 — panneaux, listes et jauges
+  se coupent droit — et `rounded-doux` vaut 3 px, réservé à ce qu'on touche.
+  Rien n'est arrondi au-delà, et plus rien n'est en pastille.
+- **Pas de boîtes.** Un bloc se délimite par son titre suivi d'un filet jusqu'à
+  la marge (`TitreSection`), et les lignes de liste par un filet en tête. Les
+  cartes remplies et encadrées empilaient trois signaux pour dire une seule
+  chose.
+- **Un seul niveau de titre par bloc.** Le surtitre en capitales *et* le titre
+  répétaient la même information sous deux tailles.
+- **Le jaune ne marque qu'une famille de choses** : l'avancement et le geste
+  principal. Les onglets se soulignent au lieu de s'allumer, la page courante
+  de la barre latérale se marque d'un filet dans la marge.
+- **Colonnes inégales** (rapport 1,4) : une colonne de lecture et sa marge,
+  plutôt que deux moitiés qui n'ont jamais le même contenu.
+- **Aucun ornement** : pas de halo de fond, pas d'anneau de progression, pas
+  d'icône décorative dans les listes — elles restent à la navigation et aux
+  actions.
+
 ## Couleurs et thèmes
 
 Les jetons de `app/globals.css` portent leur **rôle**, pas leur teinte : `fond`,

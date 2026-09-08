@@ -9,9 +9,10 @@ import {
   Bouton,
   Carte,
   Chargement,
-  Etiquette,
   EtatVide,
+  Etiquette,
   Message,
+  Onglets,
   TitreSection,
 } from "@/composants/ui";
 import { Jauge } from "@/composants/jauges";
@@ -46,10 +47,10 @@ export default function PageSeance() {
 
   if (!donnees?.seance) {
     return (
-      <div className="space-y-5">
-        <header className="pt-2 lg:pt-0">
+      <div className="space-y-8">
+        <header className="mb-10 pt-1 lg:mb-12 lg:pt-0">
           <p className="surtitre mb-2.5">{libelleRelatif(date)}</p>
-          <h1 className="titre text-[28px] font-bold leading-none lg:text-[34px]">
+          <h1 className="titre text-[30px] font-bold leading-[0.95] tracking-[-0.03em] lg:text-[38px]">
             Jour de repos
           </h1>
         </header>
@@ -59,7 +60,7 @@ export default function PageSeance() {
           detail="La récupération fait partie du programme : c'est pendant le repos que le muscle se construit. Une marche de 30 minutes reste une bonne idée."
         />
         <Carte className="lg:max-w-[640px]">
-          <TitreSection surtitre="Rappel" titre="Ta semaine" />
+          <TitreSection titre="Ta semaine" />
           <p className="text-[13px] leading-relaxed text-brume">
             Tu peux déplacer tes créneaux d'entraînement depuis l'onglet Planning.
           </p>
@@ -77,12 +78,12 @@ export default function PageSeance() {
 
   return (
     <div className="space-y-5">
-      <header className="pt-2 lg:pt-0">
+      <header className="mb-10 pt-1 lg:mb-12 lg:pt-0">
         <div className="mb-2.5 flex items-center justify-between lg:max-w-[640px]">
           <p className="surtitre">{libelleRelatif(date)}</p>
           <Etiquette ton="jaune">Semaine {semaine} / 12</Etiquette>
         </div>
-        <h1 className="titre text-[28px] font-bold leading-none lg:text-[34px]">
+        <h1 className="titre text-[30px] font-bold leading-[0.95] tracking-[-0.03em] lg:text-[38px]">
           {seance.nom}
         </h1>
         <p className="mt-2 text-[14px] text-brume">{seance.focus}</p>
@@ -100,7 +101,7 @@ export default function PageSeance() {
       )}
 
       {blocCourant && (
-        <Carte className="!border-jaune/25 !bg-jaune-voile lg:max-w-[640px]">
+        <Carte className="border-l-2 border-l-jaune py-1 pl-4 lg:max-w-[640px]">
           <div className="flex items-start gap-3">
             <IconeEclair className="mt-0.5 h-4 w-4 shrink-0 text-jaune" />
             <div>
@@ -115,7 +116,7 @@ export default function PageSeance() {
 
       {!log && (
         <Carte className="lg:max-w-[640px]">
-          <TitreSection surtitre="Avant de commencer" titre="Tu t'entraînes où ?" />
+          <TitreSection titre="Tu t'entraînes où ?" />
           <div className="mb-4 grid grid-cols-2 gap-2">
             {(
               [
@@ -126,7 +127,7 @@ export default function PageSeance() {
               <button
                 key={cle}
                 onClick={() => setVarianteParDefaut(cle)}
-                className={`rounded-lg border px-3 py-3 text-left transition ${
+                className={`rounded-doux border px-3 py-3 text-left transition-colors ${
                   varianteParDefaut === cle
                     ? "border-jaune bg-jaune-voile"
                     : "border-trait bg-creux"
@@ -204,7 +205,7 @@ export default function PageSeance() {
 
           {seance.finisher && (
             <Carte className="lg:max-w-[640px]">
-              <TitreSection surtitre="Pour finir" titre="Finisher" />
+              <TitreSection titre="Finisher" />
               <p className="text-[13px] leading-relaxed text-brume">
                 {seance.finisher}
               </p>
@@ -279,34 +280,22 @@ function BlocExercice({
           </p>
         </div>
         {toutesFaites && (
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-jaune-vif text-sur-jaune">
-            <IconeCoche className="h-3.5 w-3.5" />
-          </span>
+          <IconeCoche className="h-4 w-4 shrink-0 text-jaune" />
         )}
       </div>
 
       {/* Bascule salle / maison */}
-      <div className="mt-3.5 flex gap-1 rounded-lg border border-trait bg-creux p-1">
-        {(
-          [
-            ["salle", "Avec machine"],
-            ["maison", "Sans machine"],
-          ] as const
-        ).map(([cle, libelle]) => (
-          <button
-            key={cle}
-            disabled={verrouille}
-            onClick={() =>
-              choisirVariante({ logId: log._id, exerciceId: exercice.id, variante: cle })
-            }
-            className={`flex-1 rounded-md py-2 text-[12px] font-medium transition disabled:opacity-50 ${
-              variante === cle ? "bg-jaune-vif text-sur-jaune" : "text-brume"
-            }`}
-          >
-            {libelle}
-          </button>
-        ))}
-      </div>
+      <Onglets
+        className="mt-3.5"
+        options={[
+          { cle: "salle", libelle: "Avec machine", desactive: verrouille },
+          { cle: "maison", libelle: "Sans machine", desactive: verrouille },
+        ]}
+        valeur={variante}
+        onChange={(cle) =>
+          choisirVariante({ logId: log._id, exerciceId: exercice.id, variante: cle })
+        }
+      />
 
       <button
         onClick={() => setDetailOuvert((v) => !v)}
@@ -317,7 +306,7 @@ function BlocExercice({
         </p>
       </button>
       {detailOuvert && (
-        <div className="apparition mt-2.5 space-y-2 rounded-lg border border-trait bg-creux p-3.5">
+        <div className="apparition mt-2.5 space-y-2 rounded-doux border border-trait bg-creux p-3.5">
           <p className="text-[13px] leading-relaxed text-brume">{detail.execution}</p>
           <p className="border-t border-trait pt-2.5 text-[12px] leading-relaxed text-brume-faible">
             {exercice.conseil}
@@ -389,7 +378,7 @@ function LigneSerie({
 
   return (
     <div
-      className={`flex items-center gap-2 rounded-lg border px-2.5 py-2 transition ${
+      className={`flex items-center gap-2 rounded-doux border px-2.5 py-2 transition-colors ${
         serie.fait ? "border-jaune/30 bg-jaune-voile" : "border-trait bg-creux"
       }`}
     >
@@ -405,7 +394,7 @@ function LigneSerie({
         onChange={(e) => setPoids(e.target.value)}
         placeholder="kg"
         aria-label={`Charge série ${serie.index + 1}`}
-        className="chiffres w-full min-w-0 rounded-md border border-trait bg-fond px-2.5 py-2 text-center text-[15px] outline-none focus:border-jaune"
+        className="chiffres w-full min-w-0 rounded-doux border border-trait bg-fond px-2.5 py-2 text-center text-[15px] outline-none focus:border-jaune"
       />
       <span className="shrink-0 text-[12px] text-brume-faible">×</span>
       <input
@@ -416,13 +405,13 @@ function LigneSerie({
         onChange={(e) => setReps(e.target.value)}
         placeholder="reps"
         aria-label={`Répétitions série ${serie.index + 1}`}
-        className="chiffres w-full min-w-0 rounded-md border border-trait bg-fond px-2.5 py-2 text-center text-[15px] outline-none focus:border-jaune"
+        className="chiffres w-full min-w-0 rounded-doux border border-trait bg-fond px-2.5 py-2 text-center text-[15px] outline-none focus:border-jaune"
       />
       <button
         onClick={basculer}
         disabled={verrouille}
         aria-label={serie.fait ? "Annuler la série" : "Valider la série"}
-        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md border transition disabled:opacity-50 ${
+        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-doux border transition-colors disabled:opacity-50 ${
           serie.fait
             ? "border-jaune bg-jaune-vif text-sur-jaune"
             : "border-trait text-brume-faible hover:border-jaune hover:text-jaune"
@@ -448,7 +437,7 @@ function FormulaireFin({
 
   return (
     <Carte className="apparition lg:max-w-[640px]">
-      <TitreSection surtitre="Bilan" titre="Comment c'était ?" />
+      <TitreSection titre="Comment c'était ?" />
       <div className="space-y-4">
         <label className="block">
           <span className="surtitre mb-2 block">Durée</span>
@@ -473,7 +462,7 @@ function FormulaireFin({
               <button
                 key={n}
                 onClick={() => setRessenti(n)}
-                className={`chiffres flex-1 rounded-lg border py-3 text-[15px] transition ${
+                className={`chiffres flex-1 rounded-doux border py-3 text-[15px] transition-colors ${
                   ressenti === n
                     ? "border-jaune bg-jaune-vif text-sur-jaune font-semibold"
                     : "border-trait bg-creux text-brume"

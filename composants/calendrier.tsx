@@ -3,7 +3,7 @@
 import { useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 import { api } from "@/convex/_generated/api";
-import { Carte, Etiquette, TitreSection } from "@/composants/ui";
+import { Carte, Etiquette, Onglets, TitreSection } from "@/composants/ui";
 import {
   IconeChevronDroite,
   IconeChevronGauche,
@@ -101,7 +101,7 @@ export function Calendrier({
           {date !== today && (
             <button
               onClick={() => setDate(today)}
-              className="rounded-lg border border-trait bg-creux px-3 py-2 text-[12px] text-brume transition hover:border-jaune hover:text-encre"
+              className="rounded-doux border border-trait bg-creux px-3 py-2 text-[12px] text-brume transition-colors hover:border-jaune hover:text-encre"
             >
               Aujourd'hui
             </button>
@@ -109,34 +109,21 @@ export function Calendrier({
           <button
             onClick={() => decaler(-1)}
             aria-label="Période précédente"
-            className="rounded-lg border border-trait bg-creux p-2 text-brume transition hover:text-encre"
+            className="rounded-doux border border-trait bg-creux p-2 text-brume transition-colors hover:text-encre"
           >
             <IconeChevronGauche className="h-4 w-4" />
           </button>
           <button
             onClick={() => decaler(1)}
             aria-label="Période suivante"
-            className="rounded-lg border border-trait bg-creux p-2 text-brume transition hover:text-encre"
+            className="rounded-doux border border-trait bg-creux p-2 text-brume transition-colors hover:text-encre"
           >
             <IconeChevronDroite className="h-4 w-4" />
           </button>
         </div>
       </div>
 
-      <div className="mb-4 flex gap-1 rounded-lg border border-trait bg-creux p-1 sm:max-w-[400px]">
-        {VUES.map((v) => (
-          <button
-            key={v.cle}
-            onClick={() => setVue(v.cle)}
-            aria-pressed={vue === v.cle}
-            className={`flex-1 rounded-md py-2.5 text-[13px] font-medium transition ${
-              vue === v.cle ? "bg-jaune-vif text-sur-jaune" : "text-brume hover:text-encre"
-            }`}
-          >
-            {v.libelle}
-          </button>
-        ))}
-      </div>
+      <Onglets className="mb-5" options={VUES} valeur={vue} onChange={setVue} />
 
       {vue === "jour" && (
         <VueJour
@@ -211,7 +198,7 @@ function VueJour({
             </span>
             <span className="flex flex-col items-center">
               <span
-                className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${COULEUR_POINT[e.nature]}`}
+                className={`mt-[7px] h-1.5 w-1.5 shrink-0 ${COULEUR_POINT[e.nature]}`}
               />
               {i < evenements.length - 1 && (
                 <span className="w-px flex-1 bg-trait" aria-hidden="true" />
@@ -272,7 +259,7 @@ function VueSemaine({
             key={jour}
             onClick={() => onChoisir(jour)}
             aria-pressed={choisi}
-            className={`rounded-net border p-3 text-left transition ${
+            className={`rounded-net border p-3 text-left transition-colors ${
               choisi
                 ? "border-jaune bg-jaune-voile"
                 : entrainement
@@ -359,7 +346,7 @@ function VueMois({
               onClick={() => onChoisir(jour)}
               aria-pressed={choisi}
               aria-label={libelleDate(jour)}
-              className={`flex aspect-square flex-col items-center justify-center gap-1.5 rounded-lg border transition ${
+              className={`flex aspect-square flex-col items-center justify-center gap-1.5 rounded-doux border transition-colors ${
                 choisi
                   ? "border-jaune bg-jaune-voile"
                   : dansLeMois
@@ -380,7 +367,7 @@ function VueMois({
               </span>
               <span
                 aria-hidden="true"
-                className={`h-1.5 w-1.5 rounded-full ${
+                className={`h-1.5 w-1.5 ${
                   !creneau
                     ? "bg-transparent"
                     : statut === "terminee"
@@ -421,7 +408,7 @@ function ResumeJour({
         <p className="text-[14px] font-medium">{libelleRelatif(date)}</p>
         <button
           onClick={onOuvrir}
-          className="shrink-0 text-[12px] text-brume transition hover:text-jaune"
+          className="shrink-0 text-[12px] text-brume transition-colors hover:text-jaune"
         >
           Voir la journée
         </button>

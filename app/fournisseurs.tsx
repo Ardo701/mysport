@@ -31,7 +31,6 @@ export function Fournisseurs({ children }: { children: ReactNode }) {
 function ConfigurationManquante() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-[560px] flex-col justify-center px-6 py-12">
-      <div className="mb-6 h-1 w-14 rounded-full bg-jaune-vif" />
       <h1 className="titre text-[28px] font-bold leading-tight">
         Configuration incomplète
       </h1>

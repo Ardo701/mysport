@@ -103,13 +103,13 @@ export default function PageRepas() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-8">
       {/* Navigation par jour */}
       <header className="flex items-center justify-between pt-2 lg:pt-0">
         <button
           onClick={() => setDate(ajouterJours(date, -1))}
           aria-label="Jour précédent"
-          className="rounded-lg border border-trait bg-creux p-2 text-brume transition hover:text-encre"
+          className="rounded-doux border border-trait bg-creux p-2 text-brume transition-colors hover:text-encre"
         >
           <IconeChevronGauche className="h-4 w-4" />
         </button>
@@ -123,7 +123,7 @@ export default function PageRepas() {
           onClick={() => setDate(ajouterJours(date, 1))}
           aria-label="Jour suivant"
           disabled={date >= aujourdhuiISO()}
-          className="rounded-lg border border-trait bg-creux p-2 text-brume transition hover:text-encre disabled:opacity-30"
+          className="rounded-doux border border-trait bg-creux p-2 text-brume transition-colors hover:text-encre disabled:opacity-30"
         >
           <IconeChevronDroite className="h-4 w-4" />
         </button>
@@ -170,8 +170,8 @@ export default function PageRepas() {
 
           {/* Le déjeuner : photo ou description */}
           <section>
-            <TitreSection surtitre="Le midi" titre="Repas libre" />
-            <Carte className="!border-jaune/30 !bg-jaune-voile">
+            <TitreSection titre="Repas libre" />
+            <Carte className="border-l-2 border-l-jaune py-1 pl-4">
               <p className="text-[13px] leading-relaxed text-brume">
                 Tu ne suis pas de menu à midi. Prends une photo de ton assiette, ou
                 décris-la en une phrase : l'IA estime les calories et les macros, et le
@@ -193,7 +193,6 @@ export default function PageRepas() {
           {/* Grignotage et boissons */}
           <section>
             <TitreSection
-              surtitre="Entre les repas"
               titre="Grignotage et boissons"
               action={
                 <span className="chiffres text-[12px] text-brume-faible">
@@ -203,11 +202,9 @@ export default function PageRepas() {
             />
             <button
               onClick={() => setAjoutOuvert(true)}
-              className="flex w-full items-center gap-3.5 rounded-net border border-trait bg-surface px-4 py-4 text-left transition hover:border-trait-vif"
+              className="flex w-full items-center gap-3.5 border-t border-trait px-4 py-4 text-left transition-colors hover:border-trait-vif"
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-jaune text-jaune">
-                <IconePlus className="h-4.5 w-4.5" />
-              </span>
+              <IconePlus className="h-4 w-4 shrink-0 text-jaune" />
               <span className="min-w-0 flex-1">
                 <span className="block text-[14px] font-medium">
                   Ajouter ce que tu as pris à côté
@@ -225,17 +222,19 @@ export default function PageRepas() {
           {/* Menu programmé */}
           <section>
             <TitreSection
-              surtitre={menu.source === "ia" ? "Menu généré par l'IA" : "Menu programmé"}
               titre="Matin, collation, soir"
               action={
-                <button
-                  onClick={regenerer}
-                  disabled={generation}
-                  className="flex items-center gap-1.5 text-[12px] text-brume transition hover:text-jaune disabled:opacity-50"
-                >
-                  <IconeEclair className="h-3.5 w-3.5" />
-                  {generation ? "Génération…" : "Régénérer"}
-                </button>
+                <span className="flex items-center gap-3">
+                  {menu.source === "ia" && <Etiquette ton="jaune">IA</Etiquette>}
+                  <button
+                    onClick={regenerer}
+                    disabled={generation}
+                    className="flex items-center gap-1.5 text-[12px] text-brume transition-colors hover:text-jaune disabled:opacity-50"
+                  >
+                    <IconeEclair className="h-3.5 w-3.5" />
+                    {generation ? "Génération…" : "Régénérer"}
+                  </button>
+                </span>
               }
             />
 
@@ -273,7 +272,7 @@ export default function PageRepas() {
             {menu.source === "ia" && (
               <button
                 onClick={() => reinitialiserMenu({ date })}
-                className="mt-3 text-[12px] text-brume-faible transition hover:text-encre"
+                className="mt-3 text-[12px] text-brume-faible transition-colors hover:text-encre"
               >
                 Revenir au menu par défaut
               </button>
@@ -282,9 +281,9 @@ export default function PageRepas() {
 
           {/* Journal */}
           <section>
-            <TitreSection surtitre="Enregistré" titre="Journal du jour" />
+            <TitreSection titre="Journal du jour" />
             {journal.length === 0 ? (
-              <p className="rounded-net border border-dashed border-trait px-4 py-7 text-center text-[13px] text-brume-faible">
+              <p className="border border-dashed border-trait px-4 py-7 text-center text-[13px] text-brume-faible">
                 Rien d'enregistré pour l'instant.
               </p>
             ) : (
@@ -305,10 +304,7 @@ export default function PageRepas() {
 
           {/* Liste de courses */}
           <Link href="/courses" className="block">
-            <div className="flex items-center gap-3.5 rounded-net border border-trait bg-surface px-4 py-3.5 transition hover:border-trait-vif">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-trait text-jaune">
-                <IconePanier className="h-4.5 w-4.5" />
-              </span>
+            <div className="flex items-center gap-3.5 border-t border-trait px-4 py-3.5 transition-colors hover:border-trait-vif">
               <span className="min-w-0 flex-1">
                 <span className="block text-[14px] font-medium">Liste de courses</span>
                 <span className="mt-0.5 block text-[12px] text-brume-faible">
@@ -374,13 +370,13 @@ function CartePlat({
 
       <button
         onClick={() => setOuvert((v) => !v)}
-        className="mt-3 text-[12px] text-brume-faible transition hover:text-encre"
+        className="mt-3 text-[12px] text-brume-faible transition-colors hover:text-encre"
       >
         {ouvert ? "Masquer la recette" : "Voir la recette"}
       </button>
 
       {ouvert && (
-        <div className="apparition mt-3 space-y-4 rounded-lg border border-trait bg-creux p-3.5">
+        <div className="apparition mt-3 space-y-4 rounded-doux border border-trait bg-creux p-3.5">
           <div>
             <p className="surtitre mb-2.5">Ingrédients</p>
             <ul className="space-y-1.5">
@@ -443,7 +439,7 @@ function LigneJournal({
   const [ouvert, setOuvert] = useState(false);
 
   return (
-    <li className="overflow-hidden rounded-net border border-trait bg-surface">
+    <li className="overflow-hidden border-t border-trait">
       <div className="flex items-center gap-3 px-4 py-3">
         <button
           onClick={() => setOuvert((v) => !v)}
@@ -468,7 +464,7 @@ function LigneJournal({
         <button
           onClick={onSupprimer}
           aria-label="Supprimer ce repas"
-          className="shrink-0 p-1 text-brume-faible transition hover:text-rouge"
+          className="shrink-0 p-1 text-brume-faible transition-colors hover:text-rouge"
         >
           <IconeCorbeille className="h-4 w-4" />
         </button>
@@ -524,7 +520,7 @@ function PhotoRepas({
     <img
       src={url}
       alt={nom}
-      className="max-h-48 w-full rounded-lg border border-trait object-cover"
+      className="max-h-48 w-full rounded-doux border border-trait object-cover"
     />
   );
 }

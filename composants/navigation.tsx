@@ -84,7 +84,7 @@ export function BarreNavigation() {
               >
                 <span
                   aria-hidden="true"
-                  className={`absolute inset-x-5 top-0 h-[2px] rounded-full transition-opacity ${
+                  className={`absolute inset-x-0 top-0 h-[2px] transition-opacity ${
                     actif ? "bg-jaune-vif opacity-100" : "opacity-0"
                   }`}
                 />
@@ -115,46 +115,44 @@ export function BarreLaterale({ prenom }: { prenom?: string }) {
 
   return (
     <aside className="fixed inset-y-0 left-0 z-40 hidden w-[248px] flex-col border-r border-trait bg-surface lg:flex">
-      <div className="px-6 pb-7 pt-8">
-        <div className="mb-4 h-1 w-9 rounded-full bg-jaune-vif" />
-        <p className="titre text-[22px] font-bold leading-none">Cadence</p>
-        <p className="mt-2 text-[12px] text-brume-faible">
+      <div className="border-b border-trait px-6 pb-6 pt-8">
+        <p className="titre text-[21px] font-bold leading-none tracking-[-0.03em]">
+          Cadence
+        </p>
+        <p className="mt-2 text-[11px] text-brume-faible">
           Sport, repas et sommeil
         </p>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-4 pb-6">
+      <nav className="flex-1 overflow-y-auto py-6">
         {GROUPES.map((groupe) => (
-          <div key={groupe.titre} className="mb-6 last:mb-0">
-            <p className="surtitre mb-2 px-3">{groupe.titre}</p>
-            <ul className="space-y-0.5">
+          <div key={groupe.titre} className="mb-7 last:mb-0">
+            <p className="surtitre mb-2.5 px-6">{groupe.titre}</p>
+            <ul>
               {groupe.onglets.map(({ href, libelle, Icone }) => {
                 const actif = estActif(chemin, href);
                 return (
                   <li key={href}>
+                    {/* La page courante se marque au filet, dans la marge :
+                        un aplat de couleur derrière chaque ligne active
+                        alourdit une colonne qu'on lit en permanence. */}
                     <Link
                       href={href}
                       aria-current={actif ? "page" : undefined}
-                      className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-[14px] leading-none transition ${
+                      className={`group flex items-center gap-3 border-l-2 py-2.5 pl-[22px] pr-6 text-[13.5px] leading-none transition-colors ${
                         actif
-                          ? "bg-jaune-voile text-encre"
-                          : "text-brume hover:bg-creux hover:text-encre"
+                          ? "border-l-jaune-vif text-encre"
+                          : "border-l-transparent text-brume hover:text-encre"
                       }`}
                     >
                       <Icone
-                        className={`h-[18px] w-[18px] shrink-0 transition-colors ${
+                        className={`h-4 w-4 shrink-0 transition-colors ${
                           actif
-                            ? "text-jaune"
+                            ? "text-encre"
                             : "text-brume-faible group-hover:text-brume"
                         }`}
                       />
                       {libelle}
-                      {actif && (
-                        <span
-                          aria-hidden="true"
-                          className="ml-auto h-1.5 w-1.5 rounded-full bg-jaune-vif"
-                        />
-                      )}
                     </Link>
                   </li>
                 );

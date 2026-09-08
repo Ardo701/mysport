@@ -97,17 +97,17 @@ export default function PageProgression() {
   }
 
   return (
-    <div className="space-y-5">
-      <header className="pt-2 lg:pt-0">
+    <div className="space-y-8">
+      <header className="mb-10 pt-1 lg:mb-12 lg:pt-0">
         <Link
           href="/"
-          className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-brume transition hover:text-encre lg:hidden"
+          className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-brume transition-colors hover:text-encre lg:hidden"
         >
           <IconeChevronGauche className="h-4 w-4" />
           Aujourd'hui
         </Link>
         <p className="surtitre mb-2.5">Sur la durée</p>
-        <h1 className="titre text-[28px] font-bold leading-none lg:text-[34px]">
+        <h1 className="titre text-[30px] font-bold leading-[0.95] tracking-[-0.03em] lg:text-[38px]">
           Progression
         </h1>
       </header>
@@ -145,8 +145,7 @@ export default function PageProgression() {
           {/* Courbe de poids */}
           <Carte>
             <TitreSection
-              surtitre="Poids"
-              titre="Évolution"
+              titre="Poids"
               action={<IconeBalance className="h-5 w-5 text-jaune" />}
             />
             {mesures.length < 2 ? (
@@ -211,7 +210,7 @@ export default function PageProgression() {
 
           {/* Assiduité */}
           <Carte>
-            <TitreSection surtitre="Régularité" titre="Séances par semaine" />
+            <TitreSection titre="Séances par semaine" />
             <AssiduiteHebdo
               dateReference={date}
               dates={terminees.map((s) => s.date)}
@@ -224,7 +223,6 @@ export default function PageProgression() {
           {/* Marche */}
           <Carte>
             <TitreSection
-              surtitre="Marche"
               titre="Pas par jour"
               action={
                 moyennePas > 0 ? (
@@ -256,13 +254,13 @@ export default function PageProgression() {
 
           {/* Dernières séances */}
           <section>
-            <TitreSection surtitre="Historique" titre="Dernières séances" />
+            <TitreSection titre="Dernières séances" />
             {terminees.length === 0 ? (
-              <p className="rounded-net border border-dashed border-trait px-4 py-7 text-center text-[13px] text-brume-faible">
+              <p className="border border-dashed border-trait px-4 py-7 text-center text-[13px] text-brume-faible">
                 Aucune séance terminée pour l'instant.
               </p>
             ) : (
-              <ul className="divide-y divide-trait overflow-hidden rounded-net border border-trait">
+              <ul className="divide-y divide-trait overflow-hidden border-t border-trait">
                 {terminees.slice(0, 10).map((s) => (
                   <li
                     key={s._id}
@@ -276,7 +274,7 @@ export default function PageProgression() {
                       </p>
                     </div>
                     {s.ressenti && (
-                      <span className="chiffres shrink-0 rounded-full border border-trait px-2.5 py-1 text-[11px] text-brume">
+                      <span className="chiffres shrink-0 text-[11px] text-brume-faible">
                         RPE {s.ressenti}
                       </span>
                     )}
@@ -385,7 +383,7 @@ function AssiduiteHebdo({
             <div key={s.fin} className="flex flex-1 flex-col items-center gap-2">
               <div className="flex h-full w-full items-end">
                 <div
-                  className="w-full rounded-sm"
+                  className="w-full rounded-doux"
                   style={{
                     height: `${Math.max(4, ratio * 100)}%`,
                     backgroundColor:
@@ -443,7 +441,7 @@ function MarcheQuinzaine({
                   ? `${libelleDateCourt(jour)} : ${journee.pas.toLocaleString("fr-FR")} pas`
                   : `${libelleDateCourt(jour)} : non renseigné`
               }
-              className="w-full rounded-sm"
+              className="w-full rounded-doux"
               style={{
                 height: `${hauteur}%`,
                 backgroundColor: journee

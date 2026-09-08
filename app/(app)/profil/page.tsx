@@ -173,10 +173,10 @@ export default function PageProfil() {
   }
 
   return (
-    <div className="space-y-5">
-      <header className="pt-2 lg:pt-0">
+    <div className="space-y-8">
+      <header className="mb-10 pt-1 lg:mb-12 lg:pt-0">
         <p className="surtitre mb-2.5">Ton compte</p>
-        <h1 className="titre text-[28px] font-bold leading-none lg:text-[34px]">
+        <h1 className="titre text-[30px] font-bold leading-[0.95] tracking-[-0.03em] lg:text-[38px]">
           {profil.prenom}
         </h1>
         {profil.email && (
@@ -200,7 +200,6 @@ export default function PageProfil() {
           {/* Programme */}
           <Carte>
             <TitreSection
-              surtitre="Entraînement"
               titre="Ton programme"
               action={
                 <Etiquette ton={programme?.source === "ia" ? "jaune" : "neutre"}>
@@ -265,12 +264,11 @@ export default function PageProfil() {
           {/* Cibles */}
           <Carte>
             <TitreSection
-              surtitre="Nutrition"
               titre="Cibles quotidiennes"
               action={
                 <button
                   onClick={() => setOuvert(ouvert === "cibles" ? null : "cibles")}
-                  className="text-[12px] text-brume transition hover:text-jaune"
+                  className="text-[12px] text-brume transition-colors hover:text-jaune"
                 >
                   {ouvert === "cibles" ? "Fermer" : "Ajuster"}
                 </button>
@@ -332,7 +330,7 @@ export default function PageProfil() {
                 ].map(([libelle, valeur]) => (
                   <div
                     key={libelle as string}
-                    className="rounded-lg border border-trait bg-creux px-2 py-3 text-center"
+                    className="rounded-doux border border-trait bg-creux px-2 py-3 text-center"
                   >
                     <p className="chiffres titre text-[16px] font-semibold leading-none">
                       {valeur}
@@ -350,13 +348,13 @@ export default function PageProfil() {
         <Colonne>
           <div className="grid grid-cols-2 gap-2 lg:hidden">
             <Link href="/progression" className="block">
-              <div className="flex h-full items-center justify-between rounded-net border border-trait bg-surface px-4 py-3.5 transition hover:border-trait-vif">
+              <div className="flex h-full items-center justify-between border-t border-trait px-4 py-3.5 transition-colors hover:border-trait-vif">
                 <span className="text-[14px]">Progression</span>
                 <IconeCourbe className="h-4.5 w-4.5 text-jaune" />
               </div>
             </Link>
             <Link href="/sommeil" className="block">
-              <div className="flex h-full items-center justify-between rounded-net border border-trait bg-surface px-4 py-3.5 transition hover:border-trait-vif">
+              <div className="flex h-full items-center justify-between border-t border-trait px-4 py-3.5 transition-colors hover:border-trait-vif">
                 <span className="text-[14px]">Sommeil</span>
                 <IconeLune className="h-4.5 w-4.5 text-jaune" />
               </div>
@@ -366,12 +364,11 @@ export default function PageProfil() {
           {/* Profil */}
           <Carte>
             <TitreSection
-              surtitre="Toi"
               titre="Profil et objectif"
               action={
                 <button
                   onClick={() => setOuvert(ouvert === "profil" ? null : "profil")}
-                  className="flex items-center gap-1.5 text-[12px] text-brume transition hover:text-jaune"
+                  className="flex items-center gap-1.5 text-[12px] text-brume transition-colors hover:text-jaune"
                 >
                   <IconeReglages className="h-3.5 w-3.5" />
                   {ouvert === "profil" ? "Fermer" : "Modifier"}
@@ -460,7 +457,7 @@ export default function PageProfil() {
                       <button
                         key={l}
                         onClick={() => basculer("legumesAimes", l)}
-                        className={`rounded-full border px-3 py-2 text-[13px] transition ${
+                        className={`rounded-doux border px-3 py-2 text-[13px] transition-colors ${
                           form.legumesAimes.includes(l)
                             ? "border-jaune bg-jaune-voile text-encre"
                             : "border-trait bg-creux text-brume-faible"
@@ -479,7 +476,7 @@ export default function PageProfil() {
                       <button
                         key={c}
                         onClick={() => basculer("contraintes", c)}
-                        className={`rounded-full border px-3 py-2 text-[13px] transition ${
+                        className={`rounded-doux border px-3 py-2 text-[13px] transition-colors ${
                           form.contraintes.includes(c)
                             ? "border-jaune bg-jaune-voile text-encre"
                             : "border-trait bg-creux text-brume-faible"
@@ -500,7 +497,7 @@ export default function PageProfil() {
                 </p>
               </div>
             ) : (
-              <ul className="divide-y divide-trait overflow-hidden rounded-net border border-trait">
+              <ul className="divide-y divide-trait overflow-hidden border-t border-trait">
                 {[
                   ["Âge", `${profil.age} ans`],
                   ["Taille", `${profil.tailleCm} cm`],
@@ -538,7 +535,7 @@ export default function PageProfil() {
           {/* Sur ordinateur la bascule vit dans la barre latérale ; le
               téléphone n'en a pas, il lui faut donc son propre accès. */}
           <Carte>
-            <TitreSection surtitre="Affichage" titre="Thème" />
+            <TitreSection titre="Thème" />
             <BasculeTheme />
             <p className="mt-3 text-[11px] leading-relaxed text-brume-faible">
               Le choix reste sur cet appareil, et sur celui-là seulement.
@@ -550,7 +547,7 @@ export default function PageProfil() {
               await signOut();
               router.replace("/connexion");
             }}
-            className="flex w-full items-center justify-between rounded-net border border-trait bg-surface px-4 py-3.5 text-[14px] text-brume transition hover:border-rouge/40 hover:text-rouge"
+            className="flex w-full items-center justify-between border-t border-trait px-4 py-3.5 text-[14px] text-brume transition-colors hover:border-rouge/40 hover:text-rouge"
           >
             Se déconnecter
             <IconeFleche className="h-4 w-4" />

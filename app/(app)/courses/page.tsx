@@ -9,8 +9,9 @@ import {
   Bouton,
   Carte,
   Chargement,
-  Etiquette,
   EtatVide,
+  Etiquette,
+  Onglets,
   TitreSection,
 } from "@/composants/ui";
 import { Jauge } from "@/composants/jauges";
@@ -102,17 +103,17 @@ export default function PageCourses() {
   })).filter((g) => g.lignes.length > 0);
 
   return (
-    <div className="space-y-5">
-      <header className="pt-2 lg:pt-0">
+    <div className="space-y-8">
+      <header className="mb-10 pt-1 lg:mb-12 lg:pt-0">
         <Link
           href="/repas"
-          className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-brume transition hover:text-encre lg:hidden"
+          className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-brume transition-colors hover:text-encre lg:hidden"
         >
           <IconeChevronGauche className="h-4 w-4" />
           Repas
         </Link>
         <p className="surtitre mb-2.5">D'après tes menus à venir</p>
-        <h1 className="titre text-[28px] font-bold leading-none lg:text-[34px]">
+        <h1 className="titre text-[30px] font-bold leading-[0.95] tracking-[-0.03em] lg:text-[38px]">
           Liste de courses
         </h1>
       </header>
@@ -122,20 +123,15 @@ export default function PageCourses() {
         <div className="space-y-5 lg:sticky lg:top-9">
           {/* Période et avancement */}
           <Carte>
-            <div className="mb-4 flex gap-1 rounded-lg border border-trait bg-creux p-1">
-              {[3, 7, 14].map((n) => (
-                <button
-                  key={n}
-                  onClick={() => setJours(n)}
-                  className={`flex-1 rounded-md py-2.5 text-[13px] font-medium transition ${
-                    jours === n ? "bg-jaune-vif text-sur-jaune" : "text-brume"
-                  }`}
-                >
-                  {n} jours
-                </button>
-              ))}
-            </div>
-
+            <Onglets
+              className="mb-4"
+              options={[3, 7, 14].map((n) => ({
+                cle: String(n),
+                libelle: `${n} jours`,
+              }))}
+              valeur={String(jours)}
+              onChange={(v) => setJours(Number(v))}
+            />
             <div className="mb-2 flex items-baseline justify-between">
               <span className="surtitre">Avancement</span>
               <span className="chiffres text-[12px] text-brume">
@@ -152,7 +148,7 @@ export default function PageCourses() {
           {/* Ajout manuel */}
           {formulaireOuvert ? (
             <Carte className="apparition">
-              <TitreSection surtitre="Ajout" titre="Autre chose à prendre" />
+              <TitreSection titre="Autre chose à prendre" />
               <div className="space-y-3">
                 <input
                   value={nom}
@@ -195,11 +191,9 @@ export default function PageCourses() {
           ) : (
             <button
               onClick={() => setFormulaireOuvert(true)}
-              className="flex w-full items-center gap-3 rounded-net border border-dashed border-trait bg-surface px-4 py-3.5 text-left transition hover:border-jaune"
+              className="flex w-full items-center gap-3 border border-dashed border-trait px-4 py-3.5 text-left transition-colors hover:border-jaune"
             >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-trait text-brume-faible">
-                <IconePlus className="h-4 w-4" />
-              </span>
+              <IconePlus className="h-4 w-4 shrink-0 text-brume-faible" />
               <span className="text-[14px] text-brume">
                 Ajouter un produit à la main
               </span>
@@ -218,16 +212,23 @@ export default function PageCourses() {
             groupes.map((groupe) => (
               <section key={groupe.niveau}>
                 <TitreSection
-                  surtitre={`${groupe.lignes.length} produit${groupe.lignes.length > 1 ? "s" : ""}`}
                   titre={groupe.titre}
                   action={
-                    groupe.niveau === 0 ? <Etiquette ton="jaune">Priorité</Etiquette> : null
+                    <span className="flex items-center gap-3">
+                      {groupe.niveau === 0 && (
+                        <Etiquette ton="jaune">Priorité</Etiquette>
+                      )}
+                      <Etiquette>
+                        {groupe.lignes.length} produit
+                        {groupe.lignes.length > 1 ? "s" : ""}
+                      </Etiquette>
+                    </span>
                   }
                 />
                 <p className="mb-3 -mt-1 text-[12px] text-brume-faible">
                   {groupe.detail}
                 </p>
-                <ul className="divide-y divide-trait overflow-hidden rounded-net border border-trait">
+                <ul className="divide-y divide-trait overflow-hidden border-t border-trait">
                   {groupe.lignes.map((ligne) => (
                     <LigneCourse
                       key={ligne._id}
@@ -249,18 +250,22 @@ export default function PageCourses() {
           {achetes.length > 0 && (
             <section>
               <TitreSection
-                surtitre={`${achetes.length} produit${achetes.length > 1 ? "s" : ""}`}
                 titre="Déjà acheté"
                 action={
-                  <button
-                    onClick={() => decocherTout({})}
-                    className="text-[12px] text-brume transition hover:text-jaune"
-                  >
-                    Tout décocher
-                  </button>
+                  <span className="flex items-center gap-3">
+                    <Etiquette>
+                      {achetes.length} produit{achetes.length > 1 ? "s" : ""}
+                    </Etiquette>
+                    <button
+                      onClick={() => decocherTout({})}
+                      className="text-[12px] text-brume transition-colors hover:text-jaune"
+                    >
+                      Tout décocher
+                    </button>
+                  </span>
                 }
               />
-              <ul className="divide-y divide-trait overflow-hidden rounded-net border border-trait opacity-60">
+              <ul className="divide-y divide-trait overflow-hidden border-t border-trait opacity-60">
                 {achetes
                   .sort((a, b) => a.nom.localeCompare(b.nom))
                   .map((ligne) => (
@@ -299,7 +304,7 @@ function LigneCourse({
         onClick={onBasculer}
         aria-pressed={ligne.achete}
         aria-label={ligne.achete ? `Décocher ${ligne.nom}` : `Marquer ${ligne.nom} comme acheté`}
-        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md border transition ${
+        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-doux border transition-colors ${
           ligne.achete
             ? "border-jaune bg-jaune-vif text-sur-jaune"
             : "border-trait text-transparent hover:border-jaune"
@@ -324,7 +329,7 @@ function LigneCourse({
         <button
           onClick={onSupprimer}
           aria-label={`Supprimer ${ligne.nom}`}
-          className="shrink-0 p-1 text-brume-faible transition hover:text-rouge"
+          className="shrink-0 p-1 text-brume-faible transition-colors hover:text-rouge"
         >
           <IconeCorbeille className="h-4 w-4" />
         </button>

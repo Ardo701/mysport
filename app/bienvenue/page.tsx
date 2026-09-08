@@ -282,7 +282,7 @@ export default function PageBienvenue() {
                     key={l}
                     type="button"
                     onClick={() => basculer(legumes, setLegumes, l)}
-                    className={`rounded-full border px-3 py-2 text-[13px] transition ${
+                    className={`rounded-doux border px-3 py-2 text-[13px] transition-colors ${
                       actif
                         ? "border-jaune bg-jaune-voile text-encre"
                         : "border-trait bg-creux text-brume-faible"
@@ -308,7 +308,7 @@ export default function PageBienvenue() {
                     key={c}
                     type="button"
                     onClick={() => basculer(contraintes, setContraintes, c)}
-                    className={`rounded-full border px-3 py-2 text-[13px] transition ${
+                    className={`rounded-doux border px-3 py-2 text-[13px] transition-colors ${
                       actif
                         ? "border-jaune bg-jaune-voile text-encre"
                         : "border-trait bg-creux text-brume-faible"
@@ -321,7 +321,7 @@ export default function PageBienvenue() {
             </div>
           </div>
 
-          <div className="rounded-net border border-trait bg-creux p-4">
+          <div className="border-t border-trait p-4">
             <p className="surtitre mb-3">Tes cibles quotidiennes</p>
             <div className="grid grid-cols-2 gap-2">
               <Stat libelle="Calories" valeur={cibles.kcal} unite="kcal" />
@@ -348,7 +348,7 @@ export default function PageBienvenue() {
         {etapes.map((_, i) => (
           <span
             key={i}
-            className={`h-[3px] flex-1 rounded-full transition-colors ${
+            className={`h-[3px] flex-1 transition-colors ${
               i <= etape ? "bg-jaune-vif" : "bg-trait"
             }`}
           />

@@ -50,7 +50,6 @@ export function CartePas({
   return (
     <section>
       <TitreSection
-        surtitre="Activité"
         titre="Effort du jour"
         action={
           effort.kcalTotal > 0 ? (
@@ -112,7 +111,7 @@ export function CartePas({
             <button
               key={ajout}
               onClick={() => envoyer((enregistres ?? 0) + ajout)}
-              className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-trait bg-creux py-2 text-[12px] text-brume transition hover:border-jaune hover:text-encre"
+              className="flex flex-1 items-center justify-center gap-1 rounded-doux border border-trait bg-creux py-2 text-[12px] text-brume transition-colors hover:border-jaune hover:text-encre"
             >
               <IconePlus className="h-3.5 w-3.5" />
               <span className="chiffres">{ajout.toLocaleString("fr-FR")}</span>

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { api } from "@/convex/_generated/api";
 import { BOISSONS, GRIGNOTAGES, type Extra } from "@/lib/extras";
 import { heureCourante } from "@/lib/dates";
-import { Bouton, Message } from "./ui";
+import { Bouton, Message, Onglets } from "./ui";
 import { Feuille } from "./feuille";
 import { IconeCoche, IconePlus, IconeTexte } from "./icones";
 
@@ -56,26 +56,16 @@ export function AjoutRapide({
       titre="Grignotage et boissons"
     >
       <div className="space-y-5">
-        <div className="flex gap-1 rounded-lg border border-trait bg-creux p-1">
-          {(
-            [
-              ["grignotage", "À grignoter"],
-              ["boisson", "À boire"],
-            ] as const
-          ).map(([cle, libelle]) => (
-            <button
-              key={cle}
-              onClick={() => setOnglet(cle)}
-              className={`flex-1 rounded-md py-2.5 text-[13px] font-medium transition ${
-                onglet === cle ? "bg-jaune-vif text-sur-jaune" : "text-brume"
-              }`}
-            >
-              {libelle}
-            </button>
-          ))}
-        </div>
+        <Onglets
+          options={[
+            { cle: "grignotage", libelle: "À grignoter" },
+            { cle: "boisson", libelle: "À boire" },
+          ]}
+          valeur={onglet}
+          onChange={setOnglet}
+        />
 
-        <ul className="divide-y divide-trait overflow-hidden rounded-net border border-trait">
+        <ul className="divide-y divide-trait overflow-hidden border-t border-trait">
           {liste.map((extra) => {
             const quantite = quantites[extra.id] ?? 1;
             const vientDEtreAjoute = ajoutes.includes(extra.id);
@@ -91,7 +81,7 @@ export function AjoutRapide({
                   </p>
                 </div>
 
-                <div className="flex shrink-0 items-center gap-1 rounded-md border border-trait">
+                <div className="flex shrink-0 items-center gap-1 rounded-doux border border-trait">
                   <button
                     onClick={() =>
                       setQuantites((q) => ({
@@ -100,7 +90,7 @@ export function AjoutRapide({
                       }))
                     }
                     aria-label={`Diminuer la quantité de ${extra.nom}`}
-                    className="px-2 py-1.5 text-brume-faible transition hover:text-encre"
+                    className="px-2 py-1.5 text-brume-faible transition-colors hover:text-encre"
                   >
                     −
                   </button>
@@ -112,7 +102,7 @@ export function AjoutRapide({
                       setQuantites((q) => ({ ...q, [extra.id]: quantite + 1 }))
                     }
                     aria-label={`Augmenter la quantité de ${extra.nom}`}
-                    className="px-2 py-1.5 text-brume-faible transition hover:text-encre"
+                    className="px-2 py-1.5 text-brume-faible transition-colors hover:text-encre"
                   >
                     +
                   </button>
@@ -121,7 +111,7 @@ export function AjoutRapide({
                 <button
                   onClick={() => ajouter(extra)}
                   aria-label={`Ajouter ${extra.nom}`}
-                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md border transition ${
+                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-doux border transition-colors ${
                     vientDEtreAjoute
                       ? "border-jaune bg-jaune-vif text-sur-jaune"
                       : "border-trait text-brume-faible hover:border-jaune hover:text-jaune"

@@ -79,17 +79,17 @@ export default function PageSommeil() {
   }
 
   return (
-    <div className="space-y-5">
-      <header className="pt-2 lg:pt-0">
+    <div className="space-y-8">
+      <header className="mb-10 pt-1 lg:mb-12 lg:pt-0">
         <Link
           href="/"
-          className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-brume transition hover:text-encre lg:hidden"
+          className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-brume transition-colors hover:text-encre lg:hidden"
         >
           <IconeChevronGauche className="h-4 w-4" />
           Aujourd'hui
         </Link>
         <p className="surtitre mb-2.5">Nuit du {libelleRelatif(date).toLowerCase()}</p>
-        <h1 className="titre text-[28px] font-bold leading-none lg:text-[34px]">
+        <h1 className="titre text-[30px] font-bold leading-[0.95] tracking-[-0.03em] lg:text-[38px]">
           Sommeil
         </h1>
       </header>
@@ -98,7 +98,6 @@ export default function PageSommeil() {
         <Colonne>
           <Carte>
             <TitreSection
-              surtitre="À remplir au réveil"
               titre="Ta nuit"
               action={<IconeLune className="h-5 w-5 text-jaune" />}
             />
@@ -130,7 +129,7 @@ export default function PageSommeil() {
               </label>
             </div>
 
-            <div className="mt-4 rounded-net border border-trait bg-creux px-4 py-3.5">
+            <div className="mt-4 border-t border-trait px-4 py-3.5">
               <div className="flex items-end justify-between">
                 <p className="chiffres titre text-[28px] font-semibold leading-none">
                   {minutesEnHeures(duree)}
@@ -154,7 +153,7 @@ export default function PageSommeil() {
                       setQualite(n);
                       setEtat("repos");
                     }}
-                    className={`chiffres flex-1 rounded-lg border py-3 text-[15px] transition ${
+                    className={`chiffres flex-1 rounded-doux border py-3 text-[15px] transition-colors ${
                       qualite === n
                         ? "border-jaune bg-jaune-vif font-semibold text-sur-jaune"
                         : "border-trait bg-creux text-brume"
@@ -203,7 +202,7 @@ export default function PageSommeil() {
 
         <Colonne>
           <section>
-            <TitreSection surtitre="14 derniers jours" titre="Ce que ça donne" />
+            <TitreSection titre="14 derniers jours" />
             <div className="mb-3 grid grid-cols-2 gap-2">
               <Stat
                 libelle="Moyenne"
@@ -218,7 +217,7 @@ export default function PageSommeil() {
             </div>
 
             {nuits.length === 0 ? (
-              <p className="rounded-net border border-dashed border-trait px-4 py-7 text-center text-[13px] text-brume-faible">
+              <p className="border border-dashed border-trait px-4 py-7 text-center text-[13px] text-brume-faible">
                 Aucune nuit enregistrée pour l'instant.
               </p>
             ) : (
@@ -238,7 +237,7 @@ export default function PageSommeil() {
                             title={
                               n ? `${libelleDateCourt(jour)} : ${minutesEnHeures(n.dureeMin)}` : jour
                             }
-                            className="w-full rounded-sm"
+                            className="w-full rounded-doux"
                             style={{
                               height: `${hauteur}%`,
                               backgroundColor: n

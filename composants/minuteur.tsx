@@ -39,7 +39,7 @@ export function MinuteurRepos({
       role="status"
       aria-live="polite"
     >
-      <div className="mx-auto max-w-[560px] overflow-hidden rounded-net border border-jaune/40 bg-creux">
+      <div className="mx-auto max-w-[560px] overflow-hidden border-t-2 border-jaune">
         <div className="flex items-center gap-3 px-4 py-3">
           <span className="surtitre !text-jaune">Repos</span>
           <span className="chiffres titre flex-1 text-[20px] font-semibold">
@@ -47,7 +47,7 @@ export function MinuteurRepos({
           </span>
           <button
             onClick={() => setRestant(0)}
-            className="text-brume transition hover:text-encre"
+            className="text-brume transition-colors hover:text-encre"
             aria-label="Passer le repos"
           >
             <IconeCroix className="h-4 w-4" />

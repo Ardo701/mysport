@@ -44,7 +44,16 @@
   --font-titre: var(--police-titre), "Helvetica Neue", Arial, sans-serif;
   --font-sans: var(--police-corps), "Helvetica Neue", Arial, sans-serif;
 
-  --radius-net: 10px;
+  /*
+   * Deux rayons, pas plus.
+   *
+   * `net` est franchement nul : les panneaux, les listes et les jauges sont
+   * des surfaces de lecture, elles se coupent droit. `doux` ne sert qu'aux
+   * éléments qu'on touche — champs, boutons — où trois pixels suffisent à
+   * dire « cliquable » sans arrondir le dessin.
+   */
+  --radius-net: 0px;
+  --radius-doux: 3px;
 }
 
 :root {
@@ -110,7 +119,7 @@ code {
   font-size: 0.94em;
   background-color: var(--color-creux);
   border: 1px solid var(--color-trait);
-  border-radius: 5px;
+  border-radius: var(--radius-doux);
   padding: 1px 5px;
   white-space: nowrap;
 }
@@ -135,40 +144,48 @@ code {
   font-weight: 600;
 }
 
-/* Trame discrète en fond de page, pour casser l'aplat de fond. */
+/*
+ * Le fond est un aplat, sans dégradé.
+ *
+ * Il portait un halo jaune en haut de page : c'est un ornement qui ne dit
+ * rien, et qu'on retrouve à l'identique sur la moitié des interfaces
+ * fabriquées à la chaîne. La classe reste, elle ne peint plus.
+ */
 .grain {
-  background-image:
-    radial-gradient(
-      120% 80% at 50% -10%,
-      rgba(255, 221, 0, 0.07) 0%,
-      rgba(255, 221, 0, 0) 60%
-    ),
-    linear-gradient(var(--color-fond), var(--color-fond));
+  background-color: var(--color-fond);
 }
 
-/* Sur fond clair le même voile vire au sale : il faut le rendre plus discret. */
-:root[data-theme="clair"] .grain {
-  background-image:
-    radial-gradient(
-      120% 80% at 50% -10%,
-      rgba(245, 200, 0, 0.16) 0%,
-      rgba(245, 200, 0, 0) 62%
-    ),
-    linear-gradient(var(--color-fond), var(--color-fond));
-}
-
+/*
+ * Un groupe n'est plus une boîte.
+ *
+ * Les cartes encadrées et remplies empilaient trois signaux pour dire une
+ * chose : ce bloc va ensemble. Le titre souligné qui les précède le dit déjà.
+ * Ne restent que le blanc et l'alignement.
+ */
 .carte {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-trait);
-  border-radius: var(--radius-net);
+  background-color: transparent;
+  border: 0;
+}
+
+/*
+ * Titre de section : le libellé, puis un filet jusqu'au bord.
+ *
+ * C'est la seule séparation horizontale de l'application. Le filet part de la
+ * ligne de base du texte et file jusqu'à la marge, comme sur une planche
+ * technique : il donne la largeur du bloc sans l'enfermer.
+ */
+.filet {
+  height: 1px;
+  flex: 1;
+  background-color: var(--color-trait);
 }
 
 .champ {
   width: 100%;
   background-color: var(--color-creux);
   border: 1px solid var(--color-trait);
-  border-radius: 8px;
-  padding: 12px 14px;
+  border-radius: var(--radius-doux);
+  padding: 11px 13px;
   font-size: 16px; /* évite le zoom automatique sur iOS */
   color: var(--color-encre);
   outline: none;

@@ -81,9 +81,9 @@ export default function PagePlanning() {
 
   return (
     <div className="space-y-5 pb-4">
-      <header className="pt-2 lg:pt-0">
+      <header className="mb-10 pt-1 lg:mb-12 lg:pt-0">
         <p className="surtitre mb-2.5">Tes horaires</p>
-        <h1 className="titre text-[28px] font-bold leading-none lg:text-[34px]">
+        <h1 className="titre text-[30px] font-bold leading-[0.95] tracking-[-0.03em] lg:text-[38px]">
           Planning
         </h1>
         <p className="mt-2.5 text-[14px] leading-relaxed text-brume">
@@ -109,7 +109,6 @@ export default function PagePlanning() {
           {/* Sommeil */}
           <Carte>
             <TitreSection
-              surtitre="Récupération"
               titre="Sommeil"
               action={<IconeLune className="h-5 w-5 text-jaune" />}
             />
@@ -155,7 +154,7 @@ export default function PagePlanning() {
                       setObjectifSommeilH(h);
                       setEtat("repos");
                     }}
-                    className={`chiffres flex-1 rounded-lg border py-2.5 text-[13px] transition ${
+                    className={`chiffres flex-1 rounded-doux border py-2.5 text-[13px] transition-colors ${
                       objectifSommeilH === h
                         ? "border-jaune bg-jaune-vif text-sur-jaune font-semibold"
                         : "border-trait bg-creux text-brume"
@@ -178,8 +177,8 @@ export default function PagePlanning() {
 
           {/* Repas */}
           <Carte>
-            <TitreSection surtitre="Rythme alimentaire" titre="Heures des repas" />
-            <ul className="divide-y divide-trait overflow-hidden rounded-net border border-trait">
+            <TitreSection titre="Heures des repas" />
+            <ul className="divide-y divide-trait overflow-hidden border-t border-trait">
               {TYPES_REPAS.filter((t) => t.cle !== "extra").map((t) => {
                 const ligne = repas.find((r) => r.type === t.cle);
                 if (!ligne) return null;
@@ -191,14 +190,14 @@ export default function PagePlanning() {
                     <button
                       onClick={() => majRepas(t.cle, { actif: !ligne.actif })}
                       aria-pressed={ligne.actif}
-                      className={`h-5 w-9 shrink-0 rounded-full border transition ${
+                      className={`h-5 w-9 shrink-0 rounded-doux border transition-colors ${
                         ligne.actif ? "border-jaune bg-jaune-vif" : "border-trait bg-fond"
                       }`}
                     >
                       <span
-                        className={`block h-3.5 w-3.5 rounded-full transition ${
+                        className={`block h-3 w-3 transition-all ${
                           ligne.actif
-                            ? "ml-[18px] bg-fond"
+                            ? "ml-[19px] bg-fond"
                             : "ml-[3px] bg-brume-faible"
                         }`}
                       />
@@ -213,7 +212,7 @@ export default function PagePlanning() {
                       value={ligne.heure}
                       disabled={!ligne.actif}
                       onChange={(e) => majRepas(t.cle, { heure: e.target.value })}
-                      className="chiffres w-[104px] rounded-md border border-trait bg-fond px-2.5 py-2 text-center text-[14px] outline-none focus:border-jaune disabled:opacity-40"
+                      className="chiffres w-[104px] rounded-doux border border-trait bg-fond px-2.5 py-2 text-center text-[14px] outline-none focus:border-jaune disabled:opacity-40"
                     />
                   </li>
                 );
@@ -230,7 +229,6 @@ export default function PagePlanning() {
           {/* Entraînements */}
           <Carte>
             <TitreSection
-              surtitre="Semaine type"
               titre="Créneaux d'entraînement"
               action={
                 <Etiquette ton="jaune">{entrainements.length} par semaine</Etiquette>
@@ -243,7 +241,7 @@ export default function PagePlanning() {
                 return (
                   <li
                     key={jour}
-                    className={`rounded-net border px-3.5 py-3 transition ${
+                    className={`rounded-net border px-3.5 py-3 transition-colors ${
                       creneau ? "border-jaune/30 bg-jaune-voile" : "border-trait bg-creux"
                     }`}
                   >
@@ -256,7 +254,7 @@ export default function PagePlanning() {
                         onChange={(e) =>
                           majJour(jour, e.target.value === "" ? null : e.target.value)
                         }
-                        className="min-w-0 flex-1 rounded-md border border-trait bg-fond px-2.5 py-2 text-[13px] outline-none focus:border-jaune"
+                        className="min-w-0 flex-1 rounded-doux border border-trait bg-fond px-2.5 py-2 text-[13px] outline-none focus:border-jaune"
                       >
                         <option value="">Repos</option>
                         {seances.map((s) => (
@@ -270,7 +268,7 @@ export default function PagePlanning() {
                           type="time"
                           value={creneau.heure}
                           onChange={(e) => majJour(jour, creneau.seanceId, e.target.value)}
-                          className="chiffres w-[96px] shrink-0 rounded-md border border-trait bg-fond px-2 py-2 text-center text-[13px] outline-none focus:border-jaune"
+                          className="chiffres w-[96px] shrink-0 rounded-doux border border-trait bg-fond px-2 py-2 text-center text-[13px] outline-none focus:border-jaune"
                         />
                       )}
                     </div>
