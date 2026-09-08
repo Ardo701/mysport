@@ -30,7 +30,7 @@ export default defineSchema({
   /** Planning : heures de sommeil, de repas et créneaux d'entraînement. */
   plannings: defineTable({
     userId: v.id("users"),
-    heureLever: v.string(), // "07:00"
+    heureLever: v.string(), // "08:00"
     heureCoucher: v.string(),
     objectifSommeilH: v.number(),
     repas: v.array(

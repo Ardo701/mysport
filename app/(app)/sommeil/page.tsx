@@ -36,8 +36,8 @@ export default function PageSommeil() {
   );
   const enregistrer = useMutation(api.sommeil.enregistrerNuit);
 
-  const [coucher, setCoucher] = useState("23:00");
-  const [lever, setLever] = useState("07:00");
+  const [coucher, setCoucher] = useState("00:00");
+  const [lever, setLever] = useState("08:00");
   const [qualite, setQualite] = useState(3);
   const [notes, setNotes] = useState("");
   const [etat, setEtat] = useState<"repos" | "envoi" | "enregistre">("repos");

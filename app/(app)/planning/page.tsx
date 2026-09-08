@@ -26,8 +26,8 @@ export default function PagePlanning() {
   const programme = useQuery(api.programme.programmeActif);
   const enregistrer = useMutation(api.planning.enregistrerPlanning);
 
-  const [heureLever, setHeureLever] = useState("07:00");
-  const [heureCoucher, setHeureCoucher] = useState("23:00");
+  const [heureLever, setHeureLever] = useState("08:00");
+  const [heureCoucher, setHeureCoucher] = useState("00:00");
   const [objectifSommeilH, setObjectifSommeilH] = useState(8);
   const [repas, setRepas] = useState<Repas[]>([]);
   const [entrainements, setEntrainements] = useState<Creneau[]>([]);

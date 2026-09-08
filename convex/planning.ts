@@ -4,12 +4,19 @@ import { mutation, query } from "./_generated/server";
 import { utilisateurConnecte } from "./lib/session";
 import { PLANNING_DEFAUT_ENTRAINEMENTS } from "./data/programme";
 
+/*
+ * Journée par défaut : minuit – 8 h, soit les huit heures visées pile.
+ *
+ * Le petit-déjeuner suit le lever et ne le précède jamais : la journée type se
+ * trie à partir de l'heure de lever (voir `evenementsDuJour`), donc un repas
+ * placé avant elle basculerait en fin de journée, après le coucher.
+ */
 const PLANNING_DEFAUT = {
-  heureLever: "07:00",
-  heureCoucher: "23:00",
+  heureLever: "08:00",
+  heureCoucher: "00:00",
   objectifSommeilH: 8,
   repas: [
-    { type: "petit_dejeuner", heure: "07:30", actif: true },
+    { type: "petit_dejeuner", heure: "08:30", actif: true },
     { type: "dejeuner", heure: "12:30", actif: true },
     { type: "collation", heure: "16:30", actif: true },
     { type: "diner", heure: "19:30", actif: true },
