@@ -241,7 +241,7 @@ export default function PagePlanning() {
                 return (
                   <li
                     key={jour}
-                    className={`rounded-net border px-3.5 py-3 transition-colors ${
+                    className={`rounded-doux border px-3.5 py-3 transition-colors ${
                       creneau ? "border-jaune/30 bg-jaune-voile" : "border-trait bg-creux"
                     }`}
                   >

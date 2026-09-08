@@ -45,15 +45,15 @@
   --font-sans: var(--police-corps), "Helvetica Neue", Arial, sans-serif;
 
   /*
-   * Deux rayons, pas plus.
+   * Un seul rayon.
    *
-   * `net` est franchement nul : les panneaux, les listes et les jauges sont
-   * des surfaces de lecture, elles se coupent droit. `doux` ne sert qu'aux
-   * éléments qu'on touche — champs, boutons — où trois pixels suffisent à
-   * dire « cliquable » sans arrondir le dessin.
+   * Il y en avait deux : zéro pour les surfaces de lecture, trois pixels pour
+   * ce qu'on touche. À l'usage l'écart ne se voyait pas, et le zéro rendait
+   * les cartes du calendrier franchement coupantes. Six pixels adoucissent
+   * l'angle sans le rendre pour autant remarquable — les jauges et les filets,
+   * eux, restent droits parce qu'ils ne portent aucune classe de rayon.
    */
-  --radius-net: 0px;
-  --radius-doux: 3px;
+  --radius-doux: 6px;
 }
 
 :root {

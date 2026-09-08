@@ -259,7 +259,7 @@ function VueSemaine({
             key={jour}
             onClick={() => onChoisir(jour)}
             aria-pressed={choisi}
-            className={`rounded-net border p-3 text-left transition-colors ${
+            className={`rounded-doux border p-3 text-left transition-colors ${
               choisi
                 ? "border-jaune bg-jaune-voile"
                 : entrainement

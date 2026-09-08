@@ -138,9 +138,9 @@ scripts/          déploiement Vercel et génération des icônes
 L'application se tient au vocabulaire d'un instrument de mesure : ce sont les
 chiffres qui portent la page, tout le reste s'efface.
 
-- **Deux rayons, pas plus.** `rounded-net` vaut 0 — panneaux, listes et jauges
-  se coupent droit — et `rounded-doux` vaut 3 px, réservé à ce qu'on touche.
-  Rien n'est arrondi au-delà, et plus rien n'est en pastille.
+- **Un seul rayon.** `rounded-doux` vaut 6 px, partout : panneaux, cartes,
+  champs, boutons. Les jauges et les filets restent droits, faute de classe de
+  rayon. Rien n'est arrondi au-delà, et plus rien n'est en pastille.
 - **Pas de boîtes.** Un bloc se délimite par son titre suivi d'un filet jusqu'à
   la marge (`TitreSection`), et les lignes de liste par un filet en tête. Les
   cartes remplies et encadrées empilaient trois signaux pour dire une seule
