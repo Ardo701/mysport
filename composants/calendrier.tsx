@@ -4,6 +4,12 @@ import { useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 import { api } from "@/convex/_generated/api";
 import { Carte, Etiquette, Onglets, TitreSection } from "@/composants/ui";
+import { Feuille } from "@/composants/feuille";
+import type { Doc } from "@/convex/_generated/dataModel";
+import { semaineDuProgramme } from "@/convex/lib/dates";
+// `semaineDe` existe des deux côtés : ici les sept jours d'une semaine,
+// là-bas la semaine du cycle d'entraînement. On les distingue à l'import.
+import { doseDe, semaineDe as semaineDuCycle } from "@/convex/lib/programme";
 import {
   IconeChevronDroite,
   IconeChevronGauche,
@@ -65,7 +71,12 @@ export function Calendrier({
 }) {
   const [vue, setVue] = useState<Vue>("semaine");
   const [date, setDate] = useState<string | null>(null);
+  // Date dont on regarde la séance en détail, dans la feuille glissante.
+  const [detail, setDetail] = useState<string | null>(null);
   const journaux = useQuery(api.seances.historique, { limite: 200 });
+  // Le programme complet : la liste d'exercices et les douze semaines n'entrent
+  // pas dans les props légères du planning en cours d'édition.
+  const programme = useQuery(api.programme.programmeActif);
 
   useEffect(() => setDate(aujourdhuiISO()), []);
   if (!date) return null;
@@ -73,6 +84,7 @@ export function Calendrier({
   const today = aujourdhuiISO();
   const statutDe = (jour: string) =>
     journaux?.find((l) => l.date === jour)?.statut ?? null;
+  const journalDe = (jour: string) => journaux?.find((l) => l.date === jour) ?? null;
 
   function decaler(sens: 1 | -1) {
     setDate((actuelle) => {
@@ -131,6 +143,7 @@ export function Calendrier({
           seances={seances}
           date={date}
           statut={statutDe(date)}
+          onVoirSeance={() => setDetail(date)}
         />
       )}
 
@@ -161,8 +174,17 @@ export function Calendrier({
           seances={seances}
           date={date}
           onOuvrir={() => setVue("jour")}
+          onVoirSeance={() => setDetail(date)}
         />
       )}
+
+      <DetailSeance
+        date={detail}
+        planning={planning}
+        programme={programme ?? null}
+        journal={detail ? journalDe(detail) : null}
+        onFermer={() => setDetail(null)}
+      />
     </Carte>
   );
 }
@@ -173,11 +195,13 @@ function VueJour({
   seances,
   date,
   statut,
+  onVoirSeance,
 }: {
   planning: PlanningLocal;
   seances: SeanceProgramme[];
   date: string;
   statut: string | null;
+  onVoirSeance: () => void;
 }) {
   const evenements = evenementsDuJour(planning, seances, date);
 
@@ -216,6 +240,14 @@ function VueJour({
                 <p className="mt-1 text-[12px] leading-snug text-brume-faible">
                   {e.detail}
                 </p>
+              )}
+              {e.nature === "seance" && (
+                <button
+                  onClick={onVoirSeance}
+                  className="mt-1.5 text-[12px] text-jaune transition-opacity hover:opacity-70"
+                >
+                  Voir le détail
+                </button>
               )}
             </div>
           </li>
@@ -406,11 +438,13 @@ function ResumeJour({
   seances,
   date,
   onOuvrir,
+  onVoirSeance,
 }: {
   planning: PlanningLocal;
   seances: SeanceProgramme[];
   date: string;
   onOuvrir: () => void;
+  onVoirSeance: () => void;
 }) {
   const entrainement = seanceDuJour(planning, seances, date);
   const repasActifs = planning.repas.filter((r) => r.actif);
@@ -419,12 +453,22 @@ function ResumeJour({
     <div className="mt-4 border-t border-trait pt-3.5">
       <div className="flex items-baseline justify-between gap-3">
         <p className="text-[14px] font-medium">{libelleRelatif(date)}</p>
-        <button
-          onClick={onOuvrir}
-          className="shrink-0 text-[12px] text-brume transition-colors hover:text-jaune"
-        >
-          Voir la journée
-        </button>
+        <span className="flex shrink-0 items-center gap-3">
+          {entrainement && (
+            <button
+              onClick={onVoirSeance}
+              className="text-[12px] text-jaune transition-opacity hover:opacity-70"
+            >
+              Détail de la séance
+            </button>
+          )}
+          <button
+            onClick={onOuvrir}
+            className="text-[12px] text-brume transition-colors hover:text-jaune"
+          >
+            Voir la journée
+          </button>
+        </span>
       </div>
       <p className="mt-1.5 text-[12px] leading-relaxed text-brume-faible">
         {entrainement
@@ -439,4 +483,179 @@ function ResumeJour({
       </p>
     </div>
   );
+}
+
+/**
+ * Détail d'une séance : ce qui est prévu, ou ce qui a été fait.
+ *
+ * Le calendrier ne montrait qu'un nom et une heure. On ne pouvait donc ni
+ * préparer une séance à venir — quels exercices, combien de séries cette
+ * semaine-là — ni relire une séance passée avec les charges réellement
+ * soulevées. Les deux vivent ici, parce que c'est la même question posée de
+ * part et d'autre d'aujourd'hui.
+ */
+function DetailSeance({
+  date,
+  planning,
+  programme,
+  journal,
+  onFermer,
+}: {
+  date: string | null;
+  planning: PlanningLocal;
+  programme: Doc<"programmes"> | null;
+  journal: Doc<"seancesLog"> | null;
+  onFermer: () => void;
+}) {
+  if (!date) return null;
+
+  if (!programme) {
+    return (
+      <Feuille ouverte onFermer={onFermer} surtitre={libelleDate(date)} titre="Séance">
+        <p className="text-[13px] leading-relaxed text-brume">
+          Programme en cours de chargement.
+        </p>
+      </Feuille>
+    );
+  }
+
+  const creneau = creneauDuJour(planning, date);
+  const seance = programme.seances.find((s) => s.id === creneau?.seanceId);
+
+  if (!creneau || !seance) {
+    return (
+      <Feuille ouverte onFermer={onFermer} surtitre={libelleDate(date)} titre="Repos">
+        <p className="text-[13px] leading-relaxed text-brume">
+          Aucune séance prévue ce jour-là.
+        </p>
+      </Feuille>
+    );
+  }
+
+  const numero = semaineDuProgramme(programme.debutISO, date);
+  const cycle = semaineDuCycle(programme.semaines, numero);
+  const fait = journal?.statut === "terminee";
+  const seriesFaites = journal?.series.filter((s) => s.fait) ?? [];
+
+  return (
+    <Feuille
+      ouverte
+      onFermer={onFermer}
+      surtitre={`${libelleDate(date)} · ${creneau.heure}`}
+      titre={seance.nom}
+    >
+      <div className="flex flex-wrap items-center gap-3">
+        <Etiquette ton="jaune">Semaine {numero} / 12</Etiquette>
+        {cycle && <Etiquette>{cycle.bloc}</Etiquette>}
+        {journal?.statut === "terminee" && <Etiquette ton="vert">Faite</Etiquette>}
+        {journal?.statut === "sautee" && <Etiquette ton="rouge">Sautée</Etiquette>}
+        {journal?.statut === "en_cours" && <Etiquette ton="jaune">En cours</Etiquette>}
+      </div>
+
+      {fait ? (
+        <p className="mt-3 text-[13px] leading-relaxed text-brume">
+          {seriesFaites.length} série{seriesFaites.length > 1 ? "s" : ""} validée
+          {seriesFaites.length > 1 ? "s" : ""}
+          {journal?.dureeMin ? ` en ${journal.dureeMin} minutes` : ""}.
+        </p>
+      ) : (
+        cycle && (
+          <p className="mt-3 text-[13px] leading-relaxed text-brume">
+            {cycle.intention}
+          </p>
+        )
+      )}
+
+      {/* L'échauffement ne sert qu'avant : le relire après coup est du bruit. */}
+      {!journal && seance.echauffement.length > 0 && (
+        <section className="mt-6">
+          <TitreSection titre="Échauffement" />
+          <ul className="space-y-1.5">
+            {seance.echauffement.map((ligne) => (
+              <li key={ligne} className="text-[13px] leading-snug text-brume">
+                {ligne}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <section className="mt-6">
+        <TitreSection
+          titre="Exercices"
+          action={<Etiquette>{seance.exercices.length}</Etiquette>}
+        />
+        <ul className="divide-y divide-trait border-t border-trait">
+          {seance.exercices.map((exercice) => {
+            const dose = doseDe(exercice, cycle);
+            const series = (journal?.series ?? [])
+              .filter((s) => s.exerciceId === exercice.id)
+              .sort((a, b) => a.index - b.index);
+
+            return (
+              <li key={exercice.id} className="py-3">
+                <p className="text-[14px] leading-tight font-medium">{exercice.nom}</p>
+                <p className="chiffres mt-1 text-[12px] text-brume">
+                  {dose.series} × {dose.reps} · repos {dose.reposSec}s
+                  {series.length > 0 &&
+                    (series[0].variante === "maison"
+                      ? " · sans machine"
+                      : " · avec machine")}
+                </p>
+                {dose.reserve && !journal && (
+                  <p className="mt-0.5 text-[12px] text-brume-faible">{dose.reserve}</p>
+                )}
+
+                {/* Ce qui a réellement été soulevé, série par série. */}
+                {series.length > 0 && (
+                  <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+                    {series.map((s) => (
+                      <li
+                        key={s.index}
+                        className={`chiffres text-[12px] ${
+                          s.fait ? "text-encre" : "text-brume-faible line-through"
+                        }`}
+                      >
+                        {libelleSerie(s)}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
+      {seance.finisher && (
+        <section className="mt-6">
+          <TitreSection
+            titre="Finisher"
+            action={
+              cycle ? (
+                <Etiquette ton={cycle.finisherObligatoire ? "jaune" : undefined}>
+                  {cycle.finisherObligatoire ? "Prévu" : "Facultatif"}
+                </Etiquette>
+              ) : undefined
+            }
+          />
+          <p className="text-[13px] leading-relaxed text-brume">{seance.finisher}</p>
+        </section>
+      )}
+    </Feuille>
+  );
+}
+
+/**
+ * Une série réalisée, dite avec ce qu'on en sait.
+ *
+ * Les deux champs sont facultatifs : une planche n'a ni répétitions ni charge,
+ * des pompes ont des répétitions sans charge. Écrire « — × poids du corps »
+ * dans ces cas-là revenait à inventer une information qu'on n'a pas.
+ */
+function libelleSerie(s: Doc<"seancesLog">["series"][number]): string {
+  if (s.reps != null && s.poidsKg != null) return `${s.reps} × ${s.poidsKg} kg`;
+  if (s.reps != null) return `${s.reps} reps`;
+  if (s.poidsKg != null) return `${s.poidsKg} kg`;
+  return s.fait ? "faite" : "non faite";
 }

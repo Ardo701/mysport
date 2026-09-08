@@ -29,7 +29,10 @@ téléphone, barre latérale et mise en page sur deux colonnes à partir de 1024
 - **Planning** — calendrier à trois échelles (jour, semaine, mois) qui montre
   la journée type, la semaine d'entraînement et le mois d'un coup d'œil, et se
   met à jour en direct pendant qu'on modifie les horaires : heures de coucher
-  et de lever, heures des repas, créneaux d'entraînement de la semaine.
+  et de lever, heures des repas, créneaux d'entraînement de la semaine. Le
+  **détail d'une séance** s'ouvre depuis n'importe quel jour : à venir, la liste
+  des exercices avec la prescription de la semaine en cours ; passée, les
+  charges et répétitions réellement enregistrées, série par série.
 - **Thème** — sombre par défaut, clair au choix. La bascule est en bas de la
   barre latérale sur ordinateur, et sur la page Profil pour le téléphone, qui
   n'a pas de barre latérale. Le choix est propre à l'appareil.
