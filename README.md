@@ -84,14 +84,21 @@ npx convex dev  # dans un autre, pour synchroniser les fonctions Convex
 ## Déploiement sur Vercel
 
 La commande de build est fixée par `vercel.json` : `node scripts/deployer.mjs`.
-Ce script fait tout le travail de configuration à chaque déploiement, sans rien
-écraser de ce qui existe déjà :
+Ce script fait tout le travail de configuration à chaque déploiement :
 
-1. génère la paire `JWT_PRIVATE_KEY` / `JWKS` de Convex Auth si elle manque ;
+1. génère la paire `JWT_PRIVATE_KEY` / `JWKS` de Convex Auth si elle manque —
+   jamais autrement, la regénérer déconnecterait tous les comptes ;
 2. cale `SITE_URL` sur l'URL du déploiement Vercel ;
-3. recopie `OPENAI_API_KEY` des variables Vercel vers Convex ;
+3. porte `OPENAI_API_KEY` et `OPENAI_MODEL` des variables Vercel vers Convex,
+   quand elles y manquent **ou qu'elles y diffèrent** : Vercel est l'endroit où
+   on les saisit, une clé changée là doit donc suivre. Sans cette comparaison,
+   une rotation de clé laisserait l'application appeler OpenAI avec l'ancienne,
+   sans rien dire ;
 4. déploie les fonctions Convex, puis construit l'application en lui injectant
    `NEXT_PUBLIC_CONVEX_URL`.
+
+Une variable modifiée dans Vercel n'atteint Convex qu'au déploiement suivant :
+après l'avoir changée, relancer un build (Vercel → Deployments → Redeploy).
 
 Deux valeurs seulement sont à saisir une fois dans Vercel (Settings →
 Environment Variables), parce qu'elles n'existent que dans tes comptes :
