@@ -24,8 +24,10 @@ téléphone, barre latérale et mise en page sur deux colonnes à partir de 1024
   supposé par le niveau d'activité** ouvre des calories sur la cible du jour :
   compter la marche entière la compterait deux fois, puisque le multiplicateur
   du profil la contient déjà.
-- **Planning** — heures de coucher et de lever, heures des repas, créneaux
-  d'entraînement de la semaine.
+- **Planning** — calendrier à trois échelles (jour, semaine, mois) qui montre
+  la journée type, la semaine d'entraînement et le mois d'un coup d'œil, et se
+  met à jour en direct pendant qu'on modifie les horaires : heures de coucher
+  et de lever, heures des repas, créneaux d'entraînement de la semaine.
 - **Sommeil** — durée, qualité, dette de sommeil sur 14 jours.
 - **Progression** — courbe de poids, tour de taille, régularité des séances,
   volume soulevé, marche des 14 derniers jours.

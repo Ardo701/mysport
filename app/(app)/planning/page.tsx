@@ -13,6 +13,7 @@ import {
   Message,
   TitreSection,
 } from "@/composants/ui";
+import { Calendrier } from "@/composants/calendrier";
 import { IconeHorloge, IconeLune } from "@/composants/icones";
 import { JOURS, dureeNuitMin, minutesEnHeures } from "@/lib/dates";
 import { TYPES_REPAS } from "@/lib/repas";
@@ -90,6 +91,18 @@ export default function PagePlanning() {
           dans un rythme, la faim et le sommeil se calent dessus.
         </p>
       </header>
+
+      {/* Le calendrier lit les réglages du dessous, en direct. */}
+      <Calendrier
+        planning={{
+          heureLever,
+          heureCoucher,
+          objectifSommeilH,
+          repas,
+          entrainements,
+        }}
+        seances={seances}
+      />
 
       <Colonnes>
         <Colonne>
