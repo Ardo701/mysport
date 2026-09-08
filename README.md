@@ -120,7 +120,19 @@ convex/
   ia.ts           actions OpenAI : photo, texte, menus, programme
   schema.ts       modèle de données
 lib/              utilitaires côté client
+scripts/          déploiement Vercel et génération des icônes
 ```
+
+## Icônes
+
+Le logo vit dans `app/icon.svg`. Les PNG qui en dérivent — `app/apple-icon.png`
+pour l'écran d'accueil iOS, `public/icone-*.png` pour le manifeste — sont
+générés par `node scripts/icones.mjs`, à relancer après toute retouche du
+dessin. Le SVG seul ne suffit pas : iOS ne le lit pas au moment d'ajouter le
+site à l'écran d'accueil, et affiche sinon une capture de la page.
+
+iOS garde l'icône en cache : après un déploiement, retirer le raccourci et le
+rajouter pour voir la nouvelle.
 
 ## Accès
 
