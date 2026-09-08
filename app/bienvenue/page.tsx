@@ -284,8 +284,8 @@ export default function PageBienvenue() {
                     onClick={() => basculer(legumes, setLegumes, l)}
                     className={`rounded-full border px-3 py-2 text-[13px] transition ${
                       actif
-                        ? "border-jaune bg-jaune-voile text-craie"
-                        : "border-trait bg-ardoise text-brume-sombre"
+                        ? "border-jaune bg-jaune-voile text-encre"
+                        : "border-trait bg-creux text-brume-faible"
                     }`}
                   >
                     {l}
@@ -293,7 +293,7 @@ export default function PageBienvenue() {
                 );
               })}
             </div>
-            <p className="mt-2.5 text-[11px] leading-relaxed text-brume-sombre">
+            <p className="mt-2.5 text-[11px] leading-relaxed text-brume-faible">
               Seuls ces légumes apparaîtront dans tes menus. Tu pourras les changer
               plus tard depuis ton profil.
             </p>
@@ -310,8 +310,8 @@ export default function PageBienvenue() {
                     onClick={() => basculer(contraintes, setContraintes, c)}
                     className={`rounded-full border px-3 py-2 text-[13px] transition ${
                       actif
-                        ? "border-jaune bg-jaune-voile text-craie"
-                        : "border-trait bg-ardoise text-brume-sombre"
+                        ? "border-jaune bg-jaune-voile text-encre"
+                        : "border-trait bg-creux text-brume-faible"
                     }`}
                   >
                     {c}
@@ -321,7 +321,7 @@ export default function PageBienvenue() {
             </div>
           </div>
 
-          <div className="rounded-net border border-trait bg-ardoise p-4">
+          <div className="rounded-net border border-trait bg-creux p-4">
             <p className="surtitre mb-3">Tes cibles quotidiennes</p>
             <div className="grid grid-cols-2 gap-2">
               <Stat libelle="Calories" valeur={cibles.kcal} unite="kcal" />
@@ -329,7 +329,7 @@ export default function PageBienvenue() {
               <Stat libelle="Glucides" valeur={cibles.glucides} unite="g" />
               <Stat libelle="Lipides" valeur={cibles.lipides} unite="g" />
             </div>
-            <p className="mt-3 text-[11px] leading-relaxed text-brume-sombre">
+            <p className="mt-3 text-[11px] leading-relaxed text-brume-faible">
               Calculées à partir de ton métabolisme et de ton objectif. Ajustables
               à tout moment.
             </p>
@@ -349,7 +349,7 @@ export default function PageBienvenue() {
           <span
             key={i}
             className={`h-[3px] flex-1 rounded-full transition-colors ${
-              i <= etape ? "bg-jaune" : "bg-trait"
+              i <= etape ? "bg-jaune-vif" : "bg-trait"
             }`}
           />
         ))}

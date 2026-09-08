@@ -163,7 +163,7 @@ export function AnalyseurRepas({
     >
       {!analyse && (
         <div className="space-y-5">
-          <div className="flex gap-1 rounded-lg border border-trait bg-ardoise p-1">
+          <div className="flex gap-1 rounded-lg border border-trait bg-creux p-1">
             {(
               [
                 ["photo", "Photo", IconeAppareilPhoto],
@@ -177,7 +177,7 @@ export function AnalyseurRepas({
                   setErreur(null);
                 }}
                 className={`flex flex-1 items-center justify-center gap-2 rounded-md py-2.5 text-[13px] font-medium transition ${
-                  onglet === cle ? "bg-jaune text-noir" : "text-brume"
+                  onglet === cle ? "bg-jaune-vif text-sur-jaune" : "text-brume"
                 }`}
               >
                 <Icone className="h-4 w-4" />
@@ -195,8 +195,8 @@ export function AnalyseurRepas({
                   onClick={() => setType(t.cle)}
                   className={`rounded-lg border px-1 py-2.5 text-[11px] leading-tight transition ${
                     type === t.cle
-                      ? "border-jaune bg-jaune-voile text-craie"
-                      : "border-trait bg-ardoise text-brume-sombre"
+                      ? "border-jaune bg-jaune-voile text-encre"
+                      : "border-trait bg-creux text-brume-faible"
                   }`}
                 >
                   {t.court}
@@ -220,7 +220,7 @@ export function AnalyseurRepas({
               />
               <button
                 onClick={() => champFichier.current?.click()}
-                className="flex w-full flex-col items-center justify-center gap-3 rounded-net border border-dashed border-trait bg-ardoise px-4 py-10 transition hover:border-jaune"
+                className="flex w-full flex-col items-center justify-center gap-3 rounded-net border border-dashed border-trait bg-creux px-4 py-10 transition hover:border-jaune"
               >
                 {apercu ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -235,7 +235,7 @@ export function AnalyseurRepas({
                     <span className="text-[14px] font-medium">
                       Prendre une photo du repas
                     </span>
-                    <span className="text-[12px] text-brume-sombre">
+                    <span className="text-[12px] text-brume-faible">
                       Cadre l'assiette entière, de trois quarts si possible
                     </span>
                   </>
@@ -267,7 +267,7 @@ export function AnalyseurRepas({
                 placeholder="Ex. : un kebab galette avec frites et sauce blanche, un coca 33 cl et deux carrés de chocolat."
                 className="champ resize-none !font-sans !text-[14px]"
               />
-              <p className="text-[11px] leading-relaxed text-brume-sombre">
+              <p className="text-[11px] leading-relaxed text-brume-faible">
                 Donne les quantités si tu les connais (grammes, nombre de parts,
                 taille du plat) : l'estimation sera bien plus juste.
               </p>
@@ -314,13 +314,13 @@ export function AnalyseurRepas({
             ].map(([libelle, valeur, unite]) => (
               <div
                 key={libelle as string}
-                className="rounded-lg border border-trait bg-ardoise px-2 py-3 text-center"
+                className="rounded-lg border border-trait bg-creux px-2 py-3 text-center"
               >
                 <p className="chiffres titre text-[19px] font-semibold leading-none">
                   {valeur}
                   {unite}
                 </p>
-                <p className="mt-1.5 text-[10px] uppercase tracking-wider text-brume-sombre">
+                <p className="mt-1.5 text-[10px] uppercase tracking-wider text-brume-faible">
                   {libelle}
                 </p>
               </div>
@@ -333,11 +333,11 @@ export function AnalyseurRepas({
               {analyse.aliments.map((a, i) => (
                 <li
                   key={i}
-                  className="flex items-baseline justify-between gap-3 bg-ardoise px-3.5 py-2.5"
+                  className="flex items-baseline justify-between gap-3 bg-creux px-3.5 py-2.5"
                 >
                   <div className="min-w-0">
                     <p className="truncate text-[13px]">{a.aliment}</p>
-                    <p className="text-[11px] text-brume-sombre">
+                    <p className="text-[11px] text-brume-faible">
                       {a.quantiteEstimee}
                     </p>
                   </div>
@@ -367,7 +367,7 @@ export function AnalyseurRepas({
               {etat === "enregistrement" ? "Enregistrement…" : "Ajouter au journal"}
             </Bouton>
           </div>
-          <p className="text-[11px] leading-relaxed text-brume-sombre">
+          <p className="text-[11px] leading-relaxed text-brume-faible">
             Une estimation reste une estimation. Elle suffit largement pour piloter
             une semaine, pas pour compter au gramme près.
           </p>

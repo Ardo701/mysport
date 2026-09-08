@@ -31,7 +31,7 @@ export function Fournisseurs({ children }: { children: ReactNode }) {
 function ConfigurationManquante() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-[560px] flex-col justify-center px-6 py-12">
-      <div className="mb-6 h-1 w-14 rounded-full bg-jaune" />
+      <div className="mb-6 h-1 w-14 rounded-full bg-jaune-vif" />
       <h1 className="titre text-[28px] font-bold leading-tight">
         Configuration incomplète
       </h1>
@@ -40,14 +40,14 @@ function ConfigurationManquante() {
         n'était pas définie au moment du build : l'application ne sait pas à quel
         déploiement Convex se connecter.
       </p>
-      <ul className="mt-5 space-y-3 text-[13px] leading-relaxed text-brume-sombre">
+      <ul className="mt-5 space-y-3 text-[13px] leading-relaxed text-brume-faible">
         <li>
-          <span className="text-craie">En local</span> — lance{" "}
+          <span className="text-encre">En local</span> — lance{" "}
           <code className="text-jaune">npx convex dev</code>, qui écrit la
           variable dans <code>.env.local</code>.
         </li>
         <li>
-          <span className="text-craie">Sur Vercel</span> — la commande de build
+          <span className="text-encre">Sur Vercel</span> — la commande de build
           doit être{" "}
           <code className="text-jaune">
             npx convex deploy --cmd &apos;npm run build&apos;

@@ -56,7 +56,7 @@ export function AjoutRapide({
       titre="Grignotage et boissons"
     >
       <div className="space-y-5">
-        <div className="flex gap-1 rounded-lg border border-trait bg-ardoise p-1">
+        <div className="flex gap-1 rounded-lg border border-trait bg-creux p-1">
           {(
             [
               ["grignotage", "À grignoter"],
@@ -67,7 +67,7 @@ export function AjoutRapide({
               key={cle}
               onClick={() => setOnglet(cle)}
               className={`flex-1 rounded-md py-2.5 text-[13px] font-medium transition ${
-                onglet === cle ? "bg-jaune text-noir" : "text-brume"
+                onglet === cle ? "bg-jaune-vif text-sur-jaune" : "text-brume"
               }`}
             >
               {libelle}
@@ -82,11 +82,11 @@ export function AjoutRapide({
             return (
               <li
                 key={extra.id}
-                className="flex items-center gap-2.5 bg-ardoise px-3.5 py-2.5"
+                className="flex items-center gap-2.5 bg-creux px-3.5 py-2.5"
               >
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-[14px]">{extra.nom}</p>
-                  <p className="chiffres text-[11px] text-brume-sombre">
+                  <p className="chiffres text-[11px] text-brume-faible">
                     {extra.portion} · {extra.kcal} kcal
                   </p>
                 </div>
@@ -100,7 +100,7 @@ export function AjoutRapide({
                       }))
                     }
                     aria-label={`Diminuer la quantité de ${extra.nom}`}
-                    className="px-2 py-1.5 text-brume-sombre transition hover:text-craie"
+                    className="px-2 py-1.5 text-brume-faible transition hover:text-encre"
                   >
                     −
                   </button>
@@ -112,7 +112,7 @@ export function AjoutRapide({
                       setQuantites((q) => ({ ...q, [extra.id]: quantite + 1 }))
                     }
                     aria-label={`Augmenter la quantité de ${extra.nom}`}
-                    className="px-2 py-1.5 text-brume-sombre transition hover:text-craie"
+                    className="px-2 py-1.5 text-brume-faible transition hover:text-encre"
                   >
                     +
                   </button>
@@ -123,8 +123,8 @@ export function AjoutRapide({
                   aria-label={`Ajouter ${extra.nom}`}
                   className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md border transition ${
                     vientDEtreAjoute
-                      ? "border-jaune bg-jaune text-noir"
-                      : "border-trait text-brume-sombre hover:border-jaune hover:text-jaune"
+                      ? "border-jaune bg-jaune-vif text-sur-jaune"
+                      : "border-trait text-brume-faible hover:border-jaune hover:text-jaune"
                   }`}
                 >
                   {vientDEtreAjoute ? (

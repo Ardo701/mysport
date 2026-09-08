@@ -39,7 +39,7 @@ export function Anneau({
           cy={taille / 2}
           r={rayon}
           fill="none"
-          stroke={depassement ? "var(--color-rouge)" : "var(--color-jaune)"}
+          stroke={depassement ? "var(--color-rouge)" : "var(--color-jaune-vif)"}
           strokeWidth={epaisseur}
           strokeLinecap="round"
           strokeDasharray={`${rempli} ${circonference}`}
@@ -50,7 +50,7 @@ export function Anneau({
         <span className="chiffres titre text-[34px] font-semibold leading-none">
           {Math.round(valeur)}
         </span>
-        <span className="mt-1.5 text-[11px] text-brume-sombre">
+        <span className="mt-1.5 text-[11px] text-brume-faible">
           sur {Math.round(cible)} {unite}
         </span>
         <span
@@ -69,7 +69,7 @@ export function BarreMacro({
   valeur,
   cible,
   unite = "g",
-  couleur = "var(--color-jaune)",
+  couleur = "var(--color-jaune-vif)",
 }: {
   libelle: string;
   valeur: number;
@@ -83,8 +83,8 @@ export function BarreMacro({
     <div>
       <div className="mb-1.5 flex items-baseline justify-between">
         <span className="text-[12px] text-brume">{libelle}</span>
-        <span className="chiffres text-[12px] text-brume-sombre">
-          <span className={depasse ? "text-rouge" : "text-craie"}>
+        <span className="chiffres text-[12px] text-brume-faible">
+          <span className={depasse ? "text-rouge" : "text-encre"}>
             {Math.round(valeur)}
           </span>
           {" / "}
@@ -108,7 +108,7 @@ export function BarreMacro({
 /** Petite jauge linéaire utilisée pour le sommeil et les séances. */
 export function Jauge({
   pourcent,
-  couleur = "var(--color-jaune)",
+  couleur = "var(--color-jaune-vif)",
 }: {
   pourcent: number;
   couleur?: string;
@@ -140,17 +140,17 @@ export function Stat({
   detail?: string;
 }) {
   return (
-    <div className="rounded-net border border-trait bg-ardoise px-3.5 py-3">
+    <div className="rounded-net border border-trait bg-creux px-3.5 py-3">
       <p className="surtitre mb-2">{libelle}</p>
       <p className="chiffres titre text-[22px] font-semibold leading-none">
         {valeur}
         {unite && (
-          <span className="ml-1 text-[12px] font-normal text-brume-sombre">
+          <span className="ml-1 text-[12px] font-normal text-brume-faible">
             {unite}
           </span>
         )}
       </p>
-      {detail && <p className="mt-1.5 text-[11px] text-brume-sombre">{detail}</p>}
+      {detail && <p className="mt-1.5 text-[11px] text-brume-faible">{detail}</p>}
     </div>
   );
 }

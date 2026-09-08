@@ -127,7 +127,7 @@ export default function PageAujourdhui() {
             />
             {seance?.seance ? (
               <Link href="/seance" className="block">
-                <Carte className="transition hover:border-trait-clair">
+                <Carte className="transition hover:border-trait-vif">
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
                       <div className="mb-2 flex items-center gap-2">
@@ -143,7 +143,7 @@ export default function PageAujourdhui() {
                         {seance.seance.focus}
                       </p>
                     </div>
-                    <IconeFleche className="mt-1 h-5 w-5 shrink-0 text-brume-sombre" />
+                    <IconeFleche className="mt-1 h-5 w-5 shrink-0 text-brume-faible" />
                   </div>
 
                   <div className="mt-4 flex items-center gap-3">
@@ -183,7 +183,7 @@ export default function PageAujourdhui() {
                       fatiguer les muscles.
                     </p>
                   </div>
-                  <IconeEclair className="h-5 w-5 shrink-0 text-brume-sombre" />
+                  <IconeEclair className="h-5 w-5 shrink-0 text-brume-faible" />
                 </div>
               </Carte>
             )}
@@ -214,12 +214,12 @@ export default function PageAujourdhui() {
 
                 return (
                   <Link key={type} href="/repas" className="block">
-                    <div className="flex items-center gap-3.5 rounded-net border border-trait bg-nuit px-4 py-3.5 transition hover:border-trait-clair">
+                    <div className="flex items-center gap-3.5 rounded-net border border-trait bg-surface px-4 py-3.5 transition hover:border-trait-vif">
                       <span
                         className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border ${
                           fait
-                            ? "border-jaune bg-jaune text-noir"
-                            : "border-trait text-brume-sombre"
+                            ? "border-jaune bg-jaune-vif text-sur-jaune"
+                            : "border-trait text-brume-faible"
                         }`}
                       >
                         <IconeAssiette className="h-4 w-4" />
@@ -230,12 +230,12 @@ export default function PageAujourdhui() {
                             {libelleTypeRepas(type)}
                           </p>
                           {heure && (
-                            <span className="chiffres text-[11px] text-brume-sombre">
+                            <span className="chiffres text-[11px] text-brume-faible">
                               {heure}
                             </span>
                           )}
                         </div>
-                        <p className="mt-0.5 truncate text-[12px] text-brume-sombre">
+                        <p className="mt-0.5 truncate text-[12px] text-brume-faible">
                           {fait
                             ? enregistres.map((r) => r.nom).join(", ")
                             : type === "dejeuner"
@@ -268,13 +268,13 @@ export default function PageAujourdhui() {
 
           {/* Courses */}
           <Link href="/courses" className="block">
-            <div className="flex items-center gap-3.5 rounded-net border border-trait bg-nuit px-4 py-3.5 transition hover:border-trait-clair">
+            <div className="flex items-center gap-3.5 rounded-net border border-trait bg-surface px-4 py-3.5 transition hover:border-trait-vif">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-trait text-jaune">
                 <IconePanier className="h-4.5 w-4.5" />
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[14px] font-medium">Liste de courses</span>
-                <span className="mt-0.5 block text-[12px] text-brume-sombre">
+                <span className="mt-0.5 block text-[12px] text-brume-faible">
                   {courses === undefined
                     ? "Chargement…"
                     : courses.filter((l) => !l.achete).length === 0
@@ -282,7 +282,7 @@ export default function PageAujourdhui() {
                       : `${courses.filter((l) => !l.achete).length} produits à prendre`}
                 </span>
               </span>
-              <IconeFleche className="h-4 w-4 shrink-0 text-brume-sombre" />
+              <IconeFleche className="h-4 w-4 shrink-0 text-brume-faible" />
             </div>
           </Link>
         </Colonne>
@@ -292,7 +292,7 @@ export default function PageAujourdhui() {
           <section>
             <TitreSection surtitre="Récupération" titre="Nuit dernière" />
             <Link href="/sommeil" className="block">
-              <Carte className="transition hover:border-trait-clair">
+              <Carte className="transition hover:border-trait-vif">
                 {nuit ? (
                   <>
                     <div className="flex items-end justify-between">
@@ -300,7 +300,7 @@ export default function PageAujourdhui() {
                         <p className="chiffres titre text-[26px] font-semibold leading-none">
                           {minutesEnHeures(nuit.dureeMin)}
                         </p>
-                        <p className="chiffres mt-2 text-[12px] text-brume-sombre">
+                        <p className="chiffres mt-2 text-[12px] text-brume-faible">
                           {nuit.heureCoucher} → {nuit.heureLever} · qualité{" "}
                           {nuit.qualite}/5
                         </p>
@@ -309,7 +309,7 @@ export default function PageAujourdhui() {
                     </div>
                     <div className="mt-4">
                       <Jauge pourcent={(nuit.dureeMin / objectifSommeilMin) * 100} />
-                      <p className="mt-2 text-[11px] text-brume-sombre">
+                      <p className="mt-2 text-[11px] text-brume-faible">
                         Objectif {planning?.objectifSommeilH ?? 8} h par nuit
                         {nuit.dureeMin < objectifSommeilMin - 30
                           ? " — tu es en dessous, la récupération musculaire en pâtit."
@@ -349,7 +349,7 @@ export default function PageAujourdhui() {
                 }
               />
               <Link href="/progression" className="block">
-                <div className="flex h-full items-center justify-between rounded-net border border-trait bg-ardoise px-3.5 py-3 transition hover:border-trait-clair">
+                <div className="flex h-full items-center justify-between rounded-net border border-trait bg-creux px-3.5 py-3 transition hover:border-trait-vif">
                   <div>
                     <p className="surtitre mb-2">Suivi</p>
                     <p className="titre text-[15px] font-semibold leading-none">

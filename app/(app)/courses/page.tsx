@@ -106,7 +106,7 @@ export default function PageCourses() {
       <header className="pt-2 lg:pt-0">
         <Link
           href="/repas"
-          className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-brume transition hover:text-craie lg:hidden"
+          className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-brume transition hover:text-encre lg:hidden"
         >
           <IconeChevronGauche className="h-4 w-4" />
           Repas
@@ -122,13 +122,13 @@ export default function PageCourses() {
         <div className="space-y-5 lg:sticky lg:top-9">
           {/* Période et avancement */}
           <Carte>
-            <div className="mb-4 flex gap-1 rounded-lg border border-trait bg-ardoise p-1">
+            <div className="mb-4 flex gap-1 rounded-lg border border-trait bg-creux p-1">
               {[3, 7, 14].map((n) => (
                 <button
                   key={n}
                   onClick={() => setJours(n)}
                   className={`flex-1 rounded-md py-2.5 text-[13px] font-medium transition ${
-                    jours === n ? "bg-jaune text-noir" : "text-brume"
+                    jours === n ? "bg-jaune-vif text-sur-jaune" : "text-brume"
                   }`}
                 >
                   {n} jours
@@ -143,7 +143,7 @@ export default function PageCourses() {
               </span>
             </div>
             <Jauge pourcent={progression} />
-            <p className="mt-3 text-[12px] leading-relaxed text-brume-sombre">
+            <p className="mt-3 text-[12px] leading-relaxed text-brume-faible">
               Du {libelleDateCourt(date)} au {libelleDateCourt(ajouterJours(date, jours - 1))}.
               Le déjeuner n'y figure pas : c'est ton repas libre.
             </p>
@@ -195,9 +195,9 @@ export default function PageCourses() {
           ) : (
             <button
               onClick={() => setFormulaireOuvert(true)}
-              className="flex w-full items-center gap-3 rounded-net border border-dashed border-trait bg-nuit px-4 py-3.5 text-left transition hover:border-jaune"
+              className="flex w-full items-center gap-3 rounded-net border border-dashed border-trait bg-surface px-4 py-3.5 text-left transition hover:border-jaune"
             >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-trait text-brume-sombre">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-trait text-brume-faible">
                 <IconePlus className="h-4 w-4" />
               </span>
               <span className="text-[14px] text-brume">
@@ -224,7 +224,7 @@ export default function PageCourses() {
                     groupe.niveau === 0 ? <Etiquette ton="jaune">Priorité</Etiquette> : null
                   }
                 />
-                <p className="mb-3 -mt-1 text-[12px] text-brume-sombre">
+                <p className="mb-3 -mt-1 text-[12px] text-brume-faible">
                   {groupe.detail}
                 </p>
                 <ul className="divide-y divide-trait overflow-hidden rounded-net border border-trait">
@@ -294,14 +294,14 @@ function LigneCourse({
   onSupprimer?: () => void;
 }) {
   return (
-    <li className="flex items-center gap-3 bg-nuit px-3.5 py-3">
+    <li className="flex items-center gap-3 bg-surface px-3.5 py-3">
       <button
         onClick={onBasculer}
         aria-pressed={ligne.achete}
         aria-label={ligne.achete ? `Décocher ${ligne.nom}` : `Marquer ${ligne.nom} comme acheté`}
         className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md border transition ${
           ligne.achete
-            ? "border-jaune bg-jaune text-noir"
+            ? "border-jaune bg-jaune-vif text-sur-jaune"
             : "border-trait text-transparent hover:border-jaune"
         }`}
       >
@@ -310,11 +310,11 @@ function LigneCourse({
 
       <button onClick={onBasculer} className="min-w-0 flex-1 text-left">
         <p
-          className={`truncate text-[14px] ${ligne.achete ? "text-brume-sombre line-through" : ""}`}
+          className={`truncate text-[14px] ${ligne.achete ? "text-brume-faible line-through" : ""}`}
         >
           {ligne.nom}
         </p>
-        <p className="chiffres mt-0.5 text-[11px] text-brume-sombre">
+        <p className="chiffres mt-0.5 text-[11px] text-brume-faible">
           {ligne.quantite} · {ligne.rayon.toLowerCase()} · pour{" "}
           {libelleRelatif(ligne.dateBesoin).toLowerCase()}
         </p>
@@ -324,7 +324,7 @@ function LigneCourse({
         <button
           onClick={onSupprimer}
           aria-label={`Supprimer ${ligne.nom}`}
-          className="shrink-0 p-1 text-brume-sombre transition hover:text-rouge"
+          className="shrink-0 p-1 text-brume-faible transition hover:text-rouge"
         >
           <IconeCorbeille className="h-4 w-4" />
         </button>

@@ -44,10 +44,10 @@ const VUES: { cle: Vue; libelle: string }[] = [
 ];
 
 const COULEUR_POINT: Record<Evenement["nature"], string> = {
-  lever: "bg-brume-sombre",
+  lever: "bg-brume-faible",
   repas: "bg-brume",
-  seance: "bg-jaune",
-  coucher: "bg-brume-sombre",
+  seance: "bg-jaune-vif",
+  coucher: "bg-brume-faible",
 };
 
 /**
@@ -101,7 +101,7 @@ export function Calendrier({
           {date !== today && (
             <button
               onClick={() => setDate(today)}
-              className="rounded-lg border border-trait bg-ardoise px-3 py-2 text-[12px] text-brume transition hover:border-jaune hover:text-craie"
+              className="rounded-lg border border-trait bg-creux px-3 py-2 text-[12px] text-brume transition hover:border-jaune hover:text-encre"
             >
               Aujourd'hui
             </button>
@@ -109,28 +109,28 @@ export function Calendrier({
           <button
             onClick={() => decaler(-1)}
             aria-label="Période précédente"
-            className="rounded-lg border border-trait bg-ardoise p-2 text-brume transition hover:text-craie"
+            className="rounded-lg border border-trait bg-creux p-2 text-brume transition hover:text-encre"
           >
             <IconeChevronGauche className="h-4 w-4" />
           </button>
           <button
             onClick={() => decaler(1)}
             aria-label="Période suivante"
-            className="rounded-lg border border-trait bg-ardoise p-2 text-brume transition hover:text-craie"
+            className="rounded-lg border border-trait bg-creux p-2 text-brume transition hover:text-encre"
           >
             <IconeChevronDroite className="h-4 w-4" />
           </button>
         </div>
       </div>
 
-      <div className="mb-4 flex gap-1 rounded-lg border border-trait bg-ardoise p-1 sm:max-w-[400px]">
+      <div className="mb-4 flex gap-1 rounded-lg border border-trait bg-creux p-1 sm:max-w-[400px]">
         {VUES.map((v) => (
           <button
             key={v.cle}
             onClick={() => setVue(v.cle)}
             aria-pressed={vue === v.cle}
             className={`flex-1 rounded-md py-2.5 text-[13px] font-medium transition ${
-              vue === v.cle ? "bg-jaune text-noir" : "text-brume hover:text-craie"
+              vue === v.cle ? "bg-jaune-vif text-sur-jaune" : "text-brume hover:text-encre"
             }`}
           >
             {v.libelle}
@@ -226,7 +226,7 @@ function VueJour({
                 {e.libelle}
               </p>
               {e.detail && (
-                <p className="mt-1 text-[12px] leading-snug text-brume-sombre">
+                <p className="mt-1 text-[12px] leading-snug text-brume-faible">
                   {e.detail}
                 </p>
               )}
@@ -235,7 +235,7 @@ function VueJour({
         ))}
       </ul>
 
-      <p className="mt-4 border-t border-trait pt-3.5 text-[12px] leading-relaxed text-brume-sombre">
+      <p className="mt-4 border-t border-trait pt-3.5 text-[12px] leading-relaxed text-brume-faible">
         {minutesEnHeures(dureeNuitMin(planning.heureCoucher, planning.heureLever))} de
         sommeil prévues, objectif {planning.objectifSommeilH} h.
       </p>
@@ -276,8 +276,8 @@ function VueSemaine({
               choisi
                 ? "border-jaune bg-jaune-voile"
                 : entrainement
-                  ? "border-trait bg-ardoise hover:border-trait-clair"
-                  : "border-trait bg-noir hover:border-trait-clair"
+                  ? "border-trait bg-creux hover:border-trait-vif"
+                  : "border-trait bg-fond hover:border-trait-vif"
             }`}
           >
             <div className="flex items-baseline justify-between gap-2 lg:block">
@@ -286,7 +286,7 @@ function VueSemaine({
               >
                 {JOURS[jourDeLaSemaine(jour) - 1]}
               </span>
-              <span className="chiffres text-[11px] text-brume-sombre lg:mt-1 lg:block">
+              <span className="chiffres text-[11px] text-brume-faible lg:mt-1 lg:block">
                 {Number(jour.slice(8))}
               </span>
             </div>
@@ -308,10 +308,10 @@ function VueSemaine({
                 )}
               </div>
             ) : (
-              <p className="mt-2.5 text-[11px] text-brume-sombre">Repos</p>
+              <p className="mt-2.5 text-[11px] text-brume-faible">Repos</p>
             )}
 
-            <p className="chiffres mt-2.5 text-[10px] text-brume-sombre">
+            <p className="chiffres mt-2.5 text-[10px] text-brume-faible">
               {repasActifs} repas · {planning.heureCoucher}
             </p>
           </button>
@@ -363,17 +363,17 @@ function VueMois({
                 choisi
                   ? "border-jaune bg-jaune-voile"
                   : dansLeMois
-                    ? "border-trait bg-ardoise hover:border-trait-clair"
+                    ? "border-trait bg-creux hover:border-trait-vif"
                     : "border-transparent"
               }`}
             >
               <span
                 className={`chiffres text-[13px] leading-none ${
                   !dansLeMois
-                    ? "text-brume-sombre/50"
+                    ? "text-brume-faible/50"
                     : jour === today
                       ? "font-semibold text-jaune"
-                      : "text-craie"
+                      : "text-encre"
                 }`}
               >
                 {Number(jour.slice(8))}
@@ -388,8 +388,8 @@ function VueMois({
                       : statut === "sautee"
                         ? "bg-rouge"
                         : dansLeMois
-                          ? "bg-jaune"
-                          : "bg-trait-clair"
+                          ? "bg-jaune-vif"
+                          : "bg-trait-vif"
                 }`}
               />
             </button>
@@ -426,7 +426,7 @@ function ResumeJour({
           Voir la journée
         </button>
       </div>
-      <p className="mt-1.5 text-[12px] leading-relaxed text-brume-sombre">
+      <p className="mt-1.5 text-[12px] leading-relaxed text-brume-faible">
         {entrainement
           ? `${entrainement.seance?.nom ?? "Séance"} à ${entrainement.creneau.heure}`
           : "Jour de repos"}

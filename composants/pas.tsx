@@ -63,15 +63,15 @@ export function CartePas({
           <div>
             <p className="chiffres titre text-[30px] font-bold leading-none">
               {enregistres === null ? (
-                <span className="text-brume-sombre">—</span>
+                <span className="text-brume-faible">—</span>
               ) : (
                 enregistres.toLocaleString("fr-FR")
               )}
-              <span className="ml-1.5 text-[13px] font-normal text-brume-sombre">
+              <span className="ml-1.5 text-[13px] font-normal text-brume-faible">
                 pas
               </span>
             </p>
-            <p className="chiffres mt-2 text-[12px] text-brume-sombre">
+            <p className="chiffres mt-2 text-[12px] text-brume-faible">
               {enregistres === null
                 ? `Objectif ${objectif.toLocaleString("fr-FR")} pas`
                 : `${effort.distanceKm.toFixed(1)} km · ${effort.kcalMarche} kcal`}
@@ -112,7 +112,7 @@ export function CartePas({
             <button
               key={ajout}
               onClick={() => envoyer((enregistres ?? 0) + ajout)}
-              className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-trait bg-ardoise py-2 text-[12px] text-brume transition hover:border-jaune hover:text-craie"
+              className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-trait bg-creux py-2 text-[12px] text-brume transition hover:border-jaune hover:text-encre"
             >
               <IconePlus className="h-3.5 w-3.5" />
               <span className="chiffres">{ajout.toLocaleString("fr-FR")}</span>
@@ -124,12 +124,12 @@ export function CartePas({
           <div className="mt-4 space-y-2 border-t border-trait pt-3.5">
             {effort.kcalSeance > 0 && (
               <p className="flex items-center gap-2 text-[12px] text-brume">
-                <IconeHaltere className="h-3.5 w-3.5 shrink-0 text-brume-sombre" />
+                <IconeHaltere className="h-3.5 w-3.5 shrink-0 text-brume-faible" />
                 Séance : <span className="chiffres">{effort.kcalSeance} kcal</span>
               </p>
             )}
             {enregistres !== null && (
-              <p className="text-[11px] leading-relaxed text-brume-sombre">
+              <p className="text-[11px] leading-relaxed text-brume-faible">
                 {effort.ecartPas > 0 ? (
                   <>
                     Au-dessus de ton rythme habituel (

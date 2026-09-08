@@ -109,7 +109,7 @@ export default function PageRepas() {
         <button
           onClick={() => setDate(ajouterJours(date, -1))}
           aria-label="Jour précédent"
-          className="rounded-lg border border-trait bg-ardoise p-2 text-brume transition hover:text-craie"
+          className="rounded-lg border border-trait bg-creux p-2 text-brume transition hover:text-encre"
         >
           <IconeChevronGauche className="h-4 w-4" />
         </button>
@@ -123,7 +123,7 @@ export default function PageRepas() {
           onClick={() => setDate(ajouterJours(date, 1))}
           aria-label="Jour suivant"
           disabled={date >= aujourdhuiISO()}
-          className="rounded-lg border border-trait bg-ardoise p-2 text-brume transition hover:text-craie disabled:opacity-30"
+          className="rounded-lg border border-trait bg-creux p-2 text-brume transition hover:text-encre disabled:opacity-30"
         >
           <IconeChevronDroite className="h-4 w-4" />
         </button>
@@ -138,7 +138,7 @@ export default function PageRepas() {
                 <p className="surtitre mb-2">Consommé</p>
                 <p className="chiffres titre text-[30px] font-bold leading-none">
                   {Math.round(totaux.kcal)}
-                  <span className="ml-1.5 text-[13px] font-normal text-brume-sombre">
+                  <span className="ml-1.5 text-[13px] font-normal text-brume-faible">
                     / {effort.kcalCible} kcal
                   </span>
                 </p>
@@ -196,14 +196,14 @@ export default function PageRepas() {
               surtitre="Entre les repas"
               titre="Grignotage et boissons"
               action={
-                <span className="chiffres text-[12px] text-brume-sombre">
+                <span className="chiffres text-[12px] text-brume-faible">
                   {extras.reduce((s, r) => s + r.kcal, 0)} kcal
                 </span>
               }
             />
             <button
               onClick={() => setAjoutOuvert(true)}
-              className="flex w-full items-center gap-3.5 rounded-net border border-trait bg-nuit px-4 py-4 text-left transition hover:border-trait-clair"
+              className="flex w-full items-center gap-3.5 rounded-net border border-trait bg-surface px-4 py-4 text-left transition hover:border-trait-vif"
             >
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-jaune text-jaune">
                 <IconePlus className="h-4.5 w-4.5" />
@@ -212,7 +212,7 @@ export default function PageRepas() {
                 <span className="block text-[14px] font-medium">
                   Ajouter ce que tu as pris à côté
                 </span>
-                <span className="mt-0.5 block text-[12px] leading-snug text-brume-sombre">
+                <span className="mt-0.5 block text-[12px] leading-snug text-brume-faible">
                   Café, soda, bière, chips, chocolat… tout ce qui n'est pas de l'eau
                   compte dans la journée.
                 </span>
@@ -273,7 +273,7 @@ export default function PageRepas() {
             {menu.source === "ia" && (
               <button
                 onClick={() => reinitialiserMenu({ date })}
-                className="mt-3 text-[12px] text-brume-sombre transition hover:text-craie"
+                className="mt-3 text-[12px] text-brume-faible transition hover:text-encre"
               >
                 Revenir au menu par défaut
               </button>
@@ -284,7 +284,7 @@ export default function PageRepas() {
           <section>
             <TitreSection surtitre="Enregistré" titre="Journal du jour" />
             {journal.length === 0 ? (
-              <p className="rounded-net border border-dashed border-trait px-4 py-7 text-center text-[13px] text-brume-sombre">
+              <p className="rounded-net border border-dashed border-trait px-4 py-7 text-center text-[13px] text-brume-faible">
                 Rien d'enregistré pour l'instant.
               </p>
             ) : (
@@ -305,17 +305,17 @@ export default function PageRepas() {
 
           {/* Liste de courses */}
           <Link href="/courses" className="block">
-            <div className="flex items-center gap-3.5 rounded-net border border-trait bg-nuit px-4 py-3.5 transition hover:border-trait-clair">
+            <div className="flex items-center gap-3.5 rounded-net border border-trait bg-surface px-4 py-3.5 transition hover:border-trait-vif">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-trait text-jaune">
                 <IconePanier className="h-4.5 w-4.5" />
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[14px] font-medium">Liste de courses</span>
-                <span className="mt-0.5 block text-[12px] text-brume-sombre">
+                <span className="mt-0.5 block text-[12px] text-brume-faible">
                   Construite depuis tes menus, avec les dates d'achat
                 </span>
               </span>
-              <IconeChevronDroite className="h-4 w-4 shrink-0 text-brume-sombre" />
+              <IconeChevronDroite className="h-4 w-4 shrink-0 text-brume-faible" />
             </div>
           </Link>
         </Colonne>
@@ -374,13 +374,13 @@ function CartePlat({
 
       <button
         onClick={() => setOuvert((v) => !v)}
-        className="mt-3 text-[12px] text-brume-sombre transition hover:text-craie"
+        className="mt-3 text-[12px] text-brume-faible transition hover:text-encre"
       >
         {ouvert ? "Masquer la recette" : "Voir la recette"}
       </button>
 
       {ouvert && (
-        <div className="apparition mt-3 space-y-4 rounded-lg border border-trait bg-ardoise p-3.5">
+        <div className="apparition mt-3 space-y-4 rounded-lg border border-trait bg-creux p-3.5">
           <div>
             <p className="surtitre mb-2.5">Ingrédients</p>
             <ul className="space-y-1.5">
@@ -390,7 +390,7 @@ function CartePlat({
                   className="flex justify-between gap-3 text-[13px] text-brume"
                 >
                   <span>{ing.nom}</span>
-                  <span className="chiffres shrink-0 text-brume-sombre">
+                  <span className="chiffres shrink-0 text-brume-faible">
                     {ing.quantite}
                   </span>
                 </li>
@@ -443,17 +443,17 @@ function LigneJournal({
   const [ouvert, setOuvert] = useState(false);
 
   return (
-    <li className="overflow-hidden rounded-net border border-trait bg-nuit">
+    <li className="overflow-hidden rounded-net border border-trait bg-surface">
       <div className="flex items-center gap-3 px-4 py-3">
         <button
           onClick={() => setOuvert((v) => !v)}
           className="min-w-0 flex-1 text-left"
         >
           <div className="flex items-baseline gap-2">
-            <span className="chiffres text-[11px] text-brume-sombre">
+            <span className="chiffres text-[11px] text-brume-faible">
               {ligne.heure}
             </span>
-            <span className="surtitre !text-brume-sombre">
+            <span className="surtitre !text-brume-faible">
               {libelleTypeRepas(ligne.type)}
             </span>
             {ligne.source === "photo" && (
@@ -468,14 +468,14 @@ function LigneJournal({
         <button
           onClick={onSupprimer}
           aria-label="Supprimer ce repas"
-          className="shrink-0 p-1 text-brume-sombre transition hover:text-rouge"
+          className="shrink-0 p-1 text-brume-faible transition hover:text-rouge"
         >
           <IconeCorbeille className="h-4 w-4" />
         </button>
       </div>
 
       {ouvert && (
-        <div className="apparition space-y-3 border-t border-trait bg-ardoise px-4 py-3.5">
+        <div className="apparition space-y-3 border-t border-trait bg-creux px-4 py-3.5">
           {ligne.photoId && <PhotoRepas photoId={ligne.photoId} nom={ligne.nom} />}
           <div className="chiffres flex gap-4 text-[12px] text-brume">
             <span>{ligne.proteines} g prot.</span>
@@ -487,11 +487,11 @@ function LigneJournal({
               {ligne.detail.map((d, i) => (
                 <li
                   key={i}
-                  className="flex justify-between gap-3 text-[12px] text-brume-sombre"
+                  className="flex justify-between gap-3 text-[12px] text-brume-faible"
                 >
                   <span>
                     {d.aliment}{" "}
-                    <span className="text-brume-sombre/70">({d.quantiteEstimee})</span>
+                    <span className="text-brume-faible/70">({d.quantiteEstimee})</span>
                   </span>
                   <span className="chiffres shrink-0">{d.kcal} kcal</span>
                 </li>

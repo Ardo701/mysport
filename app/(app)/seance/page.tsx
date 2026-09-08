@@ -129,17 +129,17 @@ export default function PageSeance() {
                 className={`rounded-lg border px-3 py-3 text-left transition ${
                   varianteParDefaut === cle
                     ? "border-jaune bg-jaune-voile"
-                    : "border-trait bg-ardoise"
+                    : "border-trait bg-creux"
                 }`}
               >
                 <span className="block text-[14px] font-medium">{titre}</span>
-                <span className="mt-1 block text-[11px] text-brume-sombre">
+                <span className="mt-1 block text-[11px] text-brume-faible">
                   {detail}
                 </span>
               </button>
             ))}
           </div>
-          <p className="mb-4 text-[12px] leading-relaxed text-brume-sombre">
+          <p className="mb-4 text-[12px] leading-relaxed text-brume-faible">
             Tu pourras changer exercice par exercice pendant la séance, si une
             machine est prise ou absente.
           </p>
@@ -167,7 +167,7 @@ export default function PageSeance() {
             <ul className="space-y-1.5">
               {seance.echauffement.map((e, i) => (
                 <li key={i} className="flex gap-2.5 text-[13px] leading-relaxed text-brume">
-                  <span className="chiffres text-brume-sombre">{i + 1}.</span>
+                  <span className="chiffres text-brume-faible">{i + 1}.</span>
                   {e}
                 </li>
               ))}
@@ -178,7 +178,7 @@ export default function PageSeance() {
 
       {log && log.statut !== "sautee" && (
         <>
-          <div className="sticky top-0 z-30 -mx-5 border-b border-trait bg-noir/90 px-5 py-3 backdrop-blur-xl lg:-mx-10 lg:px-10 xl:-mx-14 xl:px-14">
+          <div className="sticky top-0 z-30 -mx-5 border-b border-trait bg-fond/90 px-5 py-3 backdrop-blur-xl lg:-mx-10 lg:px-10 xl:-mx-14 xl:px-14">
             <div className="mb-2 flex items-baseline justify-between">
               <span className="surtitre">Avancement</span>
               <span className="chiffres text-[12px] text-brume">
@@ -279,14 +279,14 @@ function BlocExercice({
           </p>
         </div>
         {toutesFaites && (
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-jaune text-noir">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-jaune-vif text-sur-jaune">
             <IconeCoche className="h-3.5 w-3.5" />
           </span>
         )}
       </div>
 
       {/* Bascule salle / maison */}
-      <div className="mt-3.5 flex gap-1 rounded-lg border border-trait bg-ardoise p-1">
+      <div className="mt-3.5 flex gap-1 rounded-lg border border-trait bg-creux p-1">
         {(
           [
             ["salle", "Avec machine"],
@@ -300,7 +300,7 @@ function BlocExercice({
               choisirVariante({ logId: log._id, exerciceId: exercice.id, variante: cle })
             }
             className={`flex-1 rounded-md py-2 text-[12px] font-medium transition disabled:opacity-50 ${
-              variante === cle ? "bg-jaune text-noir" : "text-brume"
+              variante === cle ? "bg-jaune-vif text-sur-jaune" : "text-brume"
             }`}
           >
             {libelle}
@@ -312,21 +312,21 @@ function BlocExercice({
         onClick={() => setDetailOuvert((v) => !v)}
         className="mt-3 w-full text-left"
       >
-        <p className="text-[12px] text-brume-sombre">
+        <p className="text-[12px] text-brume-faible">
           {detail.materiel} · {detailOuvert ? "masquer" : "comment faire"}
         </p>
       </button>
       {detailOuvert && (
-        <div className="apparition mt-2.5 space-y-2 rounded-lg border border-trait bg-ardoise p-3.5">
+        <div className="apparition mt-2.5 space-y-2 rounded-lg border border-trait bg-creux p-3.5">
           <p className="text-[13px] leading-relaxed text-brume">{detail.execution}</p>
-          <p className="border-t border-trait pt-2.5 text-[12px] leading-relaxed text-brume-sombre">
+          <p className="border-t border-trait pt-2.5 text-[12px] leading-relaxed text-brume-faible">
             {exercice.conseil}
           </p>
         </div>
       )}
 
       {dernieresCharges?.poidsKg !== undefined && (
-        <p className="chiffres mt-3 text-[11px] text-brume-sombre">
+        <p className="chiffres mt-3 text-[11px] text-brume-faible">
           Dernière fois : {dernieresCharges.poidsKg} kg × {dernieresCharges.reps ?? "?"}{" "}
           reps
         </p>
@@ -390,10 +390,10 @@ function LigneSerie({
   return (
     <div
       className={`flex items-center gap-2 rounded-lg border px-2.5 py-2 transition ${
-        serie.fait ? "border-jaune/30 bg-jaune-voile" : "border-trait bg-ardoise"
+        serie.fait ? "border-jaune/30 bg-jaune-voile" : "border-trait bg-creux"
       }`}
     >
-      <span className="chiffres w-6 shrink-0 text-center text-[12px] text-brume-sombre">
+      <span className="chiffres w-6 shrink-0 text-center text-[12px] text-brume-faible">
         {serie.index + 1}
       </span>
       <input
@@ -405,9 +405,9 @@ function LigneSerie({
         onChange={(e) => setPoids(e.target.value)}
         placeholder="kg"
         aria-label={`Charge série ${serie.index + 1}`}
-        className="chiffres w-full min-w-0 rounded-md border border-trait bg-noir px-2.5 py-2 text-center text-[15px] outline-none focus:border-jaune"
+        className="chiffres w-full min-w-0 rounded-md border border-trait bg-fond px-2.5 py-2 text-center text-[15px] outline-none focus:border-jaune"
       />
-      <span className="shrink-0 text-[12px] text-brume-sombre">×</span>
+      <span className="shrink-0 text-[12px] text-brume-faible">×</span>
       <input
         type="number"
         inputMode="numeric"
@@ -416,7 +416,7 @@ function LigneSerie({
         onChange={(e) => setReps(e.target.value)}
         placeholder="reps"
         aria-label={`Répétitions série ${serie.index + 1}`}
-        className="chiffres w-full min-w-0 rounded-md border border-trait bg-noir px-2.5 py-2 text-center text-[15px] outline-none focus:border-jaune"
+        className="chiffres w-full min-w-0 rounded-md border border-trait bg-fond px-2.5 py-2 text-center text-[15px] outline-none focus:border-jaune"
       />
       <button
         onClick={basculer}
@@ -424,8 +424,8 @@ function LigneSerie({
         aria-label={serie.fait ? "Annuler la série" : "Valider la série"}
         className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md border transition disabled:opacity-50 ${
           serie.fait
-            ? "border-jaune bg-jaune text-noir"
-            : "border-trait text-brume-sombre hover:border-jaune hover:text-jaune"
+            ? "border-jaune bg-jaune-vif text-sur-jaune"
+            : "border-trait text-brume-faible hover:border-jaune hover:text-jaune"
         }`}
       >
         <IconeCoche className="h-4 w-4" />
@@ -460,7 +460,7 @@ function FormulaireFin({
               onChange={(e) => setDuree(e.target.value)}
               className="champ chiffres"
             />
-            <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-sm text-brume-sombre">
+            <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-sm text-brume-faible">
               min
             </span>
           </div>
@@ -475,15 +475,15 @@ function FormulaireFin({
                 onClick={() => setRessenti(n)}
                 className={`chiffres flex-1 rounded-lg border py-3 text-[15px] transition ${
                   ressenti === n
-                    ? "border-jaune bg-jaune text-noir font-semibold"
-                    : "border-trait bg-ardoise text-brume"
+                    ? "border-jaune bg-jaune-vif text-sur-jaune font-semibold"
+                    : "border-trait bg-creux text-brume"
                 }`}
               >
                 {n}
               </button>
             ))}
           </div>
-          <p className="mt-2 text-[11px] text-brume-sombre">
+          <p className="mt-2 text-[11px] text-brume-faible">
             1 = trop facile, 5 = à la limite. Sers-t'en pour ajuster les charges la
             prochaine fois.
           </p>

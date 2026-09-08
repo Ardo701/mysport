@@ -101,7 +101,7 @@ export default function PageProgression() {
       <header className="pt-2 lg:pt-0">
         <Link
           href="/"
-          className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-brume transition hover:text-craie lg:hidden"
+          className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-brume transition hover:text-encre lg:hidden"
         >
           <IconeChevronGauche className="h-4 w-4" />
           Aujourd'hui
@@ -150,7 +150,7 @@ export default function PageProgression() {
               action={<IconeBalance className="h-5 w-5 text-jaune" />}
             />
             {mesures.length < 2 ? (
-              <p className="py-6 text-center text-[13px] text-brume-sombre">
+              <p className="py-6 text-center text-[13px] text-brume-faible">
                 Ajoute au moins deux pesées pour voir la courbe. Pèse-toi le matin, à
                 jeun, deux fois par semaine.
               </p>
@@ -202,7 +202,7 @@ export default function PageProgression() {
                   <Message ton="succes">Pesée enregistrée.</Message>
                 </div>
               )}
-              <p className="mt-3 text-[11px] leading-relaxed text-brume-sombre">
+              <p className="mt-3 text-[11px] leading-relaxed text-brume-faible">
                 Le tour de taille est le meilleur indicateur pour le ventre et les
                 poignées d'amour : il bouge même quand la balance stagne.
               </p>
@@ -239,7 +239,7 @@ export default function PageProgression() {
               journees={journeesPas}
               reference={pasDeReference(profil.niveauActivite)}
             />
-            <p className="mt-3 text-[11px] leading-relaxed text-brume-sombre">
+            <p className="mt-3 text-[11px] leading-relaxed text-brume-faible">
               En jaune, les journées au-dessus des{" "}
               {pasDeReference(profil.niveauActivite).toLocaleString("fr-FR")} pas
               que suppose déjà ton niveau d'activité. Ce sont celles-là qui
@@ -258,7 +258,7 @@ export default function PageProgression() {
           <section>
             <TitreSection surtitre="Historique" titre="Dernières séances" />
             {terminees.length === 0 ? (
-              <p className="rounded-net border border-dashed border-trait px-4 py-7 text-center text-[13px] text-brume-sombre">
+              <p className="rounded-net border border-dashed border-trait px-4 py-7 text-center text-[13px] text-brume-faible">
                 Aucune séance terminée pour l'instant.
               </p>
             ) : (
@@ -266,11 +266,11 @@ export default function PageProgression() {
                 {terminees.slice(0, 10).map((s) => (
                   <li
                     key={s._id}
-                    className="flex items-center gap-3 bg-nuit px-4 py-3"
+                    className="flex items-center gap-3 bg-surface px-4 py-3"
                   >
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-[14px]">{s.seanceNom}</p>
-                      <p className="chiffres mt-0.5 text-[11px] text-brume-sombre">
+                      <p className="chiffres mt-0.5 text-[11px] text-brume-faible">
                         {libelleDateCourt(s.date)} · {s.series.filter((x) => x.fait).length}{" "}
                         séries · {s.dureeMin ?? "?"} min
                       </p>
@@ -342,13 +342,13 @@ function CourbePoids({ points }: { points: { date: string; valeur: number }[] })
             cx={c.x}
             cy={c.y}
             r={i === coords.length - 1 ? 3.5 : 2}
-            fill={i === coords.length - 1 ? "var(--color-jaune)" : "var(--color-noir)"}
+            fill={i === coords.length - 1 ? "var(--color-jaune)" : "var(--color-fond)"}
             stroke="var(--color-jaune)"
             strokeWidth="1.5"
           />
         ))}
       </svg>
-      <div className="chiffres mt-2 flex justify-between text-[11px] text-brume-sombre">
+      <div className="chiffres mt-2 flex justify-between text-[11px] text-brume-faible">
         <span>{libelleDateCourt(points[0].date)}</span>
         <span>
           {valeurs[0].toFixed(1)} → {valeurs[valeurs.length - 1].toFixed(1)} kg
@@ -393,18 +393,18 @@ function AssiduiteHebdo({
                         ? "var(--color-jaune)"
                         : s.compte === 0
                           ? "var(--color-trait)"
-                          : "var(--color-trait-clair)",
+                          : "var(--color-trait-vif)",
                   }}
                 />
               </div>
-              <span className="chiffres text-[10px] text-brume-sombre">
+              <span className="chiffres text-[10px] text-brume-faible">
                 {s.compte}
               </span>
             </div>
           );
         })}
       </div>
-      <p className="mt-3 text-[11px] leading-relaxed text-brume-sombre">
+      <p className="mt-3 text-[11px] leading-relaxed text-brume-faible">
         Objectif : {objectif} séances par semaine. Les semaines pleines sont en
         jaune. La régularité pèse plus lourd que la perfection d'une séance.
       </p>
@@ -449,7 +449,7 @@ function MarcheQuinzaine({
                 backgroundColor: journee
                   ? auDessus
                     ? "var(--color-jaune)"
-                    : "var(--color-trait-clair)"
+                    : "var(--color-trait-vif)"
                   : "transparent",
                 border: journee ? "none" : "1px dashed var(--color-trait)",
                 minHeight: journee ? undefined : "6px",

@@ -68,7 +68,7 @@ export function BarreNavigation() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-trait bg-noir/85 backdrop-blur-xl lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-trait bg-fond/85 backdrop-blur-xl lg:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <ul className="mx-auto flex max-w-[560px] items-stretch">
@@ -84,17 +84,17 @@ export function BarreNavigation() {
                 <span
                   aria-hidden="true"
                   className={`absolute inset-x-5 top-0 h-[2px] rounded-full transition-opacity ${
-                    actif ? "bg-jaune opacity-100" : "opacity-0"
+                    actif ? "bg-jaune-vif opacity-100" : "opacity-0"
                   }`}
                 />
                 <Icone
                   className={`h-[21px] w-[21px] transition-colors ${
-                    actif ? "text-jaune" : "text-brume-sombre"
+                    actif ? "text-jaune" : "text-brume-faible"
                   }`}
                 />
                 <span
                   className={`text-[10px] leading-none transition-colors ${
-                    actif ? "text-craie" : "text-brume-sombre"
+                    actif ? "text-encre" : "text-brume-faible"
                   }`}
                 >
                   {libelle}
@@ -113,11 +113,11 @@ export function BarreLaterale({ prenom }: { prenom?: string }) {
   const chemin = usePathname();
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-40 hidden w-[248px] flex-col border-r border-trait bg-nuit lg:flex">
+    <aside className="fixed inset-y-0 left-0 z-40 hidden w-[248px] flex-col border-r border-trait bg-surface lg:flex">
       <div className="px-6 pb-7 pt-8">
-        <div className="mb-4 h-1 w-9 rounded-full bg-jaune" />
+        <div className="mb-4 h-1 w-9 rounded-full bg-jaune-vif" />
         <p className="titre text-[22px] font-bold leading-none">Cadence</p>
-        <p className="mt-2 text-[12px] text-brume-sombre">
+        <p className="mt-2 text-[12px] text-brume-faible">
           Sport, repas et sommeil
         </p>
       </div>
@@ -136,22 +136,22 @@ export function BarreLaterale({ prenom }: { prenom?: string }) {
                       aria-current={actif ? "page" : undefined}
                       className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-[14px] leading-none transition ${
                         actif
-                          ? "bg-jaune-voile text-craie"
-                          : "text-brume hover:bg-ardoise hover:text-craie"
+                          ? "bg-jaune-voile text-encre"
+                          : "text-brume hover:bg-creux hover:text-encre"
                       }`}
                     >
                       <Icone
                         className={`h-[18px] w-[18px] shrink-0 transition-colors ${
                           actif
                             ? "text-jaune"
-                            : "text-brume-sombre group-hover:text-brume"
+                            : "text-brume-faible group-hover:text-brume"
                         }`}
                       />
                       {libelle}
                       {actif && (
                         <span
                           aria-hidden="true"
-                          className="ml-auto h-1.5 w-1.5 rounded-full bg-jaune"
+                          className="ml-auto h-1.5 w-1.5 rounded-full bg-jaune-vif"
                         />
                       )}
                     </Link>

@@ -157,8 +157,8 @@ export default function PagePlanning() {
                     }}
                     className={`chiffres flex-1 rounded-lg border py-2.5 text-[13px] transition ${
                       objectifSommeilH === h
-                        ? "border-jaune bg-jaune text-noir font-semibold"
-                        : "border-trait bg-ardoise text-brume"
+                        ? "border-jaune bg-jaune-vif text-sur-jaune font-semibold"
+                        : "border-trait bg-creux text-brume"
                     }`}
                   >
                     {h}
@@ -167,7 +167,7 @@ export default function PagePlanning() {
               </div>
             </div>
 
-            <p className="mt-3.5 flex items-center gap-2 text-[12px] leading-relaxed text-brume-sombre">
+            <p className="mt-3.5 flex items-center gap-2 text-[12px] leading-relaxed text-brume-faible">
               <IconeHorloge className="h-3.5 w-3.5 shrink-0" />
               Ces horaires donnent {minutesEnHeures(dureePrevue)} de sommeil
               {dureePrevue < objectifSommeilH * 60
@@ -186,25 +186,25 @@ export default function PagePlanning() {
                 return (
                   <li
                     key={t.cle}
-                    className="flex items-center gap-3 bg-ardoise px-3.5 py-3"
+                    className="flex items-center gap-3 bg-creux px-3.5 py-3"
                   >
                     <button
                       onClick={() => majRepas(t.cle, { actif: !ligne.actif })}
                       aria-pressed={ligne.actif}
                       className={`h-5 w-9 shrink-0 rounded-full border transition ${
-                        ligne.actif ? "border-jaune bg-jaune" : "border-trait bg-noir"
+                        ligne.actif ? "border-jaune bg-jaune-vif" : "border-trait bg-fond"
                       }`}
                     >
                       <span
                         className={`block h-3.5 w-3.5 rounded-full transition ${
                           ligne.actif
-                            ? "ml-[18px] bg-noir"
-                            : "ml-[3px] bg-brume-sombre"
+                            ? "ml-[18px] bg-fond"
+                            : "ml-[3px] bg-brume-faible"
                         }`}
                       />
                     </button>
                     <span
-                      className={`flex-1 text-[14px] ${ligne.actif ? "" : "text-brume-sombre line-through"}`}
+                      className={`flex-1 text-[14px] ${ligne.actif ? "" : "text-brume-faible line-through"}`}
                     >
                       {t.libelle}
                     </span>
@@ -213,13 +213,13 @@ export default function PagePlanning() {
                       value={ligne.heure}
                       disabled={!ligne.actif}
                       onChange={(e) => majRepas(t.cle, { heure: e.target.value })}
-                      className="chiffres w-[104px] rounded-md border border-trait bg-noir px-2.5 py-2 text-center text-[14px] outline-none focus:border-jaune disabled:opacity-40"
+                      className="chiffres w-[104px] rounded-md border border-trait bg-fond px-2.5 py-2 text-center text-[14px] outline-none focus:border-jaune disabled:opacity-40"
                     />
                   </li>
                 );
               })}
             </ul>
-            <p className="mt-3 text-[12px] leading-relaxed text-brume-sombre">
+            <p className="mt-3 text-[12px] leading-relaxed text-brume-faible">
               Le déjeuner reste libre : c'est le repas que tu enregistres par photo ou
               par description.
             </p>
@@ -244,7 +244,7 @@ export default function PagePlanning() {
                   <li
                     key={jour}
                     className={`rounded-net border px-3.5 py-3 transition ${
-                      creneau ? "border-jaune/30 bg-jaune-voile" : "border-trait bg-ardoise"
+                      creneau ? "border-jaune/30 bg-jaune-voile" : "border-trait bg-creux"
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -256,7 +256,7 @@ export default function PagePlanning() {
                         onChange={(e) =>
                           majJour(jour, e.target.value === "" ? null : e.target.value)
                         }
-                        className="min-w-0 flex-1 rounded-md border border-trait bg-noir px-2.5 py-2 text-[13px] outline-none focus:border-jaune"
+                        className="min-w-0 flex-1 rounded-md border border-trait bg-fond px-2.5 py-2 text-[13px] outline-none focus:border-jaune"
                       >
                         <option value="">Repos</option>
                         {seances.map((s) => (
@@ -270,12 +270,12 @@ export default function PagePlanning() {
                           type="time"
                           value={creneau.heure}
                           onChange={(e) => majJour(jour, creneau.seanceId, e.target.value)}
-                          className="chiffres w-[96px] shrink-0 rounded-md border border-trait bg-noir px-2 py-2 text-center text-[13px] outline-none focus:border-jaune"
+                          className="chiffres w-[96px] shrink-0 rounded-md border border-trait bg-fond px-2 py-2 text-center text-[13px] outline-none focus:border-jaune"
                         />
                       )}
                     </div>
                     {creneau && (
-                      <p className="mt-2 pl-[86px] text-[11px] text-brume-sombre">
+                      <p className="mt-2 pl-[86px] text-[11px] text-brume-faible">
                         {seances.find((s) => s.id === creneau.seanceId)?.focus}
                       </p>
                     )}

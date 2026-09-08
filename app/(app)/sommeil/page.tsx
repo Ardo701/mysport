@@ -83,7 +83,7 @@ export default function PageSommeil() {
       <header className="pt-2 lg:pt-0">
         <Link
           href="/"
-          className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-brume transition hover:text-craie lg:hidden"
+          className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-brume transition hover:text-encre lg:hidden"
         >
           <IconeChevronGauche className="h-4 w-4" />
           Aujourd'hui
@@ -130,12 +130,12 @@ export default function PageSommeil() {
               </label>
             </div>
 
-            <div className="mt-4 rounded-net border border-trait bg-ardoise px-4 py-3.5">
+            <div className="mt-4 rounded-net border border-trait bg-creux px-4 py-3.5">
               <div className="flex items-end justify-between">
                 <p className="chiffres titre text-[28px] font-semibold leading-none">
                   {minutesEnHeures(duree)}
                 </p>
-                <span className="text-[12px] text-brume-sombre">
+                <span className="text-[12px] text-brume-faible">
                   objectif {planning.objectifSommeilH} h
                 </span>
               </div>
@@ -156,15 +156,15 @@ export default function PageSommeil() {
                     }}
                     className={`chiffres flex-1 rounded-lg border py-3 text-[15px] transition ${
                       qualite === n
-                        ? "border-jaune bg-jaune font-semibold text-noir"
-                        : "border-trait bg-ardoise text-brume"
+                        ? "border-jaune bg-jaune-vif font-semibold text-sur-jaune"
+                        : "border-trait bg-creux text-brume"
                     }`}
                   >
                     {n}
                   </button>
                 ))}
               </div>
-              <p className="mt-2 text-[11px] text-brume-sombre">
+              <p className="mt-2 text-[11px] text-brume-faible">
                 1 = nuit hachée, 5 = réveil frais.
               </p>
             </div>
@@ -218,7 +218,7 @@ export default function PageSommeil() {
             </div>
 
             {nuits.length === 0 ? (
-              <p className="rounded-net border border-dashed border-trait px-4 py-7 text-center text-[13px] text-brume-sombre">
+              <p className="rounded-net border border-dashed border-trait px-4 py-7 text-center text-[13px] text-brume-faible">
                 Aucune nuit enregistrée pour l'instant.
               </p>
             ) : (
@@ -244,7 +244,7 @@ export default function PageSommeil() {
                               backgroundColor: n
                                 ? suffisant
                                   ? "var(--color-jaune)"
-                                  : "var(--color-trait-clair)"
+                                  : "var(--color-trait-vif)"
                                 : "transparent",
                               border: n ? "none" : "1px dashed var(--color-trait)",
                               minHeight: n ? undefined : "6px",
@@ -255,7 +255,7 @@ export default function PageSommeil() {
                     );
                   })}
                 </div>
-                <p className="mt-3 text-[11px] leading-relaxed text-brume-sombre">
+                <p className="mt-3 text-[11px] leading-relaxed text-brume-faible">
                   En jaune, les nuits qui atteignent ton objectif. Sous 7 h de manière
                   répétée, la récupération musculaire et la gestion de la faim se
                   dégradent nettement.

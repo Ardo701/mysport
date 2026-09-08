@@ -179,7 +179,7 @@ export default function PageProfil() {
           {profil.prenom}
         </h1>
         {profil.email && (
-          <p className="mt-2 text-[13px] text-brume-sombre">{profil.email}</p>
+          <p className="mt-2 text-[13px] text-brume-faible">{profil.email}</p>
         )}
       </header>
 
@@ -234,7 +234,7 @@ export default function PageProfil() {
                     {generation ? "Génération…" : "Générer"}
                   </Bouton>
                 </div>
-                <p className="text-[11px] leading-relaxed text-brume-sombre">
+                <p className="text-[11px] leading-relaxed text-brume-faible">
                   Le nouveau programme garde tes créneaux du planning. Chaque exercice
                   conserve une version avec et une version sans machine.
                 </p>
@@ -331,12 +331,12 @@ export default function PageProfil() {
                 ].map(([libelle, valeur]) => (
                   <div
                     key={libelle as string}
-                    className="rounded-lg border border-trait bg-ardoise px-2 py-3 text-center"
+                    className="rounded-lg border border-trait bg-creux px-2 py-3 text-center"
                   >
                     <p className="chiffres titre text-[16px] font-semibold leading-none">
                       {valeur}
                     </p>
-                    <p className="mt-1.5 text-[10px] uppercase tracking-wider text-brume-sombre">
+                    <p className="mt-1.5 text-[10px] uppercase tracking-wider text-brume-faible">
                       {libelle}
                     </p>
                   </div>
@@ -349,13 +349,13 @@ export default function PageProfil() {
         <Colonne>
           <div className="grid grid-cols-2 gap-2 lg:hidden">
             <Link href="/progression" className="block">
-              <div className="flex h-full items-center justify-between rounded-net border border-trait bg-nuit px-4 py-3.5 transition hover:border-trait-clair">
+              <div className="flex h-full items-center justify-between rounded-net border border-trait bg-surface px-4 py-3.5 transition hover:border-trait-vif">
                 <span className="text-[14px]">Progression</span>
                 <IconeCourbe className="h-4.5 w-4.5 text-jaune" />
               </div>
             </Link>
             <Link href="/sommeil" className="block">
-              <div className="flex h-full items-center justify-between rounded-net border border-trait bg-nuit px-4 py-3.5 transition hover:border-trait-clair">
+              <div className="flex h-full items-center justify-between rounded-net border border-trait bg-surface px-4 py-3.5 transition hover:border-trait-vif">
                 <span className="text-[14px]">Sommeil</span>
                 <IconeLune className="h-4.5 w-4.5 text-jaune" />
               </div>
@@ -461,8 +461,8 @@ export default function PageProfil() {
                         onClick={() => basculer("legumesAimes", l)}
                         className={`rounded-full border px-3 py-2 text-[13px] transition ${
                           form.legumesAimes.includes(l)
-                            ? "border-jaune bg-jaune-voile text-craie"
-                            : "border-trait bg-ardoise text-brume-sombre"
+                            ? "border-jaune bg-jaune-voile text-encre"
+                            : "border-trait bg-creux text-brume-faible"
                         }`}
                       >
                         {l}
@@ -480,8 +480,8 @@ export default function PageProfil() {
                         onClick={() => basculer("contraintes", c)}
                         className={`rounded-full border px-3 py-2 text-[13px] transition ${
                           form.contraintes.includes(c)
-                            ? "border-jaune bg-jaune-voile text-craie"
-                            : "border-trait bg-ardoise text-brume-sombre"
+                            ? "border-jaune bg-jaune-voile text-encre"
+                            : "border-trait bg-creux text-brume-faible"
                         }`}
                       >
                         {c}
@@ -493,7 +493,7 @@ export default function PageProfil() {
                 <Bouton taille="large" onClick={sauvegarderProfil}>
                   Enregistrer le profil
                 </Bouton>
-                <p className="text-[11px] leading-relaxed text-brume-sombre">
+                <p className="text-[11px] leading-relaxed text-brume-faible">
                   Modifier ton poids ou ton objectif recalcule automatiquement tes
                   cibles caloriques.
                 </p>
@@ -524,7 +524,7 @@ export default function PageProfil() {
                 ].map(([libelle, valeur]) => (
                   <li
                     key={libelle}
-                    className="flex items-center justify-between gap-3 bg-ardoise px-3.5 py-2.5 text-[13px]"
+                    className="flex items-center justify-between gap-3 bg-creux px-3.5 py-2.5 text-[13px]"
                   >
                     <span className="text-brume">{libelle}</span>
                     <span className="chiffres">{valeur}</span>
@@ -539,7 +539,7 @@ export default function PageProfil() {
               await signOut();
               router.replace("/connexion");
             }}
-            className="flex w-full items-center justify-between rounded-net border border-trait bg-nuit px-4 py-3.5 text-[14px] text-brume transition hover:border-rouge/40 hover:text-rouge"
+            className="flex w-full items-center justify-between rounded-net border border-trait bg-surface px-4 py-3.5 text-[14px] text-brume transition hover:border-rouge/40 hover:text-rouge"
           >
             Se déconnecter
             <IconeFleche className="h-4 w-4" />
@@ -547,7 +547,7 @@ export default function PageProfil() {
         </Colonne>
       </Colonnes>
 
-      <p className="max-w-[62ch] pb-2 text-center text-[11px] leading-relaxed text-brume-sombre lg:text-left">
+      <p className="max-w-[62ch] pb-2 text-center text-[11px] leading-relaxed text-brume-faible lg:text-left">
         Cadence · les estimations nutritionnelles et les programmes sont des
         repères, pas un avis médical.
       </p>

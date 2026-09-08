@@ -36,10 +36,10 @@ type VarianteBouton = "primaire" | "secondaire" | "fantome" | "danger";
 
 const styleBouton: Record<VarianteBouton, string> = {
   primaire:
-    "bg-jaune text-noir hover:bg-jaune-sombre active:scale-[.985] font-semibold",
+    "bg-jaune-vif text-sur-jaune hover:bg-jaune-appui active:scale-[.985] font-semibold",
   secondaire:
-    "bg-ardoise text-craie border border-trait hover:border-trait-clair active:scale-[.985]",
-  fantome: "text-brume hover:text-craie",
+    "bg-creux text-encre border border-trait hover:border-trait-vif active:scale-[.985]",
+  fantome: "text-brume hover:text-encre",
   danger: "bg-transparent text-rouge border border-rouge/40 hover:bg-rouge/10",
 };
 
@@ -83,7 +83,7 @@ export function Champ({
       <span className="relative block">
         <input className={`champ chiffres ${className}`} {...props} />
         {suffixe && (
-          <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-sm text-brume-sombre">
+          <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-sm text-brume-faible">
             {suffixe}
           </span>
         )}
@@ -119,15 +119,15 @@ export function GroupeOptions<T extends string>({
               onClick={() => onChange(o.valeur)}
               className={`rounded-lg border px-3 py-3 text-left transition ${
                 actif
-                  ? "border-jaune bg-jaune-voile text-craie"
-                  : "border-trait bg-ardoise text-brume hover:border-trait-clair"
+                  ? "border-jaune bg-jaune-voile text-encre"
+                  : "border-trait bg-creux text-brume hover:border-trait-vif"
               }`}
             >
               <span className="block text-[14px] font-medium leading-tight">
                 {o.libelle}
               </span>
               {o.detail && (
-                <span className="mt-1 block text-[11px] leading-snug text-brume-sombre">
+                <span className="mt-1 block text-[11px] leading-snug text-brume-faible">
                   {o.detail}
                 </span>
               )}
@@ -163,8 +163,8 @@ export function Etiquette({
 
 export function Chargement({ texte = "Chargement" }: { texte?: string }) {
   return (
-    <div className="flex items-center gap-2 py-8 text-sm text-brume-sombre">
-      <span className="pulsation h-1.5 w-1.5 rounded-full bg-jaune" />
+    <div className="flex items-center gap-2 py-8 text-sm text-brume-faible">
+      <span className="pulsation h-1.5 w-1.5 rounded-full bg-jaune-vif" />
       {texte}…
     </div>
   );
@@ -187,7 +187,7 @@ export function EtatVide({
     >
       <p className="titre text-[15px] font-medium">{titre}</p>
       {detail && (
-        <p className="mx-auto mt-1.5 max-w-[34ch] text-[13px] leading-relaxed text-brume-sombre">
+        <p className="mx-auto mt-1.5 max-w-[34ch] text-[13px] leading-relaxed text-brume-faible">
           {detail}
         </p>
       )}
@@ -206,7 +206,7 @@ export function Message({
   children: ReactNode;
 }) {
   const tons = {
-    info: "border-trait bg-ardoise text-brume",
+    info: "border-trait bg-creux text-brume",
     erreur: "border-rouge/40 bg-rouge/10 text-rouge",
     succes: "border-vert/40 bg-vert/10 text-vert",
   };
