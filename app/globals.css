@@ -51,6 +51,37 @@
   color-scheme: dark;
 }
 
+/*
+ * Thème clair. Un script posé en tête de page écrit data-theme avant le
+ * premier rendu, à partir du choix mémorisé ou, à défaut, du réglage du
+ * système : sans lui, un utilisateur en clair verrait passer un éclair noir.
+ *
+ * Le jaune se dédouble ici pour de bon : #ffdd00 sur blanc plafonne à 1,3:1,
+ * illisible. L'accent descend donc à un ambre foncé pour le texte et les
+ * bordures, tandis que les aplats gardent un jaune franc, où c'est le texte
+ * posé dessus qui porte le contraste.
+ */
+:root[data-theme="clair"] {
+  color-scheme: light;
+
+  --color-fond: #f6f6f3;
+  --color-surface: #ffffff;
+  --color-creux: #ededea;
+  --color-creux-vif: #e4e4e0;
+  --color-trait: #dedcd6;
+  --color-trait-vif: #c4c2ba;
+  --color-encre: #14141a;
+  --color-brume: #5a5a64;
+  --color-brume-faible: #74747e;
+  --color-jaune: #856400;
+  --color-jaune-vif: #f5c800;
+  --color-jaune-appui: #e0b600;
+  --color-jaune-voile: #8564001f;
+  --color-sur-jaune: #08080a;
+  --color-vert: #0a7a48;
+  --color-rouge: #cf3722;
+}
+
 html,
 body {
   background-color: var(--color-fond);
@@ -104,13 +135,24 @@ code {
   font-weight: 600;
 }
 
-/* Trame discrète en fond de page, pour casser l'aplat noir. */
+/* Trame discrète en fond de page, pour casser l'aplat de fond. */
 .grain {
   background-image:
     radial-gradient(
       120% 80% at 50% -10%,
       rgba(255, 221, 0, 0.07) 0%,
       rgba(255, 221, 0, 0) 60%
+    ),
+    linear-gradient(var(--color-fond), var(--color-fond));
+}
+
+/* Sur fond clair le même voile vire au sale : il faut le rendre plus discret. */
+:root[data-theme="clair"] .grain {
+  background-image:
+    radial-gradient(
+      120% 80% at 50% -10%,
+      rgba(245, 200, 0, 0.16) 0%,
+      rgba(245, 200, 0, 0) 62%
     ),
     linear-gradient(var(--color-fond), var(--color-fond));
 }
@@ -144,11 +186,18 @@ code {
   background-color: var(--color-creux-vif);
 }
 
-/* Champs heure et date : on garde l'indicateur natif lisible sur fond sombre. */
+/* Champs heure et date : l'indicateur natif est noir, il faut l'inverser sur
+   fond sombre — et surtout pas sur fond clair, où il disparaîtrait. */
 input[type="time"]::-webkit-calendar-picker-indicator,
 input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1) brightness(0.7);
   cursor: pointer;
+}
+
+:root:not([data-theme="clair"])
+  input[type="time"]::-webkit-calendar-picker-indicator,
+:root:not([data-theme="clair"])
+  input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(0.7);
 }
 
 @keyframes pulsation {

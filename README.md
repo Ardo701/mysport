@@ -28,6 +28,9 @@ téléphone, barre latérale et mise en page sur deux colonnes à partir de 1024
   la journée type, la semaine d'entraînement et le mois d'un coup d'œil, et se
   met à jour en direct pendant qu'on modifie les horaires : heures de coucher
   et de lever, heures des repas, créneaux d'entraînement de la semaine.
+- **Thème** — sombre par défaut, clair au choix. La bascule est en bas de la
+  barre latérale sur ordinateur, et sur la page Profil pour le téléphone, qui
+  n'a pas de barre latérale. Le choix est propre à l'appareil.
 - **Sommeil** — durée, qualité, dette de sommeil sur 14 jours.
 - **Progression** — courbe de poids, tour de taille, régularité des séances,
   volume soulevé, marche des 14 derniers jours.
@@ -129,6 +132,26 @@ convex/
 lib/              utilitaires côté client
 scripts/          déploiement Vercel et génération des icônes
 ```
+
+## Couleurs et thèmes
+
+Les jetons de `app/globals.css` portent leur **rôle**, pas leur teinte : `fond`,
+`surface`, `creux`, `trait`, `encre`, `brume`. Seules leurs valeurs changent
+d'un thème à l'autre, sous `:root[data-theme="clair"]` — un composant n'a donc
+jamais à savoir quel thème est actif, et il n'existe pas de classe
+`dark:`.
+
+Le jaune fait exception et se dédouble, parce que `#ffdd00` sur blanc plafonne
+à 1,3:1 : `jaune` est l'accent **lisible** (texte, icônes, bordures), qui passe
+à un ambre foncé en clair, tandis que `jaune-vif` porte les **aplats** de la
+marque (boutons, jauges, points), où c'est `sur-jaune` posé dessus qui assure
+le contraste.
+
+`SCRIPT_THEME` (dans `composants/theme.tsx`) est inséré en tête de `<body>` et
+pose `data-theme` avant le premier rendu : sans lui, un utilisateur en clair
+verrait passer un éclair noir à chaque chargement. Le défaut reste le sombre,
+même quand le système est en clair — l'application a toujours eu cette
+apparence, basculer sans qu'on l'ait demandé serait la surprise.
 
 ## Icônes
 

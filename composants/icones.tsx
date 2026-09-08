@@ -54,6 +54,16 @@ export function IconeLune(p: Props) {
   );
 }
 
+export function IconeSoleil(p: Props) {
+  return (
+    <Svg {...p}>
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2" />
+      <path d="M5.4 5.4 7 7M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6" />
+    </Svg>
+  );
+}
+
 export function IconeCalendrier(p: Props) {
   return (
     <Svg {...p}>

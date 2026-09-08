@@ -25,6 +25,7 @@ import {
   IconeLune,
   IconeReglages,
 } from "@/composants/icones";
+import { BasculeTheme } from "@/composants/theme";
 import { aujourdhuiISO } from "@/lib/dates";
 
 const LEGUMES = [
@@ -532,6 +533,16 @@ export default function PageProfil() {
                 ))}
               </ul>
             )}
+          </Carte>
+
+          {/* Sur ordinateur la bascule vit dans la barre latérale ; le
+              téléphone n'en a pas, il lui faut donc son propre accès. */}
+          <Carte>
+            <TitreSection surtitre="Affichage" titre="Thème" />
+            <BasculeTheme />
+            <p className="mt-3 text-[11px] leading-relaxed text-brume-faible">
+              Le choix reste sur cet appareil, et sur celui-là seulement.
+            </p>
           </Carte>
 
           <button

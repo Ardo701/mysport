@@ -12,6 +12,7 @@ import {
   IconePanier,
   IconeProfil,
 } from "./icones";
+import { BasculeTheme } from "./theme";
 
 type Onglet = {
   href: string;
@@ -163,12 +164,15 @@ export function BarreLaterale({ prenom }: { prenom?: string }) {
         ))}
       </nav>
 
-      {prenom && (
-        <div className="border-t border-trait px-6 py-5">
-          <p className="surtitre mb-2">Connecté</p>
-          <p className="text-[14px] font-medium leading-none">{prenom}</p>
-        </div>
-      )}
+      <div className="border-t border-trait px-4 py-4">
+        {prenom && (
+          <div className="mb-3.5 px-2">
+            <p className="surtitre mb-2">Connecté</p>
+            <p className="text-[14px] font-medium leading-none">{prenom}</p>
+          </div>
+        )}
+        <BasculeTheme />
+      </div>
     </aside>
   );
 }

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 import { Fournisseurs } from "./fournisseurs";
+import { SCRIPT_THEME } from "@/composants/theme";
 
 const policeTitre = Space_Grotesk({
   variable: "--police-titre",
@@ -40,6 +41,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${policeTitre.variable} ${policeCorps.variable} h-full antialiased`}
     >
       <body className="grain min-h-full">
+        {/* Avant tout le reste : le thème doit être posé avant le premier rendu. */}
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_THEME }} />
         <Fournisseurs>{children}</Fournisseurs>
       </body>
     </html>
