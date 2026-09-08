@@ -141,6 +141,15 @@ export default defineSchema({
     .index("by_user_date", ["userId", "date"])
     .index("by_user", ["userId"]),
 
+  /** Pas de la journée, saisis à la main depuis le téléphone ou la montre. */
+  pasLog: defineTable({
+    userId: v.id("users"),
+    date: v.string(),
+    pas: v.number(),
+  })
+    .index("by_user_date", ["userId", "date"])
+    .index("by_user", ["userId"]),
+
   /** Liste de courses construite à partir des menus à venir. */
   courses: defineTable({
     userId: v.id("users"),

@@ -23,7 +23,9 @@ import {
   IconeLune,
   IconePanier,
 } from "@/composants/icones";
+import { CartePas } from "@/composants/pas";
 import { aujourdhuiISO, libelleDate, minutesEnHeures } from "@/lib/dates";
+import { effortDuJour } from "@/lib/effort";
 import { libelleTypeRepas } from "@/lib/repas";
 
 function salutation() {
@@ -45,6 +47,7 @@ export default function PageAujourdhui() {
   const planning = useQuery(api.planning.monPlanning);
   const mesures = useQuery(api.mesures.historiqueMesures, { limite: 90 });
   const courses = useQuery(api.courses.maListe);
+  const pas = useQuery(api.pas.pasDuJour, date ? { date } : "skip");
 
   if (!date || !profil || journal === undefined) return <Chargement />;
 
@@ -57,6 +60,12 @@ export default function PageAujourdhui() {
     }),
     { kcal: 0, proteines: 0, glucides: 0, lipides: 0 },
   );
+
+  const seanceFaite =
+    seance?.log?.statut === "terminee"
+      ? (seance.log.dureeMin ?? seance.seance?.dureeMin ?? null)
+      : null;
+  const effort = effortDuJour(profil, pas?.pas ?? null, seanceFaite);
 
   const typesEnregistres = new Set((journal ?? []).map((r) => r.type));
   const objectifSommeilMin = (planning?.objectifSommeilH ?? 8) * 60;
@@ -82,7 +91,7 @@ export default function PageAujourdhui() {
           {/* Calories et macros */}
           <Carte className="!p-5">
             <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-center sm:gap-6">
-              <Anneau valeur={totaux.kcal} cible={profil.kcalCible} />
+              <Anneau valeur={totaux.kcal} cible={effort.kcalCible} />
               <div className="w-full flex-1 space-y-3.5">
                 <BarreMacro
                   libelle="Protéines"
@@ -254,6 +263,31 @@ export default function PageAujourdhui() {
 
       <Colonnes>
         <Colonne>
+          {/* Pas et effort */}
+          <CartePas date={date} profil={profil} seanceDureeMin={seanceFaite} />
+
+          {/* Courses */}
+          <Link href="/courses" className="block">
+            <div className="flex items-center gap-3.5 rounded-net border border-trait bg-nuit px-4 py-3.5 transition hover:border-trait-clair">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-trait text-jaune">
+                <IconePanier className="h-4.5 w-4.5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[14px] font-medium">Liste de courses</span>
+                <span className="mt-0.5 block text-[12px] text-brume-sombre">
+                  {courses === undefined
+                    ? "Chargement…"
+                    : courses.filter((l) => !l.achete).length === 0
+                      ? "Rien à acheter pour le moment"
+                      : `${courses.filter((l) => !l.achete).length} produits à prendre`}
+                </span>
+              </span>
+              <IconeFleche className="h-4 w-4 shrink-0 text-brume-sombre" />
+            </div>
+          </Link>
+        </Colonne>
+
+        <Colonne>
           {/* Sommeil */}
           <section>
             <TitreSection surtitre="Récupération" titre="Nuit dernière" />
@@ -299,28 +333,6 @@ export default function PageAujourdhui() {
               </Carte>
             </Link>
           </section>
-        </Colonne>
-
-        <Colonne>
-          {/* Courses */}
-          <Link href="/courses" className="block">
-            <div className="flex items-center gap-3.5 rounded-net border border-trait bg-nuit px-4 py-3.5 transition hover:border-trait-clair">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-trait text-jaune">
-                <IconePanier className="h-4.5 w-4.5" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-[14px] font-medium">Liste de courses</span>
-                <span className="mt-0.5 block text-[12px] text-brume-sombre">
-                  {courses === undefined
-                    ? "Chargement…"
-                    : courses.filter((l) => !l.achete).length === 0
-                      ? "Rien à acheter pour le moment"
-                      : `${courses.filter((l) => !l.achete).length} produits à prendre`}
-                </span>
-              </span>
-              <IconeFleche className="h-4 w-4 shrink-0 text-brume-sombre" />
-            </div>
-          </Link>
 
           <section>
             <div className="grid grid-cols-2 gap-2">

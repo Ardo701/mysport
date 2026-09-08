@@ -18,11 +18,17 @@ téléphone, barre latérale et mise en page sur deux colonnes à partir de 1024
   ou 14 prochains jours : quantités cumulées, classement par rayon, date à
   laquelle acheter chaque produit (les produits frais s'achètent au dernier
   moment), cases à cocher pour ce qui est déjà acheté, et ajouts manuels.
+- **Pas** — le compteur du téléphone ou de la montre se recopie dans la journée.
+  La distance et la dépense s'en déduisent (foulée estimée depuis la taille,
+  0,5 kcal par kilo et par kilomètre), et **seul l'écart avec le rythme déjà
+  supposé par le niveau d'activité** ouvre des calories sur la cible du jour :
+  compter la marche entière la compterait deux fois, puisque le multiplicateur
+  du profil la contient déjà.
 - **Planning** — heures de coucher et de lever, heures des repas, créneaux
   d'entraînement de la semaine.
 - **Sommeil** — durée, qualité, dette de sommeil sur 14 jours.
 - **Progression** — courbe de poids, tour de taille, régularité des séances,
-  volume soulevé.
+  volume soulevé, marche des 14 derniers jours.
 
 ## Pile technique
 

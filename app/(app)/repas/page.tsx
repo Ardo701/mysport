@@ -35,6 +35,7 @@ import {
   heureCourante,
   libelleRelatif,
 } from "@/lib/dates";
+import { effortDuJour } from "@/lib/effort";
 import { libelleTypeRepas } from "@/lib/repas";
 
 const TYPES_PROGRAMMES = ["petit_dejeuner", "collation", "diner"] as const;
@@ -46,6 +47,8 @@ export default function PageRepas() {
   const profil = useQuery(api.profils.monProfil);
   const menu = useQuery(api.repas.menuDuJour, date ? { date } : "skip");
   const journal = useQuery(api.repas.journalDuJour, date ? { date } : "skip");
+  const pas = useQuery(api.pas.pasDuJour, date ? { date } : "skip");
+  const seance = useQuery(api.seances.seanceDuJour, date ? { date } : "skip");
   const enregistrer = useMutation(api.repas.enregistrerRepas);
   const supprimer = useMutation(api.repas.supprimerRepas);
   const reinitialiserMenu = useMutation(api.repas.reinitialiserMenu);
@@ -69,7 +72,15 @@ export default function PageRepas() {
     { kcal: 0, proteines: 0, glucides: 0, lipides: 0 },
   );
 
-  const restantes = Math.max(0, profil.kcalCible - totaux.kcal);
+  // Même cible que sur le tableau de bord : la marche du jour la fait bouger.
+  const effort = effortDuJour(
+    profil,
+    pas?.pas ?? null,
+    seance?.log?.statut === "terminee"
+      ? (seance.log.dureeMin ?? seance.seance?.dureeMin ?? null)
+      : null,
+  );
+  const restantes = Math.max(0, effort.kcalCible - totaux.kcal);
   const extras = journal.filter((r) => r.type === "extra");
 
   async function regenerer() {
@@ -128,7 +139,7 @@ export default function PageRepas() {
                 <p className="chiffres titre text-[30px] font-bold leading-none">
                   {Math.round(totaux.kcal)}
                   <span className="ml-1.5 text-[13px] font-normal text-brume-sombre">
-                    / {profil.kcalCible} kcal
+                    / {effort.kcalCible} kcal
                   </span>
                 </p>
               </div>

@@ -22,6 +22,7 @@ import {
   libelleDateCourt,
   minutesEnHeures,
 } from "@/lib/dates";
+import { kcalMarche, pasDeReference } from "@/lib/effort";
 
 export default function PageProgression() {
   const [date, setDate] = useState<string | null>(null);
@@ -34,13 +35,24 @@ export default function PageProgression() {
     api.sommeil.dernieresNuits,
     date ? { date, jours: 28 } : "skip",
   );
+  const journeesPas = useQuery(
+    api.pas.derniersPas,
+    date ? { date, jours: 28 } : "skip",
+  );
   const enregistrerMesure = useMutation(api.mesures.enregistrerMesure);
 
   const [poids, setPoids] = useState("");
   const [taille, setTaille] = useState("");
   const [etat, setEtat] = useState<"repos" | "envoi" | "ok">("repos");
 
-  if (!date || !profil || mesures === undefined || seances === undefined || nuits === undefined)
+  if (
+    !date ||
+    !profil ||
+    mesures === undefined ||
+    seances === undefined ||
+    nuits === undefined ||
+    journeesPas === undefined
+  )
     return <Chargement />;
 
   const premiere = mesures[0];
@@ -53,6 +65,11 @@ export default function PageProgression() {
   const moyenneSommeil =
     nuits.length > 0
       ? Math.round(nuits.reduce((s, n) => s + n.dureeMin, 0) / nuits.length)
+      : 0;
+
+  const moyennePas =
+    journeesPas.length > 0
+      ? Math.round(journeesPas.reduce((s, j) => s + j.pas, 0) / journeesPas.length)
       : 0;
 
   const tonnage = terminees.reduce(
@@ -204,6 +221,39 @@ export default function PageProgression() {
         </Colonne>
 
         <Colonne>
+          {/* Marche */}
+          <Carte>
+            <TitreSection
+              surtitre="Marche"
+              titre="Pas par jour"
+              action={
+                moyennePas > 0 ? (
+                  <span className="chiffres text-[12px] text-brume">
+                    {moyennePas.toLocaleString("fr-FR")} en moyenne
+                  </span>
+                ) : null
+              }
+            />
+            <MarcheQuinzaine
+              dateReference={date}
+              journees={journeesPas}
+              reference={pasDeReference(profil.niveauActivite)}
+            />
+            <p className="mt-3 text-[11px] leading-relaxed text-brume-sombre">
+              En jaune, les journées au-dessus des{" "}
+              {pasDeReference(profil.niveauActivite).toLocaleString("fr-FR")} pas
+              que suppose déjà ton niveau d'activité. Ce sont celles-là qui
+              ouvrent des calories en plus sur la cible du jour — sur 28 jours, ta
+              marche représente environ{" "}
+              {kcalMarche(
+                journeesPas.reduce((s, j) => s + j.pas, 0),
+                profil.poidsKg,
+                profil.tailleCm,
+              ).toLocaleString("fr-FR")}{" "}
+              kcal.
+            </p>
+          </Carte>
+
           {/* Dernières séances */}
           <section>
             <TitreSection surtitre="Historique" titre="Dernières séances" />
@@ -358,6 +408,56 @@ function AssiduiteHebdo({
         Objectif : {objectif} séances par semaine. Les semaines pleines sont en
         jaune. La régularité pèse plus lourd que la perfection d'une séance.
       </p>
+    </div>
+  );
+}
+
+/** Quinze derniers jours de marche, une barre par jour. */
+function MarcheQuinzaine({
+  dateReference,
+  journees,
+  reference,
+}: {
+  dateReference: string;
+  journees: { date: string; pas: number }[];
+  reference: number;
+}) {
+  const jours = Array.from({ length: 14 }, (_, i) =>
+    ajouterJours(dateReference, -(13 - i)),
+  );
+  const maximum = Math.max(reference * 1.3, ...journees.map((j) => j.pas));
+
+  return (
+    <div className="flex h-24 items-end gap-1.5">
+      {jours.map((jour) => {
+        const journee = journees.find((j) => j.date === jour);
+        const hauteur = journee
+          ? Math.max(6, Math.min(100, (journee.pas / maximum) * 100))
+          : 0;
+        const auDessus = journee ? journee.pas >= reference : false;
+        return (
+          <div key={jour} className="flex h-full flex-1 items-end">
+            <div
+              title={
+                journee
+                  ? `${libelleDateCourt(jour)} : ${journee.pas.toLocaleString("fr-FR")} pas`
+                  : `${libelleDateCourt(jour)} : non renseigné`
+              }
+              className="w-full rounded-sm"
+              style={{
+                height: `${hauteur}%`,
+                backgroundColor: journee
+                  ? auDessus
+                    ? "var(--color-jaune)"
+                    : "var(--color-trait-clair)"
+                  : "transparent",
+                border: journee ? "none" : "1px dashed var(--color-trait)",
+                minHeight: journee ? undefined : "6px",
+              }}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }

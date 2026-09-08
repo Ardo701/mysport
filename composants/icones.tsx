@@ -201,3 +201,14 @@ export function IconePanier(p: Props) {
     </Svg>
   );
 }
+
+export function IconePas(p: Props) {
+  return (
+    <Svg {...p}>
+      <circle cx="13.6" cy="4.6" r="1.9" />
+      <path d="M13.4 7.6 11.6 12.3l2.7 2.5.7 4.9" />
+      <path d="m11.6 12.3-2.9 4.1-.8 3.3" />
+      <path d="m13.9 8.6 3 1.9 1.4 2.6" />
+    </Svg>
+  );
+}
