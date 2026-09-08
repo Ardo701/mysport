@@ -259,7 +259,7 @@ function VueSemaine({
             key={jour}
             onClick={() => onChoisir(jour)}
             aria-pressed={choisi}
-            className={`rounded-doux border p-3 text-left transition-colors ${
+            className={`flex flex-col rounded-doux border p-3 text-left transition-colors ${
               choisi
                 ? "border-jaune bg-jaune-voile"
                 : entrainement
@@ -273,30 +273,43 @@ function VueSemaine({
               >
                 {JOURS[jourDeLaSemaine(jour) - 1]}
               </span>
-              <span className="chiffres text-[11px] text-brume-faible lg:mt-1 lg:block">
-                {Number(jour.slice(8))}
+              {/* L'état de la séance se range à côté du quantième : il tenait
+                  sa propre ligne, qui n'existait que les jours faits ou
+                  sautés et décalait alors tout le bas de la carte. */}
+              <span className="flex items-baseline gap-1.5 lg:mt-1">
+                <span className="chiffres text-[11px] text-brume-faible">
+                  {Number(jour.slice(8))}
+                </span>
+                {statut === "terminee" && (
+                  <span className="text-[10px] text-vert">Faite</span>
+                )}
+                {statut === "sautee" && (
+                  <span className="text-[10px] text-rouge">Sautée</span>
+                )}
               </span>
             </div>
 
-            {entrainement ? (
-              <div className="mt-2.5">
-                <span className="flex items-center gap-1.5 text-[12px] font-medium text-jaune">
+            {/* L'heure garde sa ligne les jours de repos, vide. */}
+            <span className="mt-2.5 flex h-[18px] items-center gap-1.5 text-[12px] font-medium leading-none text-jaune">
+              {entrainement && (
+                <>
                   <IconeHaltere className="h-3.5 w-3.5 shrink-0" />
                   <span className="chiffres">{entrainement.creneau.heure}</span>
-                </span>
-                <p className="mt-1 text-[11px] leading-snug text-brume">
-                  {entrainement.seance?.nom ?? "Séance"}
-                </p>
-                {statut === "terminee" && (
-                  <p className="mt-1 text-[10px] text-vert">Faite</p>
-                )}
-                {statut === "sautee" && (
-                  <p className="mt-1 text-[10px] text-rouge">Sautée</p>
-                )}
-              </div>
-            ) : (
-              <p className="mt-2.5 text-[11px] text-brume-faible">Repos</p>
-            )}
+                </>
+              )}
+            </span>
+
+            {/* Deux lignes réservées : « Bas du corps + Abdos » passe à la
+                ligne dans une colonne étroite, « Repos » jamais. */}
+            <p
+              className={`mt-1 line-clamp-2 h-[30px] text-[11px] leading-[15px] ${
+                entrainement ? "text-brume" : "text-brume-faible"
+              }`}
+            >
+              {entrainement
+                ? (entrainement.seance?.nom ?? "Séance")
+                : "Repos"}
+            </p>
 
             <p className="chiffres mt-2.5 text-[10px] text-brume-faible">
               {repasActifs} repas · {planning.heureCoucher}
