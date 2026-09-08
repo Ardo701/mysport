@@ -20,6 +20,7 @@ import type * as http from "../http.js";
 import type * as ia from "../ia.js";
 import type * as internes from "../internes.js";
 import type * as mesures from "../mesures.js";
+import type * as migrations from "../migrations.js";
 import type * as pas from "../pas.js";
 import type * as planning from "../planning.js";
 import type * as profils from "../profils.js";
@@ -44,6 +45,7 @@ declare const fullApi: ApiFromModules<{
   ia: typeof ia;
   internes: typeof internes;
   mesures: typeof mesures;
+  migrations: typeof migrations;
   pas: typeof pas;
   planning: typeof planning;
   profils: typeof profils;

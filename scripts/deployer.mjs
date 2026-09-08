@@ -150,3 +150,26 @@ journal("Déploiement des fonctions Convex et build de l'application.");
 execFileSync("npx", ["convex", "deploy", "--cmd", "npm run build"], {
   stdio: "inherit",
 });
+
+// 5. Rattrapages sur les données déjà en base, une fois les fonctions publiées.
+//
+//    Une valeur par défaut ne vaut que pour un compte qui n'a rien enregistré ;
+//    les autres gardent ce qui a été copié en base à leur inscription. Les
+//    rattrapages se marquent eux-mêmes et ne repassent pas (convex/migrations.ts).
+//
+//    L'étape n'est pas bloquante : l'application fonctionne sans, et un
+//    déploiement ne doit pas échouer parce qu'une retouche de données a raté.
+//    L'appel ne transporte aucun secret, sa sortie peut donc aller au journal.
+journal("Rattrapages sur les données existantes.");
+try {
+  const sortie = convex(
+    ["run", "--codegen", "disable", "--typecheck", "disable", "migrations:appliquer"],
+    { silencieux: true },
+  );
+  journal(sortie.trim() || "aucune sortie.");
+} catch (erreur) {
+  journal(
+    "Rattrapages non appliqués, le déploiement continue : " +
+      String(erreur.stderr || erreur.message || "raison inconnue").trim(),
+  );
+}

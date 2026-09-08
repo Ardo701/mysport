@@ -27,6 +27,17 @@ export default defineSchema({
     onboardingFait: v.boolean(),
   }).index("by_user", ["userId"]),
 
+  /**
+   * Rattrapages de données déjà appliqués (voir `convex/migrations.ts`).
+   *
+   * Sans cette trace, un rattrapage relancé à chaque déploiement réécrirait
+   * indéfiniment des valeurs que l'utilisateur a pu changer entre-temps.
+   */
+  migrations: defineTable({
+    nom: v.string(),
+    appliqueeLe: v.number(),
+  }).index("by_nom", ["nom"]),
+
   /** Planning : heures de sommeil, de repas et créneaux d'entraînement. */
   plannings: defineTable({
     userId: v.id("users"),

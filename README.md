@@ -98,7 +98,16 @@ Ce script fait tout le travail de configuration à chaque déploiement :
    une rotation de clé laisserait l'application appeler OpenAI avec l'ancienne,
    sans rien dire ;
 4. déploie les fonctions Convex, puis construit l'application en lui injectant
-   `NEXT_PUBLIC_CONVEX_URL`.
+   `NEXT_PUBLIC_CONVEX_URL` ;
+5. applique les rattrapages de données de `convex/migrations.ts`.
+
+Ce dernier point existe parce qu'une valeur par défaut ne vaut que pour un
+compte qui n'a rien enregistré : `creerPlanningParDefaut` en recopie une
+version en base à l'inscription, et changer la constante ensuite ne rattrape
+rien. Chaque rattrapage laisse sa trace dans la table `migrations` et ne
+repasse jamais, sinon il réécrirait à chaque déploiement des valeurs
+volontairement changées depuis. L'étape n'est pas bloquante : un build ne doit
+pas échouer parce qu'une retouche de données a raté.
 
 Une variable modifiée dans Vercel n'atteint Convex qu'au déploiement suivant :
 après l'avoir changée, relancer un build (Vercel → Deployments → Redeploy).
