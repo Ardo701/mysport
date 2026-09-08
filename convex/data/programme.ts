@@ -6,8 +6,18 @@
 
 export type Variante = { nom: string; materiel: string; execution: string };
 
+/**
+ * Rôle de l'exercice dans la progression hebdomadaire.
+ *
+ * `principal` et `accessoire` prennent la prescription de la semaine en cours
+ * (voir SEMAINES) ; `fixe` garde la sienne, parce qu'une fourchette de
+ * répétitions ne veut rien dire sur une planche ou un circuit abdos.
+ */
+export type Role = "principal" | "accessoire" | "fixe";
+
 export type Exercice = {
   id: string;
+  role: Role;
   nom: string;
   groupes: string[];
   series: number;
@@ -28,11 +38,36 @@ export type Seance = {
   finisher?: string;
 };
 
+/** Ce qu'on demande à un exercice une semaine donnée. */
+export type Dose = {
+  series: number;
+  reps: string;
+  reposSec: number;
+  reserve: string;
+};
+
+/**
+ * Une des douze semaines du cycle.
+ *
+ * C'est ici que le programme vit : les séances disent *quoi* faire, la semaine
+ * dit *combien*. Sans cette couche, les douze semaines seraient identiques et
+ * il n'y aurait aucune progression, juste une routine répétée.
+ */
+export type SemaineProgramme = {
+  numero: number;
+  bloc: string;
+  intention: string;
+  principaux: Dose;
+  accessoires: Dose;
+  finisherObligatoire: boolean;
+};
+
 export type Programme = {
   nom: string;
   description: string;
   joursParSemaine: number;
   seances: Seance[];
+  semaines: SemaineProgramme[];
   progression: { bloc: string; semaines: string; consigne: string }[];
 };
 
@@ -49,6 +84,7 @@ const seancePoussee: Seance = {
   exercices: [
     {
       id: "dev-couche",
+      role: "principal",
       nom: "Développé horizontal",
       groupes: ["Pectoraux", "Triceps"],
       series: 4,
@@ -71,6 +107,7 @@ const seancePoussee: Seance = {
     },
     {
       id: "dev-incline",
+      role: "principal",
       nom: "Développé incliné",
       groupes: ["Haut des pectoraux", "Épaules"],
       series: 3,
@@ -93,6 +130,7 @@ const seancePoussee: Seance = {
     },
     {
       id: "dev-epaules",
+      role: "principal",
       nom: "Développé épaules",
       groupes: ["Deltoïdes", "Triceps"],
       series: 3,
@@ -115,6 +153,7 @@ const seancePoussee: Seance = {
     },
     {
       id: "ecarte",
+      role: "accessoire",
       nom: "Écartés / isolation pectoraux",
       groupes: ["Pectoraux"],
       series: 3,
@@ -136,6 +175,7 @@ const seancePoussee: Seance = {
     },
     {
       id: "triceps",
+      role: "accessoire",
       nom: "Triceps",
       groupes: ["Triceps"],
       series: 3,
@@ -158,6 +198,7 @@ const seancePoussee: Seance = {
     },
     {
       id: "gainage-poussee",
+      role: "fixe",
       nom: "Gainage ventral",
       groupes: ["Abdominaux", "Ceinture"],
       series: 3,
@@ -195,6 +236,7 @@ const seanceTirage: Seance = {
   exercices: [
     {
       id: "traction",
+      role: "principal",
       nom: "Tirage vertical",
       groupes: ["Dorsaux", "Biceps"],
       series: 4,
@@ -217,6 +259,7 @@ const seanceTirage: Seance = {
     },
     {
       id: "rowing",
+      role: "principal",
       nom: "Rowing horizontal",
       groupes: ["Dorsaux", "Trapèzes", "Biceps"],
       series: 4,
@@ -238,6 +281,7 @@ const seanceTirage: Seance = {
     },
     {
       id: "tirage-horizontal",
+      role: "accessoire",
       nom: "Tirage horizontal serré",
       groupes: ["Dos", "Milieu du dos"],
       series: 3,
@@ -259,6 +303,7 @@ const seanceTirage: Seance = {
     },
     {
       id: "face-pull",
+      role: "accessoire",
       nom: "Face pull / arrière d'épaules",
       groupes: ["Arrière d'épaules", "Trapèzes"],
       series: 3,
@@ -281,6 +326,7 @@ const seanceTirage: Seance = {
     },
     {
       id: "biceps",
+      role: "accessoire",
       nom: "Curl biceps",
       groupes: ["Biceps", "Avant-bras"],
       series: 3,
@@ -302,6 +348,7 @@ const seanceTirage: Seance = {
     },
     {
       id: "gainage-dos",
+      role: "fixe",
       nom: "Renforcement lombaire",
       groupes: ["Lombaires", "Fessiers"],
       series: 3,
@@ -337,6 +384,7 @@ const seanceBas: Seance = {
   exercices: [
     {
       id: "squat",
+      role: "principal",
       nom: "Squat",
       groupes: ["Quadriceps", "Fessiers"],
       series: 4,
@@ -359,6 +407,7 @@ const seanceBas: Seance = {
     },
     {
       id: "fentes",
+      role: "accessoire",
       nom: "Fentes marchées",
       groupes: ["Quadriceps", "Fessiers", "Équilibre"],
       series: 3,
@@ -378,6 +427,7 @@ const seanceBas: Seance = {
     },
     {
       id: "ischios",
+      role: "principal",
       nom: "Chaîne postérieure",
       groupes: ["Ischio-jambiers", "Fessiers", "Lombaires"],
       series: 3,
@@ -399,6 +449,7 @@ const seanceBas: Seance = {
     },
     {
       id: "mollets",
+      role: "accessoire",
       nom: "Mollets",
       groupes: ["Mollets"],
       series: 3,
@@ -418,6 +469,7 @@ const seanceBas: Seance = {
     },
     {
       id: "abdos-circuit",
+      role: "fixe",
       nom: "Circuit abdos anti-ventre",
       groupes: ["Abdominaux", "Obliques"],
       series: 3,
@@ -454,6 +506,7 @@ const seanceFullHaut: Seance = {
   exercices: [
     {
       id: "superset-pousse-tire",
+      role: "principal",
       nom: "Superset poussée / tirage",
       groupes: ["Pectoraux", "Dos"],
       series: 4,
@@ -474,6 +527,7 @@ const seanceFullHaut: Seance = {
     },
     {
       id: "epaules-laterales",
+      role: "accessoire",
       nom: "Élévations latérales",
       groupes: ["Deltoïdes latéraux"],
       series: 3,
@@ -494,6 +548,7 @@ const seanceFullHaut: Seance = {
     },
     {
       id: "bras-superset",
+      role: "accessoire",
       nom: "Superset biceps / triceps",
       groupes: ["Biceps", "Triceps"],
       series: 3,
@@ -513,6 +568,7 @@ const seanceFullHaut: Seance = {
     },
     {
       id: "core-final",
+      role: "fixe",
       nom: "Circuit sangle abdominale",
       groupes: ["Abdominaux", "Obliques", "Ceinture"],
       series: 3,
@@ -535,30 +591,162 @@ const seanceFullHaut: Seance = {
     "15 à 20 minutes de cardio à allure modérée : marche inclinée, vélo, corde à sauter ou course lente. C'est ce bloc qui attaque le gras du ventre.",
 };
 
+/**
+ * Les douze semaines, écrites une par une.
+ *
+ * Structure : cinq semaines d'accumulation, une décharge, cinq semaines
+ * d'intensification, une décharge de fin qui sert aussi de test. Le volume
+ * monte puis les répétitions descendent — on ne peut pas augmenter les deux en
+ * même temps très longtemps, et une décharge au milieu vaut mieux qu'un
+ * plateau à la semaine 8.
+ *
+ * `reserve` est le nombre de répétitions qu'il doit rester en fin de série.
+ * C'est ce qui règle la charge : trois en réserve, on apprend le mouvement ;
+ * zéro, on va à l'échec. C'est plus fiable qu'un pourcentage d'un maximum
+ * qu'on n'a jamais mesuré.
+ */
+export const SEMAINES: SemaineProgramme[] = [
+  {
+    numero: 1,
+    bloc: "Fondations",
+    intention:
+      "Prendre les mouvements en main. Charges volontairement légères : cette semaine ne sert qu'à installer la technique et l'habitude des quatre séances.",
+    principaux: { series: 3, reps: "10-12", reposSec: 90, reserve: "3 répétitions en réserve" },
+    accessoires: { series: 2, reps: "12-15", reposSec: 60, reserve: "3 répétitions en réserve" },
+    finisherObligatoire: false,
+  },
+  {
+    numero: 2,
+    bloc: "Fondations",
+    intention:
+      "Même charge qu'en semaine 1, une série de plus partout. On ajoute du volume avant d'ajouter du poids.",
+    principaux: { series: 4, reps: "10-12", reposSec: 90, reserve: "3 répétitions en réserve" },
+    accessoires: { series: 3, reps: "12-15", reposSec: 60, reserve: "3 répétitions en réserve" },
+    finisherObligatoire: false,
+  },
+  {
+    numero: 3,
+    bloc: "Fondations",
+    intention:
+      "Première vraie montée : on serre la réserve à deux répétitions, donc on monte les charges. Le cardio de fin devient obligatoire.",
+    principaux: { series: 4, reps: "10-12", reposSec: 105, reserve: "2 répétitions en réserve" },
+    accessoires: { series: 3, reps: "12-15", reposSec: 60, reserve: "2 répétitions en réserve" },
+    finisherObligatoire: true,
+  },
+  {
+    numero: 4,
+    bloc: "Fondations",
+    intention:
+      "Les fourchettes descendent d'un cran sur les gros mouvements : moins de répétitions, plus lourd. Les accessoires ne bougent pas.",
+    principaux: { series: 4, reps: "8-10", reposSec: 105, reserve: "2 répétitions en réserve" },
+    accessoires: { series: 3, reps: "12-15", reposSec: 75, reserve: "2 répétitions en réserve" },
+    finisherObligatoire: true,
+  },
+  {
+    numero: 5,
+    bloc: "Fondations",
+    intention:
+      "Semaine la plus lourde du bloc : cinq séries sur les principaux. Si une séance passe mal, garde la charge de la semaine 4 — la décharge arrive.",
+    principaux: { series: 5, reps: "8-10", reposSec: 120, reserve: "2 répétitions en réserve" },
+    accessoires: { series: 3, reps: "10-12", reposSec: 75, reserve: "2 répétitions en réserve" },
+    finisherObligatoire: true,
+  },
+  {
+    numero: 6,
+    bloc: "Décharge",
+    intention:
+      "Volume divisé par deux, charges de la semaine 4, aucune série difficile. Ce n'est pas une semaine perdue : c'est là que les progrès des cinq précédentes se fixent. Ne la saute pas.",
+    principaux: { series: 3, reps: "8", reposSec: 120, reserve: "4 répétitions en réserve" },
+    accessoires: { series: 2, reps: "12", reposSec: 60, reserve: "4 répétitions en réserve" },
+    finisherObligatoire: false,
+  },
+  {
+    numero: 7,
+    bloc: "Intensité",
+    intention:
+      "Reprise sur les charges de la semaine 5, en 8 répétitions nettes. Repos plus longs : ils servent à soulever plus lourd, pas à traîner.",
+    principaux: { series: 4, reps: "8", reposSec: 120, reserve: "2 répétitions en réserve" },
+    accessoires: { series: 3, reps: "10-12", reposSec: 75, reserve: "2 répétitions en réserve" },
+    finisherObligatoire: true,
+  },
+  {
+    numero: 8,
+    bloc: "Intensité",
+    intention:
+      "On descend en 6-8 répétitions : ajoute du poids dès que tu tiens 8. Les accessoires restent en 10-12 pour garder du volume sur les bras et les épaules.",
+    principaux: { series: 4, reps: "6-8", reposSec: 135, reserve: "2 répétitions en réserve" },
+    accessoires: { series: 3, reps: "10-12", reposSec: 75, reserve: "2 répétitions en réserve" },
+    finisherObligatoire: true,
+  },
+  {
+    numero: 9,
+    bloc: "Intensité",
+    intention:
+      "Cinq séries lourdes et une seule répétition en réserve. C'est la semaine où la charge sur le développé et le tirage doit visiblement bouger.",
+    principaux: { series: 5, reps: "6-8", reposSec: 150, reserve: "1 répétition en réserve" },
+    accessoires: { series: 3, reps: "10-12", reposSec: 75, reserve: "1 répétition en réserve" },
+    finisherObligatoire: true,
+  },
+  {
+    numero: 10,
+    bloc: "Intensité",
+    intention:
+      "Fourchette la plus basse du cycle sur les principaux, et une série de plus sur les accessoires pour ne pas perdre le volume des bras.",
+    principaux: { series: 5, reps: "5-6", reposSec: 150, reserve: "1 répétition en réserve" },
+    accessoires: { series: 4, reps: "10-12", reposSec: 75, reserve: "1 répétition en réserve" },
+    finisherObligatoire: true,
+  },
+  {
+    numero: 11,
+    bloc: "Intensité",
+    intention:
+      "La semaine la plus dure des douze. Dernière série de chaque exercice principal menée à l'échec technique — on s'arrête quand la forme casse, pas après.",
+    principaux: { series: 5, reps: "5-6", reposSec: 180, reserve: "0 à 1 répétition en réserve" },
+    accessoires: { series: 4, reps: "8-10", reposSec: 90, reserve: "1 répétition en réserve" },
+    finisherObligatoire: true,
+  },
+  {
+    numero: 12,
+    bloc: "Décharge et test",
+    intention:
+      "Trois séries légères pour récupérer, puis une seule série lourde de 5 répétitions sur le premier exercice de chaque séance : compare-la à ta semaine 1, c'est le bilan du cycle.",
+    principaux: { series: 3, reps: "5", reposSec: 150, reserve: "3 répétitions en réserve" },
+    accessoires: { series: 2, reps: "12", reposSec: 60, reserve: "3 répétitions en réserve" },
+    finisherObligatoire: false,
+  },
+];
+
 export const PROGRAMME_DEFAUT: Programme = {
   nom: "Haut du corps prioritaire — 12 semaines",
   description:
     "4 séances par semaine, orientées pectoraux, dos, bras et abdos, avec un bas du corps entretenu. Chaque exercice a une version salle et une version maison sans machine.",
   joursParSemaine: 4,
   seances: [seancePoussee, seanceTirage, seanceBas, seanceFullHaut],
+  semaines: SEMAINES,
   progression: [
     {
-      bloc: "Bloc 1 — Fondations",
-      semaines: "Semaines 1 à 4",
+      bloc: "Fondations",
+      semaines: "Semaines 1 à 5",
       consigne:
-        "Charges modérées, 2 à 3 répétitions en réserve. L'objectif est la technique et l'habitude : ne rate aucune séance.",
+        "Technique et volume. Les charges montent lentement, les séries s'ajoutent avant le poids. Objectif : ne rater aucune séance.",
     },
     {
-      bloc: "Bloc 2 — Charge",
-      semaines: "Semaines 5 à 8",
+      bloc: "Décharge",
+      semaines: "Semaine 6",
       consigne:
-        "Ajoute 2,5 à 5 kg (ou 2 répétitions) sur les exercices principaux dès que tu tiens le haut de la fourchette. 1 à 2 répétitions en réserve.",
+        "Moitié moins de volume, rien de difficile. C'est cette semaine qui transforme le travail du bloc précédent en progrès visibles.",
     },
     {
-      bloc: "Bloc 3 — Intensité",
-      semaines: "Semaines 9 à 12",
+      bloc: "Intensité",
+      semaines: "Semaines 7 à 11",
       consigne:
-        "Séries plus lourdes en 6-8 répétitions sur les gros exercices, finisher obligatoire, 1 répétition en réserve. Semaine 12 allégée de 40 % pour récupérer.",
+        "Les répétitions descendent, les charges montent, les repos s'allongent. La semaine 11 est la plus dure du cycle.",
+    },
+    {
+      bloc: "Décharge et test",
+      semaines: "Semaine 12",
+      consigne:
+        "Récupération, puis une série lourde de référence sur le premier exercice de chaque séance pour mesurer le chemin parcouru.",
     },
   ],
 };

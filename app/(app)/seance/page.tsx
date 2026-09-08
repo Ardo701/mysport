@@ -3,6 +3,8 @@
 import { useMutation, useQuery } from "convex/react";
 import { useEffect, useMemo, useState } from "react";
 import { api } from "@/convex/_generated/api";
+import { doseDe } from "@/convex/lib/programme";
+import type { Dose } from "@/convex/data/programme";
 import type { Doc } from "@/convex/_generated/dataModel";
 import { MinuteurRepos } from "@/composants/minuteur";
 import {
@@ -69,9 +71,14 @@ export default function PageSeance() {
     );
   }
 
-  const { seance, log, semaine, progression } = donnees;
-  const blocCourant =
-    progression[Math.min(progression.length - 1, Math.floor((semaine - 1) / 4))];
+  const { seance, log, semaine, dosage, progression } = donnees;
+
+  // La semaine du cycle dit précisément quoi faire ce lundi-là. À défaut — un
+  // programme généré par l'IA n'a pas de couche hebdomadaire — on retombe sur
+  // le bloc de progression, découpé en quarts du cycle.
+  const consigne = dosage
+    ? { titre: dosage.bloc, texte: dosage.intention }
+    : progression[Math.min(progression.length - 1, Math.floor((semaine - 1) / 4))];
 
   const seriesFaites = log?.series.filter((s) => s.fait).length ?? 0;
   const seriesTotal = log?.series.length ?? 0;
@@ -100,14 +107,16 @@ export default function PageSeance() {
         </Message>
       )}
 
-      {blocCourant && (
+      {consigne && (
         <Carte className="border-l-2 border-l-jaune py-1 pl-4 lg:max-w-[640px]">
           <div className="flex items-start gap-3">
             <IconeEclair className="mt-0.5 h-4 w-4 shrink-0 text-jaune" />
             <div>
-              <p className="text-[13px] font-semibold">{blocCourant.bloc}</p>
+              <p className="text-[13px] font-semibold">
+                {"titre" in consigne ? consigne.titre : consigne.bloc}
+              </p>
               <p className="mt-1 text-[13px] leading-relaxed text-brume">
-                {blocCourant.consigne}
+                {"texte" in consigne ? consigne.texte : consigne.consigne}
               </p>
             </div>
           </div>
@@ -190,22 +199,39 @@ export default function PageSeance() {
           </div>
 
           <div className="space-y-3 lg:grid lg:grid-cols-2 lg:items-start lg:gap-4 lg:space-y-0">
-            {seance.exercices.map((exercice, i) => (
-              <BlocExercice
-                key={exercice.id}
-                numero={i + 1}
-                exercice={exercice}
-                log={log}
-                dernieresCharges={charges?.[exercice.id]}
-                verrouille={log.statut === "terminee"}
-                onRepos={() => setRepos(exercice.reposSec)}
-              />
-            ))}
+            {seance.exercices.map((exercice, i) => {
+              const dose = doseDe(exercice, dosage);
+              return (
+                <BlocExercice
+                  key={exercice.id}
+                  numero={i + 1}
+                  exercice={exercice}
+                  dose={dose}
+                  log={log}
+                  dernieresCharges={charges?.[exercice.id]}
+                  verrouille={log.statut === "terminee"}
+                  onRepos={() => setRepos(dose.reposSec)}
+                />
+              );
+            })}
           </div>
 
           {seance.finisher && (
             <Carte className="lg:max-w-[640px]">
-              <TitreSection titre="Finisher" />
+              {/* Le cardio de fin ne se fait pas toutes les semaines : il saute
+                  pendant les décharges, où l'objectif est de récupérer. */}
+              <TitreSection
+                titre="Finisher"
+                action={
+                  dosage ? (
+                    <Etiquette ton={dosage.finisherObligatoire ? "jaune" : undefined}>
+                      {dosage.finisherObligatoire
+                        ? "Prévu cette semaine"
+                        : "Facultatif cette semaine"}
+                    </Etiquette>
+                  ) : undefined
+                }
+              />
               <p className="text-[13px] leading-relaxed text-brume">
                 {seance.finisher}
               </p>
@@ -237,6 +263,7 @@ export default function PageSeance() {
 function BlocExercice({
   numero,
   exercice,
+  dose,
   log,
   dernieresCharges,
   verrouille,
@@ -244,6 +271,7 @@ function BlocExercice({
 }: {
   numero: number;
   exercice: Doc<"programmes">["seances"][number]["exercices"][number];
+  dose: Dose;
   log: Doc<"seancesLog">;
   dernieresCharges?: { reps?: number; poidsKg?: number };
   verrouille: boolean;
@@ -276,8 +304,11 @@ function BlocExercice({
             {detail.nom}
           </h3>
           <p className="chiffres mt-1.5 text-[12px] text-brume">
-            {exercice.series} × {exercice.reps} · repos {exercice.reposSec}s
+            {dose.series} × {dose.reps} · repos {dose.reposSec}s
           </p>
+          {dose.reserve && (
+            <p className="mt-1 text-[12px] text-brume-faible">{dose.reserve}</p>
+          )}
         </div>
         {toutesFaites && (
           <IconeCoche className="h-4 w-4 shrink-0 text-jaune" />

@@ -9,6 +9,10 @@ export const varianteValidator = v.object({
 
 export const exerciceValidator = v.object({
   id: v.string(),
+  // Facultatif : les programmes enregistrés avant la couche hebdomadaire, et
+  // ceux générés par l'IA, n'ont pas de rôle. Ils gardent alors la
+  // prescription écrite sur l'exercice lui-même.
+  role: v.optional(v.string()), // principal | accessoire | fixe
   nom: v.string(),
   groupes: v.array(v.string()),
   series: v.number(),
@@ -27,6 +31,23 @@ export const seanceValidator = v.object({
   echauffement: v.array(v.string()),
   exercices: v.array(exerciceValidator),
   finisher: v.optional(v.string()),
+});
+
+const doseValidator = v.object({
+  series: v.number(),
+  reps: v.string(),
+  reposSec: v.number(),
+  reserve: v.string(),
+});
+
+/** Une des semaines du cycle : ce qu'elle demande aux principaux et au reste. */
+export const semaineValidator = v.object({
+  numero: v.number(),
+  bloc: v.string(),
+  intention: v.string(),
+  principaux: doseValidator,
+  accessoires: doseValidator,
+  finisherObligatoire: v.boolean(),
 });
 
 export const repasValidator = v.object({

@@ -1,7 +1,11 @@
 import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-import { repasValidator, seanceValidator } from "./lib/validateurs";
+import {
+  repasValidator,
+  seanceValidator,
+  semaineValidator,
+} from "./lib/validateurs";
 
 export default defineSchema({
   ...authTables,
@@ -68,6 +72,10 @@ export default defineSchema({
     source: v.string(), // preset | ia
     joursParSemaine: v.number(),
     seances: v.array(seanceValidator),
+    // Facultatif, pour la même raison que `role` : un programme enregistré
+    // avant cette couche, ou généré par l'IA, n'en a pas et retombe sur les
+    // prescriptions écrites dans ses exercices.
+    semaines: v.optional(v.array(semaineValidator)),
     progression: v.array(
       v.object({ bloc: v.string(), semaines: v.string(), consigne: v.string() }),
     ),

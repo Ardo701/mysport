@@ -7,7 +7,9 @@ téléphone, barre latérale et mise en page sur deux colonnes à partir de 1024
 - **Séances** — programme de 12 semaines, 4 séances par semaine, orienté haut du
   corps. Chaque exercice existe en version **salle** (machines, charges libres)
   et en version **maison** (poids du corps, élastique, sac à dos, chaise), et la
-  bascule se fait exercice par exercice pendant la séance.
+  bascule se fait exercice par exercice pendant la séance. **Les douze semaines
+  sont écrites une par une** : ce n'est pas la même séance répétée douze fois,
+  le volume et l'intensité changent chaque semaine (voir plus bas).
 - **Repas** — menus programmés le matin, en collation et le soir. Le midi (ou
   n'importe quel repas sauté) est enregistré par **photo** ou par **description
   écrite** : OpenAI reconnaît les aliments et estime calories et macros.
@@ -34,6 +36,38 @@ téléphone, barre latérale et mise en page sur deux colonnes à partir de 1024
 - **Sommeil** — durée, qualité, dette de sommeil sur 14 jours.
 - **Progression** — courbe de poids, tour de taille, régularité des séances,
   volume soulevé, marche des 14 derniers jours.
+
+## Comment le programme progresse
+
+Les séances disent **quoi** faire, les semaines disent **combien**. Séparer les
+deux évite d'écrire quarante-huit séances dont quarante-quatre seraient des
+copies, et rend la progression lisible d'un coup d'œil dans
+`convex/data/programme.ts`.
+
+| Semaines | Bloc | Ce qui change |
+| --- | --- | --- |
+| 1 à 5 | Fondations | Le volume monte : 3 séries puis 4, puis 5 sur les gros mouvements. Les fourchettes descendent de 10-12 à 8-10, la réserve de 3 à 2 répétitions. |
+| 6 | Décharge | Volume divisé par deux, 4 répétitions en réserve, pas de finisher. C'est cette semaine qui fixe les progrès des cinq précédentes. |
+| 7 à 11 | Intensité | Les répétitions descendent jusqu'à 5-6, les repos montent jusqu'à 3 minutes, la réserve tombe à 0-1. La semaine 11 est la plus dure du cycle. |
+| 12 | Décharge et test | Trois séries légères, puis une série lourde de référence à comparer à la semaine 1. |
+
+Chaque exercice porte un **rôle** qui décide de ce qu'il reçoit :
+
+- `principal` — les gros mouvements (développés, tractions, rowing, squat,
+  soulevé roumain, superset poussée/tirage) prennent la prescription
+  « principaux » de la semaine ;
+- `accessoire` — isolations et bras prennent la prescription « accessoires »,
+  dans des fourchettes plus hautes ;
+- `fixe` — gainage et circuits abdos gardent la leur toute l'année, parce que
+  « 5 × 5-6 » ne veut rien dire sur une planche.
+
+La jointure se fait dans `convex/lib/programme.ts`, à un seul endroit : le
+serveur s'en sert pour créer le bon nombre de séries au démarrage, la page de
+séance pour afficher la consigne. Deux copies dériveraient, et on
+s'entraînerait sur une prescription différente de celle affichée.
+
+Un programme **généré par l'IA** n'a pas cette couche : ses exercices gardent
+alors la prescription écrite sur eux, et rien ne casse.
 
 ## Pile technique
 

@@ -2,60 +2,108 @@
  * Rattrapages ponctuels sur les données déjà enregistrées.
  *
  * Une valeur par défaut ne vaut que pour un compte qui n'a rien enregistré :
- * `creerPlanningParDefaut` recopie la constante en base à l'inscription, et la
- * ligne ne bouge plus ensuite. Changer la constante ne rattrape donc rien pour
- * les comptes existants — d'où ce module.
+ * l'inscription recopie les constantes en base, et la ligne ne bouge plus
+ * ensuite. Changer une constante ne rattrape donc rien pour les comptes
+ * existants — d'où ce module.
  *
  * `scripts/deployer.mjs` appelle `appliquer` après chaque déploiement. Chaque
- * rattrapage laisse sa trace dans la table `migrations` et ne repasse jamais :
- * sans ce garde-fou, quelqu'un qui remettrait volontairement les anciennes
- * heures se les verrait réécrire au déploiement suivant.
+ * rattrapage laisse son nom dans la table `migrations` et ne repasse jamais :
+ * sans ce garde-fou, quelqu'un qui remettrait volontairement une ancienne
+ * valeur se la verrait réécrire au déploiement suivant.
+ *
+ * Pour en ajouter un : une entrée de plus dans `RATTRAPAGES`, avec un nom qui
+ * ne change plus jamais. Le script de déploiement n'a pas à être touché.
  */
 
-import { internalMutation } from "./_generated/server";
+import { internalMutation, type MutationCtx } from "./_generated/server";
+import { PROGRAMME_DEFAUT } from "./data/programme";
 
-const NOM = "journee-minuit-huit-heures";
-
-/** Ancienne journée par défaut, celle que ce rattrapage remplace. */
+/** Ancienne journée par défaut : coucher tardif et lever à sept heures. */
 const ANCIEN = { coucher: "23:00", lever: "07:00", petitDejeuner: "07:30" };
 const NOUVEAU = { coucher: "00:00", lever: "08:00", petitDejeuner: "08:30" };
+
+const RATTRAPAGES: { nom: string; executer: (ctx: MutationCtx) => Promise<string> }[] = [
+  {
+    nom: "journee-minuit-huit-heures",
+    async executer(ctx) {
+      let touches = 0;
+      for (const planning of await ctx.db.query("plannings").collect()) {
+        // Seuls les plannings restés exactement sur l'ancien défaut sont
+        // corrigés : des heures choisies à la main ne sont pas des heures à
+        // rattraper.
+        if (
+          planning.heureCoucher !== ANCIEN.coucher ||
+          planning.heureLever !== ANCIEN.lever
+        ) {
+          continue;
+        }
+
+        await ctx.db.patch(planning._id, {
+          heureCoucher: NOUVEAU.coucher,
+          heureLever: NOUVEAU.lever,
+          // Le petit-déjeuner suit le lever, sinon il tomberait avant : la
+          // journée type se trie à partir de l'heure de lever, et un repas
+          // placé plus tôt s'afficherait après le coucher.
+          repas: planning.repas.map((r) =>
+            r.type === "petit_dejeuner" && r.heure === ANCIEN.petitDejeuner
+              ? { ...r, heure: NOUVEAU.petitDejeuner }
+              : r,
+          ),
+        });
+        touches += 1;
+      }
+      return `${touches} planning(s)`;
+    },
+  },
+  {
+    nom: "programme-douze-semaines-ecrites",
+    async executer(ctx) {
+      let touches = 0;
+      for (const programme of await ctx.db.query("programmes").collect()) {
+        // Uniquement les programmes préréglés : leurs séances sont une copie
+        // de `PROGRAMME_DEFAUT`, pas du contenu de l'utilisateur. Un programme
+        // généré par l'IA est le sien, on n'y touche pas — sans couche
+        // hebdomadaire, il retombe sur les prescriptions de ses exercices.
+        if (programme.source !== "preset") continue;
+
+        // `debutISO` et `actif` ne bougent pas : la date de démarrage
+        // détermine la semaine en cours, la réécrire ramènerait le cycle à la
+        // semaine 1 et effacerait les semaines déjà faites.
+        await ctx.db.patch(programme._id, {
+          nom: PROGRAMME_DEFAUT.nom,
+          description: PROGRAMME_DEFAUT.description,
+          joursParSemaine: PROGRAMME_DEFAUT.joursParSemaine,
+          seances: PROGRAMME_DEFAUT.seances,
+          semaines: PROGRAMME_DEFAUT.semaines,
+          progression: PROGRAMME_DEFAUT.progression,
+        });
+        touches += 1;
+      }
+      return `${touches} programme(s)`;
+    },
+  },
+];
 
 export const appliquer = internalMutation({
   args: {},
   handler: async (ctx) => {
-    const deja = await ctx.db
-      .query("migrations")
-      .withIndex("by_nom", (q) => q.eq("nom", NOM))
-      .unique();
-    if (deja) return `${NOM} : déjà appliqué, rien à faire.`;
+    const lignes: string[] = [];
 
-    let touches = 0;
-    for (const planning of await ctx.db.query("plannings").collect()) {
-      // Seuls les plannings restés sur l'ancien défaut sont corrigés : des
-      // heures choisies à la main ne sont pas des heures à rattraper.
-      if (
-        planning.heureCoucher !== ANCIEN.coucher ||
-        planning.heureLever !== ANCIEN.lever
-      ) {
-        continue;
-      }
+    for (const rattrapage of RATTRAPAGES) {
+      const deja = await ctx.db
+        .query("migrations")
+        .withIndex("by_nom", (q) => q.eq("nom", rattrapage.nom))
+        .unique();
+      if (deja) continue;
 
-      await ctx.db.patch(planning._id, {
-        heureCoucher: NOUVEAU.coucher,
-        heureLever: NOUVEAU.lever,
-        // Le petit-déjeuner suit le lever, sinon il tomberait avant : la
-        // journée type se trie à partir de l'heure de lever, et un repas placé
-        // plus tôt se retrouverait affiché après le coucher.
-        repas: planning.repas.map((r) =>
-          r.type === "petit_dejeuner" && r.heure === ANCIEN.petitDejeuner
-            ? { ...r, heure: NOUVEAU.petitDejeuner }
-            : r,
-        ),
+      const resume = await rattrapage.executer(ctx);
+      await ctx.db.insert("migrations", {
+        nom: rattrapage.nom,
+        appliqueeLe: Date.now(),
       });
-      touches += 1;
+      lignes.push(`${rattrapage.nom} : ${resume}`);
     }
 
-    await ctx.db.insert("migrations", { nom: NOM, appliqueeLe: Date.now() });
-    return `${NOM} : ${touches} planning(s) mis à jour.`;
+    return lignes.length > 0 ? lignes.join(" ; ") : "aucun rattrapage en attente";
   },
 });

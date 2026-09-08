@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { utilisateurConnecte } from "./lib/session";
 import { jourDeLaSemaine, semaineDuProgramme } from "./lib/dates";
+import { doseDe, semaineDe } from "./lib/programme";
 
 /** Séance prévue par le planning pour une date, plus le suivi du jour. */
 export const seanceDuJour = query({
@@ -33,11 +34,15 @@ export const seanceDuJour = query({
       .withIndex("by_user_date", (q) => q.eq("userId", userId).eq("date", date))
       .unique();
 
+    const numeroSemaine = semaineDuProgramme(programme.debutISO, date);
+
     return {
       seance,
       heure: creneau?.heure ?? null,
       log,
-      semaine: semaineDuProgramme(programme.debutISO, date),
+      semaine: numeroSemaine,
+      // La prescription de la semaine, que la page applique aux exercices.
+      dosage: semaineDe(programme.semaines, numeroSemaine),
       progression: programme.progression,
       nomProgramme: programme.nom,
     };
@@ -59,11 +64,22 @@ export const demarrerSeance = mutation({
       .query("programmes")
       .withIndex("by_user_actif", (q) => q.eq("userId", userId).eq("actif", true))
       .unique();
-    const seance = programme?.seances.find((s) => s.id === seanceId);
+    // Deux échecs distincts : aucun programme actif, ou un programme qui ne
+    // contient pas cette séance. Les confondre rendait le second illisible.
+    if (!programme) throw new Error("Aucun programme actif");
+    const seance = programme.seances.find((s) => s.id === seanceId);
     if (!seance) throw new Error("Séance introuvable dans le programme");
 
+    // Le nombre de séries vient de la semaine en cours, pas de l'exercice :
+    // c'est ce qui fait qu'une semaine d'accumulation et une semaine de
+    // décharge ne créent pas la même séance.
+    const semaine = semaineDe(
+      programme.semaines,
+      semaineDuProgramme(programme.debutISO, date),
+    );
+
     const series = seance.exercices.flatMap((ex) =>
-      Array.from({ length: ex.series }, (_, index) => ({
+      Array.from({ length: doseDe(ex, semaine).series }, (_, index) => ({
         exerciceId: ex.id,
         exerciceNom: ex.nom,
         variante,
