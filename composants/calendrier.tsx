@@ -4,6 +4,7 @@ import { useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 import { api } from "@/convex/_generated/api";
 import { Carte, Etiquette, Onglets, TitreSection } from "@/composants/ui";
+import { IllustrationExercice } from "@/composants/illustration-exercice";
 import { Feuille } from "@/composants/feuille";
 import type { Doc } from "@/convex/_generated/dataModel";
 import { semaineDuProgramme } from "@/convex/lib/dates";
@@ -592,35 +593,45 @@ function DetailSeance({
               .filter((s) => s.exerciceId === exercice.id)
               .sort((a, b) => a.index - b.index);
 
-            return (
-              <li key={exercice.id} className="py-3">
-                <p className="text-[14px] leading-tight font-medium">{exercice.nom}</p>
-                <p className="chiffres mt-1 text-[12px] text-brume">
-                  {dose.series} × {dose.reps} · repos {dose.reposSec}s
-                  {series.length > 0 &&
-                    (series[0].variante === "maison"
-                      ? " · sans machine"
-                      : " · avec machine")}
-                </p>
-                {dose.reserve && !journal && (
-                  <p className="mt-0.5 text-[12px] text-brume-faible">{dose.reserve}</p>
-                )}
+            // La variante réellement suivie s'il y en a une trace ; sinon
+            // celle avec machine, qui est la version par défaut du programme.
+            const variante = series[0]?.variante ?? "salle";
 
-                {/* Ce qui a réellement été soulevé, série par série. */}
-                {series.length > 0 && (
-                  <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
-                    {series.map((s) => (
-                      <li
-                        key={s.index}
-                        className={`chiffres text-[12px] ${
-                          s.fait ? "text-encre" : "text-brume-faible line-through"
-                        }`}
-                      >
-                        {libelleSerie(s)}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+            return (
+              <li key={exercice.id} className="flex gap-3 py-3">
+                <IllustrationExercice
+                  exerciceId={exercice.id}
+                  variante={variante}
+                  titre={variante === "maison" ? exercice.maison.nom : exercice.salle.nom}
+                  className="mt-0.5 h-[54px] w-[86px] shrink-0 rounded-doux border border-trait bg-creux"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-[14px] leading-tight font-medium">{exercice.nom}</p>
+                  <p className="chiffres mt-1 text-[12px] text-brume">
+                    {dose.series} × {dose.reps} · repos {dose.reposSec}s
+                    {series.length > 0 &&
+                      (variante === "maison" ? " · sans machine" : " · avec machine")}
+                  </p>
+                  {dose.reserve && !journal && (
+                    <p className="mt-0.5 text-[12px] text-brume-faible">{dose.reserve}</p>
+                  )}
+
+                  {/* Ce qui a réellement été soulevé, série par série. */}
+                  {series.length > 0 && (
+                    <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+                      {series.map((s) => (
+                        <li
+                          key={s.index}
+                          className={`chiffres text-[12px] ${
+                            s.fait ? "text-encre" : "text-brume-faible line-through"
+                          }`}
+                        >
+                          {libelleSerie(s)}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </li>
             );
           })}

@@ -7,9 +7,11 @@ téléphone, barre latérale et mise en page sur deux colonnes à partir de 1024
 - **Séances** — programme de 12 semaines, 4 séances par semaine, orienté haut du
   corps. Chaque exercice existe en version **salle** (machines, charges libres)
   et en version **maison** (poids du corps, élastique, sac à dos, chaise), et la
-  bascule se fait exercice par exercice pendant la séance. **Les douze semaines
-  sont écrites une par une** : ce n'est pas la même séance répétée douze fois,
-  le volume et l'intensité changent chaque semaine (voir plus bas).
+  bascule se fait exercice par exercice pendant la séance. Chaque variante est
+  **illustrée** par un schéma au trait qui montre les deux bouts du mouvement et
+  son sens (voir plus bas). **Les douze semaines sont écrites une par une** : ce
+  n'est pas la même séance répétée douze fois, le volume et l'intensité changent
+  chaque semaine (voir plus bas).
 - **Repas** — menus programmés le matin, en collation et le soir. Le midi (ou
   n'importe quel repas sauté) est enregistré par **photo** ou par **description
   écrite** : OpenAI reconnaît les aliments et estime calories et macros.
@@ -32,7 +34,8 @@ téléphone, barre latérale et mise en page sur deux colonnes à partir de 1024
   et de lever, heures des repas, créneaux d'entraînement de la semaine. Le
   **détail d'une séance** s'ouvre depuis n'importe quel jour : à venir, la liste
   des exercices avec la prescription de la semaine en cours ; passée, les
-  charges et répétitions réellement enregistrées, série par série.
+  charges et répétitions réellement enregistrées, série par série. Chaque
+  exercice y porte sa vignette, dans la variante suivie ce jour-là.
 - **Thème** — sombre par défaut, clair au choix. La bascule est en bas de la
   barre latérale sur ordinateur, et sur la page Profil pour le téléphone, qui
   n'a pas de barre latérale. Le choix est propre à l'appareil.
@@ -169,6 +172,7 @@ app/
   bienvenue/      questionnaire d'installation (profil et cibles)
   connexion/      inscription et connexion
 composants/       interface : jauges, feuille glissante, analyseur de repas…
+  illustrations/  les schémas d'exercices : primitives, poses, scènes
 convex/
   data/           programme d'entraînement et banque de repas
   lib/            calculs (nutrition, dates, menus) et validateurs
@@ -176,7 +180,7 @@ convex/
   ia.ts           actions OpenAI : photo, texte, menus, programme
   schema.ts       modèle de données
 lib/              utilitaires côté client
-scripts/          déploiement Vercel et génération des icônes
+scripts/          déploiement Vercel, icônes, vérification des illustrations
 ```
 
 ## Parti pris visuel
@@ -221,6 +225,60 @@ pose `data-theme` avant le premier rendu : sans lui, un utilisateur en clair
 verrait passer un éclair noir à chaque chargement. Le défaut reste le sombre,
 même quand le système est en clair — l'application a toujours eu cette
 apparence, basculer sans qu'on l'ait demandé serait la surprise.
+
+## Illustrations des exercices
+
+Chaque exercice est dessiné, dans ses deux variantes : quarante-deux schémas au
+trait, écrits en SVG dans `composants/illustrations/`. Rien n'est téléchargé —
+ils suivent donc le thème, restent nets à n'importe quelle taille et n'ajoutent
+aucune requête. Les banques de photos d'exercices, elles, ne connaissent aucune
+des variantes maison : personne n'a photographié un rowing australien sous une
+table de cuisine.
+
+Le dessin obéit à une grammaire fixe, pour se lire sans qu'on l'explique :
+
+| Élément | Sens |
+| --- | --- |
+| Silhouette pleine | la position qui **nomme** l'exercice : le bas d'un squat, le haut d'une traction |
+| Silhouette pâle | l'autre bout du mouvement |
+| Flèche jaune | le sens de l'**effort**, celui où l'on pousse ou tire |
+| Axe jaune pointillé | l'**alignement** à tenir, sur les exercices qui ne bougent pas |
+| Gris | le matériel, jamais le corps |
+
+Trois fichiers, dans cet ordre de dépendance :
+
+- **`figure.tsx`** — les primitives. La silhouette (neuf articulations reliées
+  par des traits épais), la flèche, l'axe, et les glyphes de matériel : barre,
+  haltère, banc, poulie, élastique, sac à dos, chaise, table, marche, machine.
+  Le repère fait 240 × 150, sol à 134, silhouette debout haute de 118 — valeurs
+  partagées par toutes les scènes, sans quoi deux dessins voisins n'auraient
+  pas la même échelle.
+- **`poses.ts`** — les positions du corps. On n'y donne que les extrémités des
+  membres ; le genou et le coude se calculent par intersection de deux cercles,
+  à longueur de segment constante. C'était la seule façon d'écrire quarante-deux
+  poses sans qu'un membre s'allonge d'un dessin à l'autre — le défaut le plus
+  visible d'une silhouette au trait.
+- **`scenes.tsx`** — les quarante-deux scènes, une par exercice et par variante.
+
+Deux exercices sur trois se dessinent de profil ; les élévations latérales, le
+face pull et les écartés passent **de face**, parce que de profil leurs deux
+bras se superposent exactement et que le mouvement disparaît. Les supersets
+montrent deux silhouettes réduites séparées d'un « + » : c'est ce qu'ils sont.
+Quand la position de départ ne peut pas se dessiner honnêtement — faute de place
+dans le cadre, ou parce qu'elle se confondrait avec l'arrivée — on ne dessine
+qu'une position et la flèche dit le reste.
+
+Après toute retouche des exercices ou des scènes :
+
+```bash
+node scripts/verifier-illustrations.mjs
+```
+
+Un dessin manquant ne casse rien — le composant ne rend alors rien du tout —
+mais ne se voit pas non plus tant qu'on n'ouvre pas la bonne séance dans la
+bonne variante. Les programmes générés par l'IA inventent leurs propres
+exercices et n'ont donc pas d'illustration : on ne peut pas dessiner ce qu'on
+ne connaît pas d'avance.
 
 ## Icônes
 

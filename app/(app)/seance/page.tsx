@@ -18,6 +18,7 @@ import {
   TitreSection,
 } from "@/composants/ui";
 import { Jauge } from "@/composants/jauges";
+import { IllustrationExercice } from "@/composants/illustration-exercice";
 import { IconeCoche, IconeEclair, IconeHorloge } from "@/composants/icones";
 import { aujourdhuiISO, libelleRelatif } from "@/lib/dates";
 
@@ -326,6 +327,15 @@ function BlocExercice({
         onChange={(cle) =>
           choisirVariante({ logId: log._id, exerciceId: exercice.id, variante: cle })
         }
+      />
+
+      {/* Sous la bascule, pas au-dessus : le dessin change avec la variante,
+          et le voir changer dit mieux que le texte ce qui les sépare. */}
+      <IllustrationExercice
+        exerciceId={exercice.id}
+        variante={variante}
+        titre={detail.nom}
+        className="mx-auto mt-3.5 aspect-[8/5] w-full max-w-[320px] rounded-doux border border-trait bg-creux"
       />
 
       <button
