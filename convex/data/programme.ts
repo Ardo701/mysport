@@ -32,6 +32,13 @@ export type Seance = {
   id: string;
   nom: string;
   focus: string;
+  /**
+   * Durée écrite à la main, conservée pour les programmes déjà enregistrés.
+   *
+   * Ce n'est plus elle qu'on affiche : une valeur figée ne peut pas être juste
+   * douze semaines de suite, puisque le nombre de séries et les temps de repos
+   * changent chaque semaine. `dureeEstimeeMin` la recalcule à la demande.
+   */
   dureeMin: number;
   echauffement: string[];
   exercices: Exercice[];

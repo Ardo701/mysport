@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 import { api } from "@/convex/_generated/api";
+import { dureeEstimeeMin } from "@/convex/lib/programme";
 import { BarreMacro, Compteur, Jauge, Stat } from "@/composants/jauges";
 import {
   Bouton,
@@ -61,9 +62,14 @@ export default function PageAujourdhui() {
     { kcal: 0, proteines: 0, glucides: 0, lipides: 0 },
   );
 
+  // La durée du jour : celle qu'on a vraiment mise si la séance est finie,
+  // sinon celle qu'annonce la prescription de la semaine.
+  const dureePrevue = seance?.seance
+    ? dureeEstimeeMin(seance.seance, seance.dosage)
+    : null;
   const seanceFaite =
     seance?.log?.statut === "terminee"
-      ? (seance.log.dureeMin ?? seance.seance?.dureeMin ?? null)
+      ? (seance.log.dureeMin ?? dureePrevue)
       : null;
   const effort = effortDuJour(profil, pas?.pas ?? null, seanceFaite);
 
@@ -131,7 +137,7 @@ export default function PageAujourdhui() {
                       <div className="mb-2 flex items-center gap-2">
                         <IconeHaltere className="h-4 w-4 text-jaune" />
                         <span className="surtitre !text-brume">
-                          {seance.heure ?? "Quand tu veux"} · {seance.seance.dureeMin} min
+                          {seance.heure ?? "Quand tu veux"} · environ {dureePrevue} min
                         </span>
                       </div>
                       <p className="titre text-[19px] font-semibold leading-tight">

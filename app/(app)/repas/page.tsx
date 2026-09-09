@@ -3,6 +3,7 @@
 import { useAction, useMutation, useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 import { api } from "@/convex/_generated/api";
+import { dureeEstimeeMin } from "@/convex/lib/programme";
 import type { Doc } from "@/convex/_generated/dataModel";
 import Link from "next/link";
 import { AjoutRapide } from "@/composants/ajout-rapide";
@@ -77,7 +78,8 @@ export default function PageRepas() {
     profil,
     pas?.pas ?? null,
     seance?.log?.statut === "terminee"
-      ? (seance.log.dureeMin ?? seance.seance?.dureeMin ?? null)
+      ? (seance.log.dureeMin ??
+        (seance.seance ? dureeEstimeeMin(seance.seance, seance.dosage) : null))
       : null,
   );
   const restantes = Math.max(0, effort.kcalCible - totaux.kcal);

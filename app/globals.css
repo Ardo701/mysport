@@ -104,6 +104,23 @@ body {
   overscroll-behavior-y: none;
 }
 
+/*
+ * Le curseur main sur ce qui se clique.
+ *
+ * Tailwind v4 a aligné son preflight sur la feuille de style du navigateur, où
+ * un <button> porte la flèche et non la main. Sur le web la main est pourtant
+ * le seul signal qui distingue un bouton d'un bloc de texte au survol, et son
+ * absence se remarque partout à la fois. La règle est donc rétablie ici, une
+ * fois, plutôt que par une classe à ne pas oublier sur chaque bouton — les
+ * boutons désactivés en sont exclus, ils portent déjà `cursor-not-allowed`.
+ */
+button:not(:disabled),
+select:not(:disabled),
+summary,
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
 /* Rien en serif nulle part, y compris dans les champs natifs. */
 input,
 textarea,

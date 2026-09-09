@@ -1,5 +1,7 @@
 /** Ce que le planning donne pour une date : horaires, repas, entraînement. */
 
+import type { SemaineProgramme } from "@/convex/data/programme";
+import { dureeEstimeeMin, type SeanceEstimable } from "@/convex/lib/programme";
 import { ajouterJours, jourDeLaSemaine } from "./dates";
 import { TYPES_REPAS } from "./repas";
 
@@ -11,11 +13,16 @@ export type PlanningLocal = {
   entrainements: { jour: number; heure: string; seanceId: string }[];
 };
 
-export type SeanceProgramme = {
+/**
+ * Une séance du programme, vue depuis le planning.
+ *
+ * Elle emporte ses exercices : la durée d'une séance ne se lit pas, elle se
+ * calcule à partir de la prescription de la semaine (voir `dureeEstimeeMin`).
+ */
+export type SeanceProgramme = SeanceEstimable & {
   id: string;
   nom: string;
   focus: string;
-  dureeMin: number;
 };
 
 export type NatureEvenement = "lever" | "repas" | "seance" | "coucher";
@@ -59,6 +66,9 @@ export function evenementsDuJour(
   planning: PlanningLocal,
   seances: SeanceProgramme[],
   dateISO: string,
+  /** La semaine du cycle pour ce jour-là, quand on la connaît : elle change la
+      durée annoncée du tout au tout d'une semaine de charge à une décharge. */
+  cycle: SemaineProgramme | null = null,
 ): Evenement[] {
   const evenements: Evenement[] = [
     {
@@ -89,7 +99,10 @@ export function evenementsDuJour(
       heure: entrainement.creneau.heure,
       libelle: entrainement.seance?.nom ?? "Séance",
       detail: entrainement.seance
-        ? `${entrainement.seance.focus} · ${entrainement.seance.dureeMin} min`
+        ? `${entrainement.seance.focus} · environ ${dureeEstimeeMin(
+            entrainement.seance,
+            cycle,
+          )} min`
         : undefined,
       nature: "seance",
     });

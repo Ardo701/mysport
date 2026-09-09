@@ -7,10 +7,15 @@ import { Carte, Etiquette, Onglets, TitreSection } from "@/composants/ui";
 import { IllustrationExercice } from "@/composants/illustration-exercice";
 import { Feuille } from "@/composants/feuille";
 import type { Doc } from "@/convex/_generated/dataModel";
+import type { SemaineProgramme } from "@/convex/data/programme";
 import { semaineDuProgramme } from "@/convex/lib/dates";
 // `semaineDe` existe des deux côtés : ici les sept jours d'une semaine,
 // là-bas la semaine du cycle d'entraînement. On les distingue à l'import.
-import { doseDe, semaineDe as semaineDuCycle } from "@/convex/lib/programme";
+import {
+  doseDe,
+  dureeEstimeeMin,
+  semaineDe as semaineDuCycle,
+} from "@/convex/lib/programme";
 import {
   IconeChevronDroite,
   IconeChevronGauche,
@@ -83,6 +88,15 @@ export function Calendrier({
   if (!date) return null;
 
   const today = aujourdhuiISO();
+  // La semaine du cycle change la durée annoncée d'une séance : sans elle, la
+  // journée type promettrait 60 minutes une semaine de décharge à 35.
+  const cycleDe = (jour: string) =>
+    programme
+      ? semaineDuCycle(
+          programme.semaines,
+          semaineDuProgramme(programme.debutISO, jour),
+        )
+      : null;
   const statutDe = (jour: string) =>
     journaux?.find((l) => l.date === jour)?.statut ?? null;
   const journalDe = (jour: string) => journaux?.find((l) => l.date === jour) ?? null;
@@ -142,6 +156,7 @@ export function Calendrier({
         <VueJour
           planning={planning}
           seances={seances}
+          cycle={cycleDe(date)}
           date={date}
           statut={statutDe(date)}
           onVoirSeance={() => setDetail(date)}
@@ -194,17 +209,19 @@ export function Calendrier({
 function VueJour({
   planning,
   seances,
+  cycle,
   date,
   statut,
   onVoirSeance,
 }: {
   planning: PlanningLocal;
   seances: SeanceProgramme[];
+  cycle: SemaineProgramme | null;
   date: string;
   statut: string | null;
   onVoirSeance: () => void;
 }) {
-  const evenements = evenementsDuJour(planning, seances, date);
+  const evenements = evenementsDuJour(planning, seances, date, cycle);
 
   return (
     <div className="lg:max-w-[560px]">
@@ -548,6 +565,11 @@ function DetailSeance({
       <div className="flex flex-wrap items-center gap-3">
         <Etiquette ton="jaune">Semaine {numero} / 12</Etiquette>
         {cycle && <Etiquette>{cycle.bloc}</Etiquette>}
+        {/* Avant la séance, la durée qu'elle devrait prendre ; après, c'est
+            celle qu'elle a prise qui compte, et elle est juste en dessous. */}
+        {!fait && (
+          <Etiquette>environ {dureeEstimeeMin(seance, cycle)} min</Etiquette>
+        )}
         {journal?.statut === "terminee" && <Etiquette ton="vert">Faite</Etiquette>}
         {journal?.statut === "sautee" && <Etiquette ton="rouge">Sautée</Etiquette>}
         {journal?.statut === "en_cours" && <Etiquette ton="jaune">En cours</Etiquette>}

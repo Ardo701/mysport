@@ -3,7 +3,7 @@
 import { useMutation, useQuery } from "convex/react";
 import { useEffect, useMemo, useState } from "react";
 import { api } from "@/convex/_generated/api";
-import { doseDe } from "@/convex/lib/programme";
+import { doseDe, dureeEstimeeMin } from "@/convex/lib/programme";
 import type { Dose } from "@/convex/data/programme";
 import type { Doc } from "@/convex/_generated/dataModel";
 import { MinuteurRepos } from "@/composants/minuteur";
@@ -84,6 +84,10 @@ export default function PageSeance() {
   const seriesFaites = log?.series.filter((s) => s.fait).length ?? 0;
   const seriesTotal = log?.series.length ?? 0;
 
+  // Recalculée pour la semaine en cours : à la semaine 11, la même séance dure
+  // près du double de la semaine 1, uniquement à cause des séries et du repos.
+  const duree = dureeEstimeeMin(seance, dosage);
+
   return (
     <div className="space-y-5">
       <header className="mb-10 pt-1 lg:mb-12 lg:pt-0">
@@ -94,7 +98,18 @@ export default function PageSeance() {
         <h1 className="titre text-[30px] font-bold leading-[0.95] tracking-[-0.03em] lg:text-[38px]">
           {seance.nom}
         </h1>
-        <p className="mt-2 text-[14px] text-brume">{seance.focus}</p>
+        <div className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[14px] text-brume">
+          <span>{seance.focus}</span>
+          <span aria-hidden className="text-brume-faible">
+            ·
+          </span>
+          {/* « Environ » plutôt qu'un chiffre net : la durée suppose qu'on
+              respecte les repos, ce qui n'arrive jamais tout à fait. */}
+          <span className="chiffres inline-flex items-center gap-1.5">
+            <IconeHorloge className="h-3.5 w-3.5 text-brume-faible" />
+            environ {duree} min
+          </span>
+        </div>
       </header>
 
       {log?.statut === "terminee" && (

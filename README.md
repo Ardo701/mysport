@@ -11,7 +11,8 @@ téléphone, barre latérale et mise en page sur deux colonnes à partir de 1024
   **illustrée** par un schéma au trait qui montre les deux bouts du mouvement et
   son sens (voir plus bas). **Les douze semaines sont écrites une par une** : ce
   n'est pas la même séance répétée douze fois, le volume et l'intensité changent
-  chaque semaine (voir plus bas).
+  chaque semaine (voir plus bas). Chaque séance annonce sa **durée estimée**,
+  recalculée pour la semaine en cours (voir plus bas).
 - **Repas** — menus programmés le matin, en collation et le soir. Le midi (ou
   n'importe quel repas sauté) est enregistré par **photo** ou par **description
   écrite** : OpenAI reconnaît les aliments et estime calories et macros.
@@ -35,7 +36,8 @@ téléphone, barre latérale et mise en page sur deux colonnes à partir de 1024
   **détail d'une séance** s'ouvre depuis n'importe quel jour : à venir, la liste
   des exercices avec la prescription de la semaine en cours ; passée, les
   charges et répétitions réellement enregistrées, série par série. Chaque
-  exercice y porte sa vignette, dans la variante suivie ce jour-là.
+  exercice y porte sa vignette, dans la variante suivie ce jour-là, et la séance
+  à venir sa durée estimée.
 - **Thème** — sombre par défaut, clair au choix. La bascule est en bas de la
   barre latérale sur ordinateur, et sur la page Profil pour le téléphone, qui
   n'a pas de barre latérale. Le choix est propre à l'appareil.
@@ -74,6 +76,21 @@ s'entraînerait sur une prescription différente de celle affichée.
 
 Un programme **généré par l'IA** n'a pas cette couche : ses exercices gardent
 alors la prescription écrite sur eux, et rien ne casse.
+
+### Durée estimée
+
+La durée d'une séance suit la même règle : elle se calcule, elle ne s'écrit
+pas. `dureeEstimeeMin` la reconstruit à partir de la prescription affichée —
+échauffement, puis pour chaque exercice `séries × (effort + repos)`, puis le
+finisher quand la semaine le prévoit — et arrondit à cinq minutes près. Une
+répétition contrôlée compte quatre secondes ; une prescription déjà en
+secondes (« 40-60 sec ») se lit telle quelle ; « 12 + 12 » additionne les deux
+mouvements d'un superset, « 10 par jambe » double la série.
+
+Le même « Poussée » passe ainsi de **40 minutes en semaine 1 à 85 en semaine
+11**, sans qu'aucun chiffre soit écrit à la main. Le champ `dureeMin` des
+séances existe toujours — les programmes enregistrés le contiennent — mais il
+n'est plus affiché : figé, il aurait été faux onze semaines sur douze.
 
 ## Pile technique
 
@@ -205,6 +222,11 @@ chiffres qui portent la page, tout le reste s'efface.
 - **Aucun ornement** : pas de halo de fond, pas d'anneau de progression, pas
   d'icône décorative dans les listes — elles restent à la navigation et aux
   actions.
+- **Le curseur main sur ce qui se clique.** Le preflight de Tailwind v4 laisse
+  aux boutons la flèche du navigateur ; une règle unique dans `globals.css` la
+  remet en main pour `button`, `select`, `summary` et `[role="button"]`, sauf
+  s'ils sont désactivés. Une classe à répéter sur chaque bouton finirait par
+  s'oublier quelque part.
 
 ## Couleurs et thèmes
 
