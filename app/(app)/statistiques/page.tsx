@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { api } from "@/convex/_generated/api";
 import { Stat } from "@/composants/jauges";
 import { IconeChevronDroite, IconeChevronGauche } from "@/composants/icones";
-import { LigneSeance } from "@/composants/seance";
+import { DetailSeance, LigneSeance } from "@/composants/seance";
 import {
   Bouton,
   Carte,
@@ -375,9 +375,12 @@ function Calendrier({ seances, aujourdhui }: { seances: Seance[]; aujourdhui: st
 
       <div className="mt-5">
         {choisies.length > 0 ? (
-          <div className="[&>a:first-child]:pt-2">
+          <div className="[&>div:first-child>a]:pt-2">
             {choisies.map((s) => (
-              <LigneSeance key={s._id} seance={s} />
+              <div key={s._id}>
+                <LigneSeance seance={s} />
+                <DetailSeance seance={s} />
+              </div>
             ))}
           </div>
         ) : (

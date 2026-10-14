@@ -6,11 +6,17 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
-import { exerciceDuCatalogue, ID_PERSO } from "@/convex/data/exercices";
+import {
+  ID_PERSO,
+  MATERIELS,
+  exerciceDuCatalogue,
+  materielParDefaut,
+  type Materiel,
+} from "@/convex/data/exercices";
 import { dureeRetenue, estimerKcal } from "@/convex/lib/calories";
 import { ChampNombre } from "@/composants/champ-nombre";
 import { ChoixExercices, type ExerciceChoisi } from "@/composants/choix-exercices";
-import { IconeChevronGauche, IconeCroix, IconePlus } from "@/composants/icones";
+import { IconeChevronDroite, IconeChevronGauche, IconeCroix, IconePlus } from "@/composants/icones";
 import {
   Bouton,
   Carte,
@@ -68,7 +74,15 @@ function Formulaire() {
     } else if (existante) {
       setDate(existante.date);
       setDureeMin(existante.dureeMin);
-      setLignes(existante.exercices.map((e) => ({ ...e, cle: nouvelleCle() })));
+      setLignes(
+        existante.exercices.map((e) => ({
+          ...e,
+          // Une séance notée avant l'arrivée du matériel n'en a pas : on
+          // reprend celui du catalogue plutôt que de laisser la liste vide.
+          materiel: e.materiel ?? materielParDefaut(e.exerciceId, e.mesure, e.chargeKg),
+          cle: nouvelleCle(),
+        })),
+      );
       setNotes(existante.notes ?? "");
       setPret(true);
     }
@@ -100,7 +114,14 @@ function Formulaire() {
   }
 
   function ajouter(choisis: ExerciceChoisi[]) {
-    setLignes((ls) => [...ls, ...choisis.map((c) => ({ ...c, cle: nouvelleCle() }))]);
+    setLignes((ls) => [
+      ...ls,
+      ...choisis.map((c) => ({
+        ...c,
+        materiel: materielParDefaut(c.exerciceId, c.mesure),
+        cle: nouvelleCle(),
+      })),
+    ]);
   }
 
   async function valider() {
@@ -335,7 +356,7 @@ function LigneExercice({
           )}
         </div>
       ) : (
-        <div className={`grid gap-2 ${ligne.mesure === "series" ? "grid-cols-3" : "grid-cols-2"}`}>
+        <div className="grid grid-cols-2 gap-2">
           <ChampNombre
             aria-label={`${ligne.nom}, séries`}
             suffixe="séries"
@@ -345,25 +366,14 @@ function LigneExercice({
             onValeur={(n) => onModifier({ series: n })}
           />
           {ligne.mesure === "series" ? (
-            <>
-              <ChampNombre
-                aria-label={`${ligne.nom}, répétitions`}
-                suffixe="reps"
-                placeholder="10"
-                valeur={ligne.repetitions}
-                max={999}
-                onValeur={(n) => onModifier({ repetitions: n })}
-              />
-              <ChampNombre
-                aria-label={`${ligne.nom}, charge`}
-                suffixe="kg"
-                placeholder="—"
-                decimales
-                valeur={ligne.chargeKg}
-                max={999}
-                onValeur={(n) => onModifier({ chargeKg: n })}
-              />
-            </>
+            <ChampNombre
+              aria-label={`${ligne.nom}, répétitions`}
+              suffixe="reps"
+              placeholder="10"
+              valeur={ligne.repetitions}
+              max={999}
+              onValeur={(n) => onModifier({ repetitions: n })}
+            />
           ) : (
             <ChampNombre
               aria-label={`${ligne.nom}, secondes par série`}
@@ -374,8 +384,65 @@ function LigneExercice({
               onValeur={(n) => onModifier({ secondes: n })}
             />
           )}
+
+          {/* Au poids du corps, il n'y a rien à peser : le champ des kilos
+              n'apparaît qu'avec du matériel, et la liste prend alors la
+              moitié de la ligne pour le lui laisser. */}
+          <ChoixMateriel
+            nom={ligne.nom}
+            valeur={ligne.materiel ?? "poids-du-corps"}
+            className={ligne.materiel === "poids-du-corps" ? "col-span-2" : ""}
+            onChange={(materiel) =>
+              onModifier(
+                materiel === "poids-du-corps"
+                  ? { materiel, chargeKg: undefined }
+                  : { materiel },
+              )
+            }
+          />
+          {ligne.materiel !== "poids-du-corps" && (
+            <ChampNombre
+              aria-label={`${ligne.nom}, ${ligne.materiel === "lest" ? "lest" : "charge"}`}
+              suffixe="kg"
+              placeholder={ligne.materiel === "lest" ? "Lest" : "Charge"}
+              decimales
+              valeur={ligne.chargeKg}
+              max={999}
+              onValeur={(n) => onModifier({ chargeKg: n })}
+            />
+          )}
         </div>
       )}
     </li>
+  );
+}
+
+function ChoixMateriel({
+  nom,
+  valeur,
+  onChange,
+  className = "",
+}: {
+  nom: string;
+  valeur: Materiel;
+  onChange: (m: Materiel) => void;
+  className?: string;
+}) {
+  return (
+    <label className={`relative block ${className}`}>
+      <select
+        aria-label={`${nom}, matériel`}
+        value={valeur}
+        onChange={(e) => onChange(e.target.value as Materiel)}
+        className="champ appearance-none truncate !pr-9 !font-sans"
+      >
+        {MATERIELS.map((m) => (
+          <option key={m.cle} value={m.cle}>
+            {m.libelle}
+          </option>
+        ))}
+      </select>
+      <IconeChevronDroite className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-brume-faible" />
+    </label>
   );
 }

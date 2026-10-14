@@ -8,6 +8,7 @@
  */
 
 import type { Doc } from "@/convex/_generated/dataModel";
+import { libelleMateriel } from "@/convex/data/exercices";
 import { ajouterJours, lundiDeLaSemaine } from "./dates";
 
 export type Seance = Doc<"seances">;
@@ -26,19 +27,27 @@ export function nombre(n: number, decimales = 1): string {
   return n.toLocaleString("fr-FR", { maximumFractionDigits: decimales });
 }
 
-/** « 4 × 8 · 80 kg », « 3 × 45 s », « 30 min · 5 km » — ce qui a été saisi, rien de plus. */
+/**
+ * « 4 × 8 · barre 80 kg », « 5 × 20 · poids du corps », « 3 × 45 s »,
+ * « 30 min · 5 km » — ce qui a été saisi, rien de plus.
+ */
 export function detailExercice(e: ExerciceSaisi): string {
   const morceaux: string[] = [];
   if (e.mesure === "duree") {
     if (e.dureeMin) morceaux.push(libelleDuree(e.dureeMin));
     if (e.distanceKm) morceaux.push(`${nombre(e.distanceKm, 2)} km`);
-  } else {
-    const quantite = e.mesure === "maintien" ? (e.secondes ? `${e.secondes} s` : null) : (e.repetitions ?? null);
-    if (e.series && quantite !== null) morceaux.push(`${e.series} × ${quantite}`);
-    else if (e.series) morceaux.push(`${e.series} séries`);
-    else if (quantite !== null) morceaux.push(String(quantite));
-    if (e.chargeKg) morceaux.push(`${nombre(e.chargeKg)} kg`);
+    return morceaux.join(" · ");
   }
+
+  const quantite = e.mesure === "maintien" ? (e.secondes ? `${e.secondes} s` : null) : (e.repetitions ?? null);
+  if (e.series && quantite !== null) morceaux.push(`${e.series} × ${quantite}`);
+  else if (e.series) morceaux.push(`${e.series} séries`);
+  else if (quantite !== null) morceaux.push(String(quantite));
+
+  // Les séances notées avant l'arrivée du matériel n'ont que la charge.
+  const materiel = e.materiel ? libelleMateriel(e.materiel, "court") : null;
+  const charge = e.chargeKg ? `${nombre(e.chargeKg)} kg` : null;
+  if (materiel || charge) morceaux.push([materiel, charge].filter(Boolean).join(" "));
   return morceaux.join(" · ");
 }
 

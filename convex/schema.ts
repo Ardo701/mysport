@@ -1,6 +1,7 @@
 import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { MATERIELS } from "./data/exercices";
 
 /** Un exercice d'une séance, tel que saisi. */
 export const exerciceValidator = v.object({
@@ -16,6 +17,9 @@ export const exerciceValidator = v.object({
   repetitions: v.optional(v.number()),
   /** Durée d'une série tenue, pour le gainage. */
   secondes: v.optional(v.number()),
+  /** Musculation et gainage seulement ; absent des séances saisies avant son ajout. */
+  materiel: v.optional(v.union(...MATERIELS.map((m) => v.literal(m.cle)))),
+  /** Charge de la barre, de l'haltère, de la machine — ou du lest. */
   chargeKg: v.optional(v.number()),
   dureeMin: v.optional(v.number()),
   distanceKm: v.optional(v.number()),

@@ -104,6 +104,7 @@ function positif(n: number | undefined) {
 function nettoyer(e: Infer<typeof exerciceValidator>): Infer<typeof exerciceValidator> {
   const nom = e.nom.trim();
   if (!nom) throw new Error("Exercice sans nom");
+  const materiel = e.mesure === "duree" ? undefined : e.materiel;
   return {
     exerciceId: e.exerciceId,
     nom,
@@ -111,7 +112,10 @@ function nettoyer(e: Infer<typeof exerciceValidator>): Infer<typeof exerciceVali
     series: positif(e.series),
     repetitions: positif(e.repetitions),
     secondes: positif(e.secondes),
-    chargeKg: positif(e.chargeKg),
+    materiel,
+    // Au poids du corps, il n'y a rien à peser : une charge restée dans le
+    // champ avant qu'on change de matériel ne doit pas s'enregistrer.
+    chargeKg: materiel === "poids-du-corps" ? undefined : positif(e.chargeKg),
     dureeMin: positif(e.dureeMin),
     distanceKm: positif(e.distanceKm),
   };
