@@ -186,6 +186,7 @@ export const EXERCICES: Exercice[] = [
     ["planche", "Planche", 3.8, "poids-du-corps"],
     ["gainage-lateral", "Gainage latéral", 3.8, "poids-du-corps"],
     ["hollow-body", "Hollow body", 3.8, "poids-du-corps"],
+    ["abdos-en-v", "Abdos en V", 3.8, "poids-du-corps"],
     ["chaise", "Chaise contre le mur", 3.8, "poids-du-corps"],
     ["l-sit", "L-sit", 4, "poids-du-corps"],
   ]),
