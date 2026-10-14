@@ -5,55 +5,52 @@
  * l'application se décline en sombre et en clair, où « noir » et « craie »
  * auraient désigné l'inverse de ce qu'ils nomment.
  *
- *   fond          fond de page
- *   surface       fond des cartes
- *   creux         fond des champs et des pastilles
- *   creux-vif     champ au focus
- *   trait         bordures
- *   trait-vif     bordure appuyée, au survol
- *   encre         texte principal
- *   brume         texte secondaire
- *   brume-faible  texte tertiaire, surtitres
- *   jaune         accent lisible : texte, icônes, bordures actives
- *   jaune-vif     aplats de la marque : boutons, jauges, points
- *   jaune-appui   aplat au survol
- *   jaune-voile   voile d'accent en fond de zone active
- *   sur-jaune     texte posé sur un aplat jaune
+ *   fond           fond de page
+ *   surface        fond des boîtes : listes, graphiques, grilles de chiffres
+ *   creux          fond des champs et des sélecteurs
+ *   creux-vif      champ au focus, ligne au survol
+ *   piste          rail vide derrière une barre de graphique ou une jauge
+ *   trait          bordures et séparateurs
+ *   trait-vif      bordure appuyée, au survol
+ *   encre          texte principal
+ *   brume          texte secondaire, libellés
+ *   brume-faible   texte tertiaire
+ *   accent         aplats : bouton principal, option choisie, barres
+ *   accent-appui   aplat au survol
+ *   accent-texte   accent lisible en texte, icône ou bordure
+ *   sur-accent     texte posé sur un aplat d'accent
  *
  * Seules les valeurs changent d'un thème à l'autre, jamais les noms : les
  * composants n'ont donc rien à savoir du thème courant.
  */
 @theme {
-  --color-fond: #08080a;
-  --color-surface: #0e0e11;
-  --color-creux: #16161a;
-  --color-creux-vif: #1e1e24;
-  --color-trait: #26262e;
-  --color-trait-vif: #33333d;
-  --color-encre: #f4f4f2;
-  --color-brume: #9a9aa6;
-  --color-brume-faible: #6b6b78;
-  --color-jaune: #ffdd00;
-  --color-jaune-vif: #ffdd00;
-  --color-jaune-appui: #d9bb00;
-  --color-jaune-voile: #ffdd0014;
-  --color-sur-jaune: #08080a;
-  --color-vert: #6ee7a8;
+  --color-fond: #0f1115;
+  --color-surface: #181b21;
+  --color-creux: #1e2128;
+  --color-creux-vif: #262a32;
+  --color-piste: #23272f;
+  --color-trait: #2a2e36;
+  --color-trait-vif: #3a3f49;
+  --color-encre: #f3f4f6;
+  --color-brume: #a2a8b3;
+  --color-brume-faible: #7c828e;
+  --color-accent: #ff7a45;
+  --color-accent-appui: #f0682f;
+  --color-accent-texte: #ff8a5c;
+  --color-sur-accent: #17120e;
+  --color-vert: #5fd39a;
   --color-rouge: #ff6b5e;
 
   --font-titre: var(--police-titre), "Helvetica Neue", Arial, sans-serif;
   --font-sans: var(--police-corps), "Helvetica Neue", Arial, sans-serif;
 
   /*
-   * Un seul rayon.
-   *
-   * Il y en avait deux : zéro pour les surfaces de lecture, trois pixels pour
-   * ce qu'on touche. À l'usage l'écart ne se voyait pas, et le zéro rendait
-   * les cartes du calendrier franchement coupantes. Six pixels adoucissent
-   * l'angle sans le rendre pour autant remarquable — les jauges et les filets,
-   * eux, restent droits parce qu'ils ne portent aucune classe de rayon.
+   * Deux rayons, nets l'un comme l'autre : huit pixels pour ce qu'on touche
+   * (boutons, champs, options), dix pour les boîtes qui les contiennent. Plus
+   * rond, l'interface prend l'air d'une maquette générée à la chaîne.
    */
-  --radius-doux: 6px;
+  --radius-doux: 8px;
+  --radius-boite: 10px;
 }
 
 :root {
@@ -62,31 +59,30 @@
 
 /*
  * Thème clair. Un script posé en tête de page écrit data-theme avant le
- * premier rendu, à partir du choix mémorisé ou, à défaut, du réglage du
- * système : sans lui, un utilisateur en clair verrait passer un éclair noir.
+ * premier rendu, à partir du choix mémorisé : sans lui, un utilisateur en
+ * clair verrait passer un éclair noir.
  *
- * Le jaune se dédouble ici pour de bon : #ffdd00 sur blanc plafonne à 1,3:1,
- * illisible. L'accent descend donc à un ambre foncé pour le texte et les
- * bordures, tandis que les aplats gardent un jaune franc, où c'est le texte
- * posé dessus qui porte le contraste.
+ * L'orange des aplats reste le même, c'est le texte posé dessus qui porte le
+ * contraste. En texte sur blanc, en revanche, il tomberait à 2,6:1 :
+ * l'accent lisible descend à un orange brûlé.
  */
 :root[data-theme="clair"] {
   color-scheme: light;
 
-  --color-fond: #f6f6f3;
+  --color-fond: #f4f5f7;
   --color-surface: #ffffff;
-  --color-creux: #ededea;
-  --color-creux-vif: #e4e4e0;
-  --color-trait: #dedcd6;
-  --color-trait-vif: #c4c2ba;
-  --color-encre: #14141a;
-  --color-brume: #5a5a64;
-  --color-brume-faible: #74747e;
-  --color-jaune: #856400;
-  --color-jaune-vif: #f5c800;
-  --color-jaune-appui: #e0b600;
-  --color-jaune-voile: #8564001f;
-  --color-sur-jaune: #08080a;
+  --color-creux: #e9ebef;
+  --color-creux-vif: #e1e4e9;
+  --color-piste: #eceef2;
+  --color-trait: #e1e3e8;
+  --color-trait-vif: #c9cdd4;
+  --color-encre: #111318;
+  --color-brume: #5a616d;
+  --color-brume-faible: #6b7280;
+  --color-accent: #ff7a45;
+  --color-accent-appui: #f0682f;
+  --color-accent-texte: #c2410c;
+  --color-sur-accent: #17120e;
   --color-vert: #0a7a48;
   --color-rouge: #cf3722;
 }
@@ -150,15 +146,19 @@ code {
 .titre {
   font-family: var(--font-titre);
   letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
 }
 
+/*
+ * Petit libellé : au-dessus d'un champ, sous un chiffre, à côté d'une date.
+ * En minuscules et en gris, sans capitales espacées : il accompagne la
+ * valeur, il ne la coiffe pas.
+ */
 .surtitre {
-  font-size: 10px;
-  line-height: 1;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--color-brume-faible);
-  font-weight: 600;
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--color-brume);
+  font-weight: 500;
 }
 
 /*
@@ -173,11 +173,7 @@ code {
 }
 
 /*
- * Un groupe n'est plus une boîte.
- *
- * Les cartes encadrées et remplies empilaient trois signaux pour dire une
- * chose : ce bloc va ensemble. Le titre souligné qui les précède le dit déjà.
- * Ne restent que le blanc et l'alignement.
+ * Un groupe de contenu, sans cadre : son titre suffit à le délimiter.
  */
 .carte {
   background-color: transparent;
@@ -185,16 +181,13 @@ code {
 }
 
 /*
- * Titre de section : le libellé, puis un filet jusqu'au bord.
- *
- * C'est la seule séparation horizontale de l'application. Le filet part de la
- * ligne de base du texte et file jusqu'à la marge, comme sur une planche
- * technique : il donne la largeur du bloc sans l'enfermer.
+ * Une boîte : ce qui se lit d'un bloc, une liste de séances, un graphique,
+ * une grille de chiffres. Fond à peine détaché, filet fin, angles nets.
  */
-.filet {
-  height: 1px;
-  flex: 1;
-  background-color: var(--color-trait);
+.boite {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-trait);
+  border-radius: var(--radius-boite);
 }
 
 .champ {
@@ -202,7 +195,7 @@ code {
   background-color: var(--color-creux);
   border: 1px solid var(--color-trait);
   border-radius: var(--radius-doux);
-  padding: 11px 13px;
+  padding: 11px 14px;
   font-size: 16px; /* évite le zoom automatique sur iOS */
   color: var(--color-encre);
   outline: none;
@@ -216,7 +209,7 @@ code {
 }
 
 .champ:focus {
-  border-color: var(--color-jaune);
+  border-color: var(--color-accent-texte);
   background-color: var(--color-creux-vif);
 }
 

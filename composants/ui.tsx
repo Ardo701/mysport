@@ -1,14 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
 
 /**
- * Groupe de contenu.
- *
- * Ne dessine plus rien : ni fond, ni cadre, ni coins. Le titre souligné qui la
- * précède délimite déjà le bloc, et l'encadrer par-dessus revenait à dire deux
- * fois la même chose — c'est ce qui donnait à chaque page son air de tableau
- * de bord fait à la chaîne.
+ * Groupe de contenu : un titre, puis ce qu'il annonce. Ne dessine rien
+ * lui-même ; ce qui doit se lire d'un bloc va dans une `.boite`.
  */
 export function Carte({
   children,
@@ -21,12 +18,9 @@ export function Carte({
 }
 
 /**
- * Titre de bloc : un libellé court, puis un filet jusqu'à la marge.
- *
- * Un seul niveau. Il y en avait deux — un surtitre en capitales *et* un titre
- * — qui répétaient la même information sous deux tailles (« ÉNERGIE » au-dessus
- * de « Calories »). C'est le libellé qui reste, en petit : le contraste vient
- * des chiffres en dessous, pas d'un empilement de titres.
+ * Titre de bloc, posé au-dessus de sa boîte comme dans les réglages d'un
+ * téléphone : un libellé court en gras, et à droite une valeur d'appoint ou
+ * une action.
  */
 export function TitreSection({
   titre,
@@ -36,10 +30,9 @@ export function TitreSection({
   action?: ReactNode;
 }) {
   return (
-    <div className="mb-3.5 flex items-center gap-3">
-      <h2 className="surtitre shrink-0 text-brume">{titre}</h2>
-      <span className="filet" />
-      {action && <div className="shrink-0 leading-none">{action}</div>}
+    <div className="mb-2.5 flex items-baseline justify-between gap-3">
+      <h2 className="text-[15px] font-semibold first-letter:uppercase">{titre}</h2>
+      {action && <div className="shrink-0 text-[13px] text-brume">{action}</div>}
     </div>
   );
 }
@@ -47,11 +40,23 @@ export function TitreSection({
 type VarianteBouton = "primaire" | "secondaire" | "fantome" | "danger";
 
 const styleBouton: Record<VarianteBouton, string> = {
-  primaire: "bg-jaune-vif text-sur-jaune hover:bg-jaune-appui font-semibold",
-  secondaire: "border border-trait text-encre hover:border-trait-vif",
-  fantome: "text-brume hover:text-encre",
-  danger: "border border-rouge/40 text-rouge hover:border-rouge",
+  primaire: "bg-accent text-sur-accent hover:bg-accent-appui font-semibold",
+  secondaire: "border border-trait bg-surface text-encre font-medium hover:bg-creux",
+  fantome: "text-brume font-medium hover:text-encre",
+  danger: "border border-rouge/40 text-rouge font-medium hover:border-rouge",
 };
+
+const tailles = {
+  petite: "h-9 px-3.5 text-[13px]",
+  normale: "h-11 px-4 text-[14px]",
+  large: "h-12 px-5 text-[15px] w-full",
+};
+
+type TailleBouton = keyof typeof tailles;
+
+function classesBouton(variante: VarianteBouton, taille: TailleBouton, className: string) {
+  return `inline-flex items-center justify-center gap-2 rounded-doux transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${tailles[taille]} ${styleBouton[variante]} ${className}`;
+}
 
 export function Bouton({
   variante = "primaire",
@@ -61,20 +66,36 @@ export function Bouton({
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
   variante?: VarianteBouton;
-  taille?: "normale" | "petite" | "large";
+  taille?: TailleBouton;
 }) {
-  const tailles = {
-    petite: "px-3 py-1.5 text-[12px]",
-    normale: "px-4 py-2.5 text-[13px]",
-    large: "px-5 py-3 text-[14px] w-full",
-  };
   return (
-    <button
-      className={`inline-flex items-center justify-center gap-2 rounded-doux transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${tailles[taille]} ${styleBouton[variante]} ${className}`}
-      {...props}
-    >
+    <button className={classesBouton(variante, taille, className)} {...props}>
       {children}
     </button>
+  );
+}
+
+/**
+ * Un lien qui a l'air d'un bouton : pour aller vers une autre page. Un vrai
+ * bouton glissé dans un lien ferait deux arrêts au clavier pour une action.
+ */
+export function BoutonLien({
+  href,
+  variante = "primaire",
+  taille = "normale",
+  className = "",
+  children,
+}: {
+  href: string;
+  variante?: VarianteBouton;
+  taille?: TailleBouton;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <Link href={href} className={classesBouton(variante, taille, className)}>
+      {children}
+    </Link>
   );
 }
 
@@ -93,7 +114,7 @@ export function Champ({
       <span className="relative block">
         <input className={`champ chiffres ${className}`} {...props} />
         {suffixe && (
-          <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[13px] text-brume-faible">
+          <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[13px] text-brume">
             {suffixe}
           </span>
         )}
@@ -103,11 +124,9 @@ export function Champ({
 }
 
 /**
- * Choix exclusif.
- *
- * L'option retenue est cerclée d'un double filet jaune plutôt que remplie
- * d'un voile de couleur : sur une page qui ne s'autorise qu'un aplat jaune,
- * la sélection se marque au trait.
+ * Choix exclusif, dessiné en sélecteur segmenté : un rail en creux, et
+ * l'option retenue remplie d'accent. Le choix doit se voir de loin, y
+ * compris sur fond sombre.
  *
  * Facultatif, un choix se retire en touchant à nouveau l'option retenue. À
  * cinq colonnes — une échelle tenue sur une ligne de téléphone —, les
@@ -133,7 +152,7 @@ export function GroupeOptions<T extends string>({
   return (
     <div>
       {libelle && <span className="surtitre mb-2 block">{libelle}</span>}
-      <div className={`grid ${grille} gap-px bg-trait`}>
+      <div className={`grid ${grille} gap-[3px] rounded-boite bg-creux p-[3px]`}>
         {options.map((o) => {
           const actif = o.valeur === valeur;
           return (
@@ -142,17 +161,19 @@ export function GroupeOptions<T extends string>({
               type="button"
               aria-pressed={actif}
               onClick={() => onChange(facultatif && actif ? undefined : o.valeur)}
-              className={`transition-colors ${serre ? "px-1 py-3 text-center" : "px-3 py-3 text-left"} ${
-                actif
-                  ? "bg-fond text-encre shadow-[inset_0_2px_0_0_var(--color-jaune)]"
-                  : "bg-fond text-brume hover:text-encre"
+              className={`min-h-10 rounded-doux transition-colors ${serre ? "px-1 py-2 text-center" : "px-3 py-2.5 text-left"} ${
+                actif ? "bg-accent text-sur-accent" : "text-brume hover:bg-creux-vif hover:text-encre"
               }`}
             >
-              <span className={`block font-medium leading-tight ${serre ? "text-[12px]" : "text-[13px]"}`}>
+              <span
+                className={`block leading-tight ${actif ? "font-semibold" : "font-medium"} ${serre ? "text-[12px]" : "text-[13px]"}`}
+              >
                 {o.libelle}
               </span>
               {o.detail && (
-                <span className="chiffres mt-1 block text-[11px] leading-snug text-brume-faible">
+                <span
+                  className={`chiffres mt-1 block text-[11px] leading-snug ${actif ? "text-sur-accent/75" : "text-brume-faible"}`}
+                >
                   {o.detail}
                 </span>
               )}
@@ -165,12 +186,8 @@ export function GroupeOptions<T extends string>({
 }
 
 /**
- * Barre d'onglets.
- *
- * L'onglet courant se marque d'un souligné, pas d'un aplat jaune. Il y avait
- * cinq de ces barres dans l'application, chacune recopiée à la main avec son
- * pavé de couleur : à trois barres sur le même écran, le jaune ne désignait
- * plus rien. Le souligné laisse l'accent au seul geste principal de la page.
+ * Barre d'onglets, au même dessin que le choix exclusif : les onglets se
+ * partagent la largeur, le courant est rempli d'accent.
  */
 export function Onglets<T extends string>({
   options,
@@ -189,9 +206,7 @@ export function Onglets<T extends string>({
   className?: string;
 }) {
   return (
-    // Plus serré sur téléphone : cinq onglets tiennent alors sur une ligne
-    // de 375 px, sans qu'aucun libellé ne se coupe en deux.
-    <div className={`flex gap-4 border-b border-trait sm:gap-6 ${className}`}>
+    <div className={`flex gap-[2px] rounded-boite bg-creux p-[3px] ${className}`}>
       {options.map(({ cle, libelle, Icone, desactive }) => {
         const actif = valeur === cle;
         return (
@@ -201,10 +216,10 @@ export function Onglets<T extends string>({
             disabled={desactive}
             aria-pressed={actif}
             onClick={() => onChange(cle)}
-            className={`-mb-px flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 pb-2.5 text-[13px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+            className={`flex h-[38px] min-w-0 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-doux px-1 text-[13px] transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
               actif
-                ? "border-b-jaune-vif text-encre"
-                : "border-b-transparent text-brume hover:text-encre"
+                ? "bg-accent font-semibold text-sur-accent"
+                : "font-medium text-brume hover:text-encre"
             }`}
           >
             {Icone && <Icone className="h-4 w-4" />}
@@ -222,11 +237,11 @@ export function Etiquette({
   ton = "neutre",
 }: {
   children: ReactNode;
-  ton?: "neutre" | "jaune" | "vert" | "rouge";
+  ton?: "neutre" | "accent" | "vert" | "rouge";
 }) {
   const tons = {
     neutre: "text-brume",
-    jaune: "text-jaune",
+    accent: "text-accent-texte",
     vert: "text-vert",
     rouge: "text-rouge",
   };
@@ -239,8 +254,8 @@ export function Etiquette({
 
 export function Chargement({ texte = "Chargement" }: { texte?: string }) {
   return (
-    <div className="flex items-center gap-2.5 py-8 text-[13px] text-brume-faible">
-      <span className="pulsation h-1.5 w-1.5 bg-jaune-vif" />
+    <div className="flex items-center gap-2.5 py-8 text-[13px] text-brume">
+      <span className="pulsation h-2 w-2 rounded-full bg-accent" />
       {texte}…
     </div>
   );
@@ -258,14 +273,14 @@ export function EtatVide({
   className?: string;
 }) {
   return (
-    <div className={`border border-dashed border-trait px-4 py-9 text-center ${className}`}>
-      <p className="text-[14px] font-medium">{titre}</p>
+    <div className={`boite px-5 py-9 text-center ${className}`}>
+      <p className="text-[15px] font-semibold">{titre}</p>
       {detail && (
-        <p className="mx-auto mt-1.5 max-w-[34ch] text-[13px] leading-relaxed text-brume-faible">
+        <p className="mx-auto mt-1.5 max-w-[34ch] text-[13px] leading-relaxed text-brume">
           {detail}
         </p>
       )}
-      {action && <div className="mt-4 flex justify-center">{action}</div>}
+      {action && <div className="mt-5 flex justify-center">{action}</div>}
     </div>
   );
 }
@@ -280,14 +295,12 @@ export function Message({
   children: ReactNode;
 }) {
   const tons = {
-    info: "border-trait text-brume",
-    erreur: "border-rouge/50 text-rouge",
-    succes: "border-vert/50 text-vert",
+    info: "bg-creux text-brume",
+    erreur: "bg-rouge/10 text-rouge",
+    succes: "bg-vert/10 text-vert",
   };
   return (
-    <p
-      className={`border-l-2 py-1 pl-3.5 text-[13px] leading-relaxed ${tons[ton]} ${className}`}
-    >
+    <p className={`rounded-doux px-3.5 py-2.5 text-[13px] leading-relaxed ${tons[ton]} ${className}`}>
       {children}
     </p>
   );
@@ -313,7 +326,7 @@ export function Colonnes({
 }) {
   return (
     <div
-      className={`grid grid-cols-1 items-start gap-x-14 gap-y-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] ${className}`}
+      className={`grid grid-cols-1 items-start gap-x-12 gap-y-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] ${className}`}
     >
       {children}
     </div>
@@ -328,14 +341,13 @@ export function Colonne({
   children: ReactNode;
   className?: string;
 }) {
-  return <div className={`space-y-9 ${className}`}>{children}</div>;
+  return <div className={`space-y-8 ${className}`}>{children}</div>;
 }
 
 /**
- * En-tête de page : la date en petit, le nom de la page en gros.
- *
- * Les deux niveaux restent parce qu'ils portent deux informations
- * différentes — quand, et quoi — contrairement aux titres de bloc.
+ * En-tête de page : le nom de la page en gros, une précision en petit
+ * au-dessus quand elle sert (la date, une adresse), et à droite l'action
+ * principale de la page.
  */
 export function EnTetePage({
   surtitre,
@@ -351,22 +363,42 @@ export function EnTetePage({
   avant?: ReactNode;
 }) {
   return (
-    <header className="mb-10 pt-1 lg:mb-12 lg:pt-0">
+    <header className="mb-6 pt-1 lg:mb-8 lg:pt-0">
       {avant}
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          {surtitre && <p className="surtitre mb-3">{surtitre}</p>}
-          <h1 className="titre text-[30px] font-bold leading-[0.95] tracking-[-0.03em] lg:text-[38px]">
-            {titre}
-          </h1>
+      <div className="flex items-center justify-between gap-4">
+        <div className="min-w-0">
+          {surtitre && <p className="mb-1.5 text-[13px] font-medium text-brume first-letter:uppercase">{surtitre}</p>}
+          <h1 className="titre text-[30px] font-bold leading-[1.1] lg:text-[34px]">{titre}</h1>
           {detail && (
-            <p className="mt-3 max-w-[62ch] text-[14px] leading-relaxed text-brume">
-              {detail}
-            </p>
+            <p className="mt-2 max-w-[62ch] text-[14px] leading-relaxed text-brume">{detail}</p>
           )}
         </div>
         {action}
       </div>
     </header>
+  );
+}
+
+/**
+ * Bouton carré d'action principale, en tête de page : ajouter une séance.
+ * Un lien, puisqu'il mène à une autre page.
+ */
+export function ActionTete({
+  href,
+  libelle,
+  children,
+}: {
+  href: string;
+  libelle: string;
+  children: ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-label={libelle}
+      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-doux bg-accent text-sur-accent transition-colors hover:bg-accent-appui"
+    >
+      {children}
+    </Link>
   );
 }

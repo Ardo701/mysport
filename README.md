@@ -13,12 +13,13 @@ deux colonnes à partir de 1024 px.
   distance pour le cardio. Un exercice absent du catalogue s'ajoute par son nom.
   Deux échelles, facultatives elles aussi, notent le ressenti avant la séance
   (de « à fond » à « fatigué ») et après (de « au top » à « vidé »).
-- **Statistiques** — semaine par semaine : la dépense de la semaine, les
-  calories jour par jour et le détail de chaque jour, repos compris. Ou sur
-  4 semaines, 3 mois, 12 mois ou tout l'historique :
-  dépense moyenne par semaine, par séance et par jour, nombre de séances et de
-  jours actifs, temps total, calories semaine par semaine, calendrier du mois
-  où chaque jour d'entraînement s'ouvre sur sa séance, exercices les plus faits.
+- **Statistiques** — semaine par semaine : la dépense de la semaine comparée à
+  la précédente, les calories jour par jour et chaque jour avec ses séances,
+  repos compris. Ou sur un mois, 3 mois, un an ou tout l'historique : dépense
+  moyenne par semaine, par séance et par jour, nombre de séances et de jours
+  actifs, temps total, calories semaine par semaine, calendrier du mois où
+  chaque jour d'entraînement s'ouvre sur sa séance, exercices les plus faits.
+  Les deux vues répartissent la dépense entre musculation, cardio et sports.
 - **Chronomètre** — minuteur d'intervalles : temps d'effort, temps de pause,
   nombre de tours. Il sonne à chaque changement, avec un décompte sur les trois
   dernières secondes, et garde l'écran allumé jusqu'à la fin.
@@ -142,45 +143,48 @@ scripts/          déploiement Vercel, clés d'authentification, icônes
 
 ## Parti pris visuel
 
-L'application se tient au vocabulaire d'un instrument de mesure : ce sont les
-chiffres qui portent la page, tout le reste s'efface.
+Une interface d'application de sport sobre : fond graphite, un seul accent
+orange, des chiffres qui portent la page. Le tout doit se lire d'un coup
+d'œil, téléphone posé par terre, et ne pas avoir l'air d'une maquette
+fabriquée à la chaîne.
 
-- **Un seul rayon.** `rounded-doux` vaut 6 px, partout : panneaux, cartes,
-  champs, boutons. Les jauges et les filets restent droits, faute de classe de
-  rayon. Rien n'est arrondi au-delà, et plus rien n'est en pastille.
-- **Pas de boîtes.** Un bloc se délimite par son titre suivi d'un filet jusqu'à
-  la marge (`TitreSection`), et les lignes de liste par un filet en tête. Les
-  cartes remplies et encadrées empilaient trois signaux pour dire une seule
-  chose.
-- **Un seul niveau de titre par bloc.** Le surtitre en capitales *et* le titre
-  répétaient la même information sous deux tailles.
-- **Le jaune ne marque qu'une famille de choses** : l'avancement et le geste
-  principal. Les onglets se soulignent au lieu de s'allumer, la page courante
-  de la barre latérale se marque d'un filet dans la marge.
-- **Colonnes inégales** (rapport 1,4) : une colonne de lecture et sa marge,
-  plutôt que deux moitiés qui n'ont jamais le même contenu.
-- **Aucun ornement** : pas de halo de fond, pas d'anneau de progression, pas
-  d'icône décorative dans les listes — elles restent à la navigation et aux
+- **Des boîtes nettes.** Ce qui se lit d'un bloc (une liste de séances, un
+  graphique, une grille de chiffres) va dans une `.boite` : fond à peine
+  détaché, filet fin, angles de 10 px. Ce qu'on touche (boutons, champs,
+  options) a des angles de 8 px. Rien de plus rond, aucune pastille.
+- **Un titre au-dessus de chaque boîte** (`TitreSection`), comme dans les
+  réglages d'un téléphone, avec à droite une valeur d'appoint ou un lien.
+- **Le chiffre principal à même le fond** (`ChiffreVedette`) : très grand, sans
+  cadre, avec deux moyennes en dessous séparées par un filet vertical.
+- **Des choix qui se voient.** Onglets, ressentis, thème : un rail en creux, et
+  l'option retenue remplie d'accent (`Onglets`, `GroupeOptions`). Les boutons
+  principaux sont pleins, les secondaires ont un fond et un filet.
+- **Pas d'ornement générique** : ni icône sur pastille teintée, ni étiquette
+  arrondie autour de chaque valeur, ni barre de navigation flottante, ni filet
+  coloré en marge d'une carte. Les icônes restent à la navigation et aux
   actions.
+- **Colonnes inégales** (rapport 1,4) sur ordinateur : une colonne de lecture
+  et sa marge, plutôt que deux moitiés qui n'ont jamais le même contenu.
 - **Le curseur main sur ce qui se clique.** Le preflight de Tailwind v4 laisse
   aux boutons la flèche du navigateur ; une règle unique dans `globals.css` la
   remet en main pour `button`, `select`, `summary` et `[role="button"]`, sauf
-  s'ils sont désactivés. Une classe à répéter sur chaque bouton finirait par
-  s'oublier quelque part.
+  s'ils sont désactivés.
+
+Polices : Outfit pour les titres et les chiffres, DM Sans pour le texte.
 
 ## Couleurs et thèmes
 
 Les jetons de `app/globals.css` portent leur **rôle**, pas leur teinte : `fond`,
-`surface`, `creux`, `trait`, `encre`, `brume`. Seules leurs valeurs changent
-d'un thème à l'autre, sous `:root[data-theme="clair"]` — un composant n'a donc
-jamais à savoir quel thème est actif, et il n'existe pas de classe
+`surface`, `creux`, `piste`, `trait`, `encre`, `brume`. Seules leurs valeurs
+changent d'un thème à l'autre, sous `:root[data-theme="clair"]` : un composant
+n'a donc jamais à savoir quel thème est actif, et il n'existe pas de classe
 `dark:`.
 
-Le jaune fait exception et se dédouble, parce que `#ffdd00` sur blanc plafonne
-à 1,3:1 : `jaune` est l'accent **lisible** (texte, icônes, bordures), qui passe
-à un ambre foncé en clair, tandis que `jaune-vif` porte les **aplats** de la
-marque (boutons, jauges, points), où c'est `sur-jaune` posé dessus qui assure
-le contraste.
+L'accent se dédouble, parce que l'orange `#ff7a45` en texte sur blanc tombe à
+2,6:1 : `accent` porte les **aplats** (bouton principal, option choisie,
+barres), où c'est `sur-accent` posé dessus qui assure le contraste, et
+`accent-texte` est l'accent **lisible** (texte, icônes, bordures), qui passe à
+un orange brûlé en clair.
 
 `SCRIPT_THEME` (dans `composants/theme.tsx`) est inséré en tête de `<body>` et
 pose `data-theme` avant le premier rendu : sans lui, un utilisateur en clair

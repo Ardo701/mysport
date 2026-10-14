@@ -4,11 +4,11 @@ import Link from "next/link";
 import { useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 import { api } from "@/convex/_generated/api";
-import { Stat } from "@/composants/jauges";
-import { IconeChrono, IconeFleche, IconePlus } from "@/composants/icones";
+import { GrilleStats, Stat } from "@/composants/jauges";
+import { IconeChevronDroite, IconeChrono, IconePlus } from "@/composants/icones";
 import { LigneSeance } from "@/composants/seance";
 import {
-  Bouton,
+  BoutonLien,
   Carte,
   Chargement,
   Colonne,
@@ -62,65 +62,68 @@ export default function PageAccueil() {
         <Colonne>
           <Carte>
             <TitreSection titre="Cette semaine" />
-            <div className="grid grid-cols-7">
-              {JOURS_COURTS.map((lettre, i) => {
-                const jour = ajouterJours(lundi, i);
-                const actif = joursActifs.has(jour);
-                const estAujourdhui = jour === aujourdhui;
-                return (
-                  <div key={jour} className="flex flex-col items-center gap-2 py-1">
-                    <span className="surtitre">{lettre}</span>
-                    <span
-                      className={`chiffres text-[15px] leading-none ${
-                        estAujourdhui ? "font-semibold text-encre" : "text-brume"
-                      }`}
-                    >
-                      {Number(jour.slice(8))}
-                    </span>
-                    <span
-                      aria-label={actif ? "séance" : undefined}
-                      className={`h-1.5 w-5 ${actif ? "bg-jaune-vif" : "bg-trait"}`}
-                    />
+            <div className="boite p-4">
+              <div className="grid grid-cols-7 gap-1.5">
+                {JOURS_COURTS.map((lettre, i) => {
+                  const jour = ajouterJours(lundi, i);
+                  const actif = joursActifs.has(jour);
+                  const estAujourdhui = jour === aujourdhui;
+                  return (
+                    <div key={jour} className="flex flex-col items-center gap-1.5">
+                      <span className="text-[11px] font-medium text-brume">{lettre}</span>
+                      <span
+                        className={`titre text-[15px] leading-none ${
+                          estAujourdhui ? "font-bold text-encre" : "font-medium text-brume"
+                        }`}
+                      >
+                        {Number(jour.slice(8))}
+                      </span>
+                      <span
+                        aria-label={actif ? "séance" : undefined}
+                        className={`mt-1 h-1.5 w-full rounded-full ${actif ? "bg-accent" : "bg-piste"}`}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-4 grid grid-cols-3 border-t border-trait pt-3.5">
+                {[
+                  { libelle: "séances", valeur: String(semaine.seances) },
+                  { libelle: "de sport", valeur: libelleDuree(semaine.dureeMin) },
+                  { libelle: "kcal", valeur: semaine.kcal.toLocaleString("fr-FR") },
+                ].map((s, i) => (
+                  <div key={s.libelle} className={i > 0 ? "border-l border-trait pl-3.5" : ""}>
+                    <p className="titre text-[22px] font-semibold leading-tight">{s.valeur}</p>
+                    <p className="text-[12px] text-brume">{s.libelle}</p>
                   </div>
-                );
-              })}
-            </div>
-            <div className="mt-6 grid grid-cols-3 gap-4">
-              <Stat libelle="Séances" valeur={semaine.seances} />
-              <Stat libelle="Temps" valeur={libelleDuree(semaine.dureeMin)} />
-              <Stat
-                libelle="Dépense"
-                valeur={semaine.kcal.toLocaleString("fr-FR")}
-                unite="kcal"
-              />
+                ))}
+              </div>
             </div>
           </Carte>
 
-          <Link href="/seance" className="block">
-            <Bouton taille="large">
-              <IconePlus className="h-4 w-4" />
-              Ajouter une séance
-            </Bouton>
-          </Link>
+          <BoutonLien href="/seance" taille="large">
+            <IconePlus className="h-[18px] w-[18px]" />
+            Ajouter une séance
+          </BoutonLien>
 
           <Carte>
             <TitreSection
               titre="Dernières séances"
               action={
                 seances.length > 0 ? (
-                  <Link href="/journal" className="text-[12px] text-brume transition-colors hover:text-encre">
+                  <Link href="/journal" className="transition-colors hover:text-encre">
                     Tout le journal
                   </Link>
                 ) : undefined
               }
             />
             {seances.length === 0 ? (
-              <p className="text-[13px] leading-relaxed text-brume">
+              <p className="boite px-4 py-4 text-[13px] leading-relaxed text-brume">
                 Rien pour l&apos;instant. Chaque séance notée alimente le journal et
                 les statistiques.
               </p>
             ) : (
-              <div className="[&>a:first-child]:border-t-0 [&>a:first-child]:pt-1">
+              <div className="boite divide-y divide-trait overflow-hidden">
                 {seances.slice(0, 4).map((s) => (
                   <LigneSeance key={s._id} seance={s} />
                 ))}
@@ -134,17 +137,17 @@ export default function PageAccueil() {
             <TitreSection
               titre="30 derniers jours"
               action={
-                <Link href="/statistiques" className="text-[12px] text-brume transition-colors hover:text-encre">
+                <Link href="/statistiques" className="transition-colors hover:text-encre">
                   Statistiques
                 </Link>
               }
             />
             {recent.seances === 0 ? (
-              <p className="text-[13px] leading-relaxed text-brume">
+              <p className="boite px-4 py-4 text-[13px] leading-relaxed text-brume">
                 Les moyennes apparaîtront après ta première séance.
               </p>
             ) : (
-              <div className="grid grid-cols-2 gap-x-4 gap-y-5">
+              <GrilleStats>
                 <Stat
                   libelle="Par séance"
                   valeur={Math.round(recent.kcal / recent.seances).toLocaleString("fr-FR")}
@@ -163,18 +166,17 @@ export default function PageAccueil() {
                   libelle="Durée moyenne"
                   valeur={libelleDuree(recent.dureeMin / recent.seances)}
                 />
-              </div>
+              </GrilleStats>
             )}
           </Carte>
 
-          <Link href="/chronometre" className="group block">
-            <div className="flex items-center justify-between border-t border-trait px-1 py-3.5 transition-colors group-hover:border-trait-vif">
-              <span className="flex items-center gap-3 text-[14px]">
-                <IconeChrono className="h-4.5 w-4.5 text-jaune" />
-                Chronomètre d&apos;intervalles
-              </span>
-              <IconeFleche className="h-4 w-4 text-brume-faible transition-colors group-hover:text-encre" />
-            </div>
+          <Link
+            href="/chronometre"
+            className="boite flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-creux"
+          >
+            <IconeChrono className="h-5 w-5 text-accent-texte" />
+            <span className="flex-1 text-[15px] font-medium">Chronomètre d&apos;intervalles</span>
+            <IconeChevronDroite className="h-4 w-4 text-brume" />
           </Link>
         </Colonne>
       </Colonnes>

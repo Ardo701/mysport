@@ -9,6 +9,7 @@
 
 import type { Doc } from "@/convex/_generated/dataModel";
 import { libelleMateriel } from "@/convex/data/exercices";
+import { estimerParts, type PartsKcal } from "@/convex/lib/calories";
 import { ajouterJours, lundiDeLaSemaine } from "./dates";
 
 export type Seance = Doc<"seances">;
@@ -109,4 +110,22 @@ export function exercicesFrequents(seances: Seance[], limite: number) {
     }
   }
   return [...compte.values()].sort((a, b) => b.seances - a.seances).slice(0, limite);
+}
+
+/**
+ * Où sont passées les calories : musculation, cardio et sports, ou séances
+ * notées sans détail. Chaque séance est découpée selon son estimation, puis
+ * ramenée à sa dépense enregistrée pour que les parts tombent juste.
+ */
+export function repartition(seances: Seance[]): PartsKcal {
+  const total: PartsKcal = { musculation: 0, cardio: 0, sansDetail: 0 };
+  for (const s of seances) {
+    const parts = estimerParts(s, s.poidsKg ?? 75);
+    const somme = parts.musculation + parts.cardio + parts.sansDetail;
+    if (somme <= 0) continue;
+    for (const cle of ["musculation", "cardio", "sansDetail"] as const) {
+      total[cle] += (parts[cle] / somme) * s.kcal;
+    }
+  }
+  return total;
 }

@@ -8,6 +8,7 @@ import { api } from "@/convex/_generated/api";
 import type { Doc } from "@/convex/_generated/dataModel";
 import { POIDS_MAX, poidsValide } from "@/convex/lib/poids";
 import { ChampNombre } from "@/composants/champ-nombre";
+import { ChiffreVedette } from "@/composants/jauges";
 import { IconeFleche } from "@/composants/icones";
 import { BasculeTheme } from "@/composants/theme";
 import {
@@ -63,32 +64,34 @@ export default function PageProfil() {
 
           <Carte>
             <TitreSection titre="Profil" />
-            <Champ
-              libelle="Prénom"
-              value={prenom}
-              onChange={(e) => {
-                setPrenom(e.target.value);
-                setEtat("repos");
-              }}
-              className="!font-sans"
-            />
+            <div className="boite p-4">
+              <Champ
+                libelle="Prénom"
+                value={prenom}
+                onChange={(e) => {
+                  setPrenom(e.target.value);
+                  setEtat("repos");
+                }}
+                className="!font-sans"
+              />
 
-            <Bouton
-              taille="large"
-              className="mt-5"
-              disabled={!modifie || etat === "envoi"}
-              onClick={sauvegarder}
-            >
-              {etat === "envoi" ? "Enregistrement…" : "Enregistrer"}
-            </Bouton>
-            {etat === "enregistre" && (
-              <Message ton="succes" className="mt-3">Profil enregistré.</Message>
-            )}
-            {etat === "erreur" && (
-              <Message ton="erreur" className="mt-3">
-                L&apos;enregistrement a échoué. Réessaie dans un instant.
-              </Message>
-            )}
+              <Bouton
+                taille="large"
+                className="mt-5"
+                disabled={!modifie || etat === "envoi"}
+                onClick={sauvegarder}
+              >
+                {etat === "envoi" ? "Enregistrement…" : "Enregistrer"}
+              </Bouton>
+              {etat === "enregistre" && (
+                <Message ton="succes" className="mt-3">Profil enregistré.</Message>
+              )}
+              {etat === "erreur" && (
+                <Message ton="erreur" className="mt-3">
+                  L&apos;enregistrement a échoué. Réessaie dans un instant.
+                </Message>
+              )}
+            </div>
           </Carte>
         </Colonne>
 
@@ -98,7 +101,7 @@ export default function PageProfil() {
           <Carte className="lg:hidden">
             <TitreSection titre="Thème" />
             <BasculeTheme />
-            <p className="mt-3 text-[11px] leading-relaxed text-brume-faible">
+            <p className="mt-2.5 text-[12px] leading-relaxed text-brume">
               Le choix reste sur cet appareil, et sur celui-là seulement.
             </p>
           </Carte>
@@ -108,7 +111,7 @@ export default function PageProfil() {
               await signOut();
               router.replace("/connexion");
             }}
-            className="flex w-full items-center justify-between border-t border-trait px-4 py-3.5 text-[14px] text-brume transition-colors hover:border-rouge/40 hover:text-rouge"
+            className="boite flex w-full items-center justify-between px-4 py-3.5 text-[15px] font-medium text-rouge transition-colors hover:bg-creux"
           >
             Se déconnecter
             <IconeFleche className="h-4 w-4" />
@@ -116,7 +119,7 @@ export default function PageProfil() {
         </Colonne>
       </Colonnes>
 
-      <p className="mt-12 max-w-[62ch] text-[11px] leading-relaxed text-brume-faible">
+      <p className="mt-10 max-w-[62ch] text-[12px] leading-relaxed text-brume">
         MySport · les calories sont une estimation à partir de valeurs moyennes
         par activité, pas une mesure.
       </p>
@@ -191,130 +194,130 @@ function CartePoids({ pesees }: { pesees: Doc<"pesees">[] }) {
 
   return (
     <Carte>
-      <TitreSection titre="Poids" />
-
       {actuelle && (
-        <div className="mb-6 flex items-end justify-between gap-4">
-          <p className="chiffres titre text-[34px] font-semibold leading-none">
-            {nombre(actuelle.poidsKg)}
-            <span className="ml-1.5 text-[14px] font-normal text-brume-faible">kg</span>
-          </p>
-          <p className="pb-0.5 text-right text-[12px] text-brume-faible">
-            pesée du {libelleJour(actuelle.date)}
-          </p>
-        </div>
+        <ChiffreVedette libelle="Poids actuel" valeur={nombre(actuelle.poidsKg)} unite="kg">
+          <p className="mt-2 text-[13px] text-brume">Pesée du {libelleJour(actuelle.date)}</p>
+        </ChiffreVedette>
       )}
 
-      <div className="grid grid-cols-2 gap-3">
-        <label className="block">
-          <span className="surtitre mb-2 block">Date</span>
-          <input
-            type="date"
-            value={date}
-            max={aujourdhuiISO()}
-            onChange={(e) => {
-              setDate(e.target.value);
+      <div className="boite mt-6 p-4">
+        <div className="grid grid-cols-2 gap-3">
+          <label className="block">
+            <span className="surtitre mb-2 block">Date</span>
+            <input
+              type="date"
+              value={date}
+              max={aujourdhuiISO()}
+              onChange={(e) => {
+                setDate(e.target.value);
+                setEtat({ cle: "repos" });
+              }}
+              className="champ chiffres"
+            />
+          </label>
+          <ChampNombre
+            libelle="Poids"
+            suffixe="kg"
+            decimales
+            placeholder={actuelle ? nombre(actuelle.poidsKg) : "80"}
+            valeur={poidsKg}
+            max={POIDS_MAX}
+            onValeur={(n) => {
+              setPoidsKg(n);
               setEtat({ cle: "repos" });
             }}
-            className="champ chiffres"
           />
-        </label>
-        <ChampNombre
-          libelle="Poids"
-          suffixe="kg"
-          decimales
-          placeholder={actuelle ? nombre(actuelle.poidsKg) : "80"}
-          valeur={poidsKg}
-          max={POIDS_MAX}
-          onValeur={(n) => {
-            setPoidsKg(n);
-            setEtat({ cle: "repos" });
-          }}
-        />
+        </div>
+
+        <Bouton
+          taille="large"
+          className="mt-4"
+          disabled={!poidsValide(poidsKg) || !date || etat.cle === "envoi"}
+          onClick={valider}
+        >
+          {etat.cle === "envoi"
+            ? "Enregistrement…"
+            : existante
+              ? `Remplacer la pesée du ${libelleDateCourt(date)}`
+              : "Ajouter la pesée"}
+        </Bouton>
+        {aSupprimer && pesees.length > 1 && (
+          <Bouton
+            variante="danger"
+            taille="large"
+            className="mt-2.5"
+            disabled={etat.cle === "envoi"}
+            onClick={effacer}
+          >
+            Supprimer cette pesée
+          </Bouton>
+        )}
+
+        {etat.cle === "enregistre" && (
+          <Message ton="succes" className="mt-3">
+            Pesée enregistrée.{texteRecalcul(etat.recalculees)}
+          </Message>
+        )}
+        {etat.cle === "supprime" && (
+          <Message ton="succes" className="mt-3">
+            Pesée supprimée.{texteRecalcul(etat.recalculees)}
+          </Message>
+        )}
+        {etat.cle === "erreur" && (
+          <Message ton="erreur" className="mt-3">
+            L&apos;enregistrement a échoué. Réessaie dans un instant.
+          </Message>
+        )}
+
+        <p className="mt-3 text-[12px] leading-relaxed text-brume">
+          Chaque séance compte avec le poids de sa date : la dernière pesée faite
+          ce jour-là ou avant. Une pesée ajoutée ou corrigée dans le passé
+          recalcule les séances qu&apos;elle concerne.
+        </p>
       </div>
 
-      <Bouton
-        taille="large"
-        className="mt-4"
-        disabled={!poidsValide(poidsKg) || !date || etat.cle === "envoi"}
-        onClick={valider}
-      >
-        {etat.cle === "envoi"
-          ? "Enregistrement…"
-          : existante
-            ? `Remplacer la pesée du ${libelleDateCourt(date)}`
-            : "Ajouter la pesée"}
-      </Bouton>
-      {aSupprimer && pesees.length > 1 && (
-        <Bouton
-          variante="fantome"
-          taille="large"
-          className="mt-1"
-          disabled={etat.cle === "envoi"}
-          onClick={effacer}
-        >
-          Supprimer cette pesée
-        </Bouton>
-      )}
-
-      {etat.cle === "enregistre" && (
-        <Message ton="succes" className="mt-3">
-          Pesée enregistrée.{texteRecalcul(etat.recalculees)}
-        </Message>
-      )}
-      {etat.cle === "supprime" && (
-        <Message ton="succes" className="mt-3">
-          Pesée supprimée.{texteRecalcul(etat.recalculees)}
-        </Message>
-      )}
-      {etat.cle === "erreur" && (
-        <Message ton="erreur" className="mt-3">
-          L&apos;enregistrement a échoué. Réessaie dans un instant.
-        </Message>
-      )}
-
-      <p className="mt-3 text-[11px] leading-relaxed text-brume-faible">
-        Chaque séance compte avec le poids de sa date : la dernière pesée faite
-        ce jour-là ou avant. Une pesée ajoutée ou corrigée dans le passé
-        recalcule les séances qu&apos;elle concerne.
-      </p>
-
-      <ul className="mt-6">
-        {visibles.map((p, i) => {
-          // La suivante dans la liste est la pesée précédente dans le temps.
-          const precedente = pesees[pesees.indexOf(p) + 1];
-          const ecart = precedente ? p.poidsKg - precedente.poidsKg : null;
-          const choisie = p._id === reprise;
-          return (
-            <li key={p._id}>
+      <div className="mt-8">
+        <TitreSection titre="Historique" action="touche une pesée pour la corriger" />
+        <ul className="boite divide-y divide-trait overflow-hidden">
+          {visibles.map((p) => {
+            // La suivante dans la liste est la pesée précédente dans le temps.
+            const precedente = pesees[pesees.indexOf(p) + 1];
+            const ecart = precedente ? p.poidsKg - precedente.poidsKg : null;
+            const choisie = p._id === reprise;
+            return (
+              <li key={p._id}>
+                <button
+                  type="button"
+                  aria-pressed={choisie}
+                  onClick={() => reprendre(p)}
+                  className={`flex w-full items-baseline gap-4 px-4 py-3 text-left transition-colors hover:bg-creux ${
+                    choisie ? "bg-creux" : ""
+                  }`}
+                >
+                  <span className="flex-1 text-[14px]">{libelleJour(p.date)}</span>
+                  <span className="chiffres w-14 text-right text-[13px] text-brume">
+                    {ecart === null || ecart === 0 ? "" : ecartSigne(ecart)}
+                  </span>
+                  <span className="titre w-16 text-right text-[15px] font-semibold">
+                    {nombre(p.poidsKg)} kg
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+          {pesees.length > PESEES_VISIBLES && (
+            <li>
               <button
                 type="button"
-                onClick={() => reprendre(p)}
-                className={`flex w-full items-baseline gap-4 py-3 text-left transition-colors hover:text-encre ${
-                  i === 0 ? "" : "border-t border-trait"
-                } ${choisie ? "text-encre" : "text-brume"}`}
+                onClick={() => setToutVoir((v) => !v)}
+                className="w-full px-4 py-3 text-left text-[13px] font-medium text-accent-texte transition-colors hover:bg-creux"
               >
-                <span className="flex-1 text-[13px]">{libelleJour(p.date)}</span>
-                <span className="chiffres w-14 text-right text-[12px] text-brume-faible">
-                  {ecart === null || ecart === 0 ? "" : ecartSigne(ecart)}
-                </span>
-                <span className="chiffres w-16 text-right text-[14px] font-medium text-encre">
-                  {nombre(p.poidsKg)} kg
-                </span>
+                {toutVoir ? "Replier" : `Voir les ${pesees.length - PESEES_VISIBLES} plus anciennes`}
               </button>
             </li>
-          );
-        })}
-      </ul>
-      {pesees.length > PESEES_VISIBLES && (
-        <button
-          type="button"
-          onClick={() => setToutVoir((v) => !v)}
-          className="w-full border-t border-trait pt-3 text-left text-[12px] text-brume transition-colors hover:text-encre"
-        >
-          {toutVoir ? "Replier" : `Voir les ${pesees.length - PESEES_VISIBLES} plus anciennes`}
-        </button>
-      )}
+          )}
+        </ul>
+      </div>
     </Carte>
   );
 }

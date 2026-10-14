@@ -137,44 +137,61 @@ export function dureeRetenue(dureeMin: number, exercices: EntreeExercice[]): num
   return Math.max(dureeMin, minutesChronometrees(exercices) + travail);
 }
 
-export function estimerKcal(
+/**
+ * La dépense d'une séance, rangée par nature d'effort : la musculation (temps
+ * dans les séries et récupération entre elles), le cardio et les sports, et
+ * la séance notée sans aucun exercice. La somme est l'estimation de la séance.
+ */
+export type PartsKcal = { musculation: number; cardio: number; sansDetail: number };
+
+export function estimerParts(
   seance: { dureeMin: number; exercices: EntreeExercice[] },
   poidsKg: number,
-): number {
+): PartsKcal {
   const { exercices } = seance;
   const duree = dureeRetenue(seance.dureeMin, exercices);
   const kcalPour = (met: number, minutes: number) => met * poidsKg * (minutes / 60);
+  const parts: PartsKcal = { musculation: 0, cardio: 0, sansDetail: 0 };
 
   if (exercices.length === 0) {
-    return Math.round(kcalPour(MET_SEANCE_SANS_DETAIL, duree));
+    parts.sansDetail = kcalPour(MET_SEANCE_SANS_DETAIL, duree);
+    return parts;
   }
 
   const force = exercices.filter((e) => e.mesure !== "duree");
   const sansDuree = exercices.filter((e) => e.mesure === "duree" && !estChronometre(e));
 
-  let kcal = 0;
   let occupe = 0;
   for (const e of exercices.filter(estChronometre)) {
-    kcal += kcalPour(metDe(e), e.dureeMin ?? 0);
+    parts.cardio += kcalPour(metDe(e), e.dureeMin ?? 0);
     occupe += e.dureeMin ?? 0;
   }
   for (const e of force) {
     const minutes = minutesDeTravail(e);
-    kcal += kcalPour(metDe(e) * facteurCharge(e, poidsKg), minutes);
+    parts.musculation += kcalPour(metDe(e) * facteurCharge(e, poidsKg), minutes);
     occupe += minutes;
   }
 
   // Le temps restant se partage entre la récupération des exercices de force
   // et les sports dont on n'a pas noté la durée : un match de foot sans durée
-  // dans une séance d'une heure en occupe forcément une part.
+  // dans une séance d'une heure en occupe forcément une part. Sans l'un ni
+  // l'autre, c'est l'échauffement d'une séance de cardio.
   const reste = Math.max(0, duree - occupe);
-  const parts = force.length + sansDuree.length;
-  if (parts === 0) {
-    kcal += kcalPour(MET_TEMPS_LIBRE, reste);
+  const nombreParts = force.length + sansDuree.length;
+  if (nombreParts === 0) {
+    parts.cardio += kcalPour(MET_TEMPS_LIBRE, reste);
   } else {
-    kcal += kcalPour(MET_RECUPERATION, (reste * force.length) / parts);
-    for (const e of sansDuree) kcal += kcalPour(metDe(e), reste / parts);
+    parts.musculation += kcalPour(MET_RECUPERATION, (reste * force.length) / nombreParts);
+    for (const e of sansDuree) parts.cardio += kcalPour(metDe(e), reste / nombreParts);
   }
 
-  return Math.round(kcal);
+  return parts;
+}
+
+export function estimerKcal(
+  seance: { dureeMin: number; exercices: EntreeExercice[] },
+  poidsKg: number,
+): number {
+  const { musculation, cardio, sansDetail } = estimerParts(seance, poidsKg);
+  return Math.round(musculation + cardio + sansDetail);
 }

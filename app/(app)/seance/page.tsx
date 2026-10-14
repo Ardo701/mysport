@@ -26,6 +26,7 @@ import { ChoixExercices, type ExerciceChoisi } from "@/composants/choix-exercice
 import { IconeChevronDroite, IconeChevronGauche, IconeCroix, IconePlus } from "@/composants/icones";
 import {
   Bouton,
+  BoutonLien,
   Carte,
   Chargement,
   EnTetePage,
@@ -111,9 +112,9 @@ function Formulaire() {
         titre="Séance introuvable"
         detail="Elle a peut-être été supprimée."
         action={
-          <Link href="/journal">
-            <Bouton variante="secondaire">Retour au journal</Bouton>
-          </Link>
+          <BoutonLien href="/journal" variante="secondaire">
+            Retour au journal
+          </BoutonLien>
         }
       />
     );
@@ -174,7 +175,7 @@ function Formulaire() {
         avant={
           <Link
             href="/journal"
-            className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-brume transition-colors hover:text-encre"
+            className="mb-3 inline-flex items-center gap-1 text-[14px] font-medium text-brume transition-colors hover:text-encre"
           >
             <IconeChevronGauche className="h-4 w-4" />
             Journal
@@ -184,8 +185,8 @@ function Formulaire() {
         titre={existante ? "Modifier la séance" : "Nouvelle séance"}
       />
 
-      <div className="space-y-9">
-        <Carte>
+      <div className="space-y-8">
+        <div className="boite p-4">
           <div className="grid grid-cols-2 gap-3">
             <label className="block">
               <span className="surtitre mb-2 block">Date</span>
@@ -207,32 +208,26 @@ function Formulaire() {
             />
           </div>
           {connue && duree > (dureeMin ?? 0) && (
-            <p className="mt-2 text-[12px] text-brume-faible">
+            <p className="mt-2.5 text-[12px] leading-relaxed text-brume">
               Comptée {libelleDuree(duree)} : les exercices notés prennent plus de
               temps que la durée saisie.
             </p>
           )}
-        </Carte>
+        </div>
 
         <Carte>
           <TitreSection
             titre="Exercices"
-            action={
-              lignes.length > 0 ? (
-                <span className="chiffres text-[12px] text-brume">{lignes.length}</span>
-              ) : undefined
-            }
+            action={lignes.length > 0 ? <span className="chiffres">{lignes.length}</span> : undefined}
           />
 
           {lignes.length === 0 ? (
-            <p className="mb-4 text-[13px] leading-relaxed text-brume">
-              Ajoute ce que tu as fait. Le détail — séries, charges, distance — est
+            <p className="boite mb-3 px-4 py-4 text-[13px] leading-relaxed text-brume">
+              Ajoute ce que tu as fait. Le détail (séries, charges, distance) est
               facultatif, mais il affine l&apos;estimation des calories.
             </p>
           ) : (
-            // Le titre porte déjà un filet : le premier exercice n'en remet pas
-            // un second juste en dessous.
-            <ul className="mb-4 [&>li:first-child]:border-t-0 [&>li:first-child]:pt-1">
+            <ul className="boite mb-3 divide-y divide-trait">
               {lignes.map((l) => (
                 <LigneExercice
                   key={l.cle}
@@ -249,14 +244,14 @@ function Formulaire() {
             taille="large"
             onClick={() => setChoixOuvert(true)}
           >
-            <IconePlus className="h-4 w-4" />
+            <IconePlus className="h-[18px] w-[18px]" />
             Ajouter des exercices
           </Bouton>
         </Carte>
 
         <Carte>
-          <TitreSection titre="Ressenti" />
-          <div className="space-y-5">
+          <TitreSection titre="Ressenti" action="facultatif" />
+          <div className="boite space-y-4 p-4">
             <GroupeOptions
               libelle="Avant la séance"
               options={OPTIONS_AVANT}
@@ -273,50 +268,45 @@ function Formulaire() {
               colonnes={5}
               facultatif
             />
+            <p className="text-[12px] text-brume">
+              Touche à nouveau un choix pour l&apos;effacer.
+            </p>
           </div>
-          <p className="mt-2.5 text-[11px] text-brume-faible">
-            Facultatif. Touche à nouveau un choix pour l&apos;effacer.
-          </p>
         </Carte>
 
         <Carte>
-          <label className="block">
-            <span className="surtitre mb-2 block">Notes (facultatif)</span>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={2}
-              placeholder="Sensations, douleur, record…"
-              className="champ resize-none !font-sans"
-            />
-          </label>
+          <TitreSection titre="Notes" action="facultatif" />
+          <textarea
+            aria-label="Notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={3}
+            placeholder="Sensations, douleur, record…"
+            className="champ resize-none !font-sans"
+          />
         </Carte>
 
-        <Carte>
-          <div className="flex items-end justify-between gap-4 border-t border-trait pt-4">
-            <div>
-              <p className="surtitre mb-2">Calories dépensées</p>
-              <p className="chiffres titre text-[28px] font-semibold leading-none">
-                {connue ? kcal : "—"}
-                <span className="ml-1.5 text-[13px] font-normal text-brume-faible">kcal</span>
-              </p>
-            </div>
-            <p className="text-right text-[12px] leading-relaxed text-brume-faible">
-              selon les exercices, les séries,
-              <br />
-              la durée et ton poids à cette date
-              {poidsKg !== undefined && ` (${nombre(poidsKg)} kg)`}
+        <div>
+          <div className="boite p-4">
+            <p className="text-[13px] font-medium text-brume">Calories dépensées</p>
+            <p className="titre mt-1 text-[32px] font-bold leading-none">
+              {connue ? kcal.toLocaleString("fr-FR") : "—"}
+              <span className="ml-1.5 text-[14px] font-medium text-brume">kcal</span>
+            </p>
+            <p className="mt-2 text-[12px] leading-relaxed text-brume">
+              Selon les exercices, les séries, la durée et ton poids à cette date
+              {poidsKg !== undefined && ` (${nombre(poidsKg)} kg)`}.
             </p>
           </div>
 
           {!connue && (
-            <Message className="mt-4">Indique la durée de la séance pour l&apos;enregistrer.</Message>
+            <Message className="mt-3">Indique la durée de la séance pour l&apos;enregistrer.</Message>
           )}
-          {erreur && <Message ton="erreur" className="mt-4">{erreur}</Message>}
+          {erreur && <Message ton="erreur" className="mt-3">{erreur}</Message>}
 
           <Bouton
             taille="large"
-            className="mt-5"
+            className="mt-4"
             disabled={envoi || !connue || !date}
             onClick={valider}
           >
@@ -327,7 +317,7 @@ function Formulaire() {
             <Bouton
               variante="danger"
               taille="large"
-              className="mt-2"
+              className="mt-2.5"
               disabled={envoi}
               onClick={() =>
                 confirmerSuppression ? effacer(existante._id) : setConfirmerSuppression(true)
@@ -336,7 +326,7 @@ function Formulaire() {
               {confirmerSuppression ? "Confirmer la suppression" : "Supprimer la séance"}
             </Bouton>
           )}
-        </Carte>
+        </div>
       </div>
 
       <ChoixExercices
@@ -364,17 +354,17 @@ function LigneExercice({
   const avecDistance = catalogue?.groupe === "Cardio";
 
   return (
-    <li className="border-t border-trait py-3.5">
+    <li className="px-4 py-3.5">
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
-          <p className="text-[14px] font-medium leading-snug">{ligne.nom}</p>
-          <p className="surtitre mt-1.5">{catalogue?.groupe ?? "Hors liste"}</p>
+          <p className="text-[15px] font-semibold leading-snug">{ligne.nom}</p>
+          <p className="mt-0.5 text-[12px] text-brume">{catalogue?.groupe ?? "Hors liste"}</p>
         </div>
         <button
           type="button"
           onClick={onRetirer}
           aria-label={`Retirer ${ligne.nom}`}
-          className="-mr-1 p-1 text-brume-faible transition-colors hover:text-rouge"
+          className="-mr-2 -mt-1 flex h-9 w-9 items-center justify-center rounded-doux text-brume transition-colors hover:bg-creux hover:text-rouge"
         >
           <IconeCroix className="h-4 w-4" />
         </button>
@@ -489,7 +479,7 @@ function ChoixMateriel({
           </option>
         ))}
       </select>
-      <IconeChevronDroite className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-brume-faible" />
+      <IconeChevronDroite className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-brume" />
     </label>
   );
 }

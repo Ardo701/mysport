@@ -1,18 +1,19 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { DM_Sans, Outfit } from "next/font/google";
 import "./globals.css";
 import { Fournisseurs } from "./fournisseurs";
 import { SCRIPT_THEME } from "@/composants/theme";
 
-const policeTitre = Space_Grotesk({
+/* Outfit pour les titres et les chiffres, DM Sans pour le texte. */
+const policeTitre = Outfit({
   variable: "--police-titre",
   subsets: ["latin"],
   weight: ["500", "600", "700"],
   display: "swap",
 });
 
-const policeCorps = Inter({
+const policeCorps = DM_Sans({
   variable: "--police-corps",
   subsets: ["latin"],
   display: "swap",
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#08080a",
+  themeColor: "#0f1115",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",

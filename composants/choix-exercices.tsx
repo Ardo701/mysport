@@ -98,10 +98,11 @@ export function ChoixExercices({
             key={g ?? "tous"}
             type="button"
             onClick={() => setGroupe(g)}
-            className={`shrink-0 rounded-doux border px-3 py-1.5 text-[12px] transition-colors ${
+            aria-pressed={groupe === g}
+            className={`h-9 shrink-0 rounded-doux px-3.5 text-[13px] transition-colors ${
               groupe === g
-                ? "border-jaune text-encre"
-                : "border-trait text-brume hover:text-encre"
+                ? "bg-accent font-semibold text-sur-accent"
+                : "bg-creux font-medium text-brume hover:text-encre"
             }`}
           >
             {g ?? "Tous"}
@@ -112,7 +113,7 @@ export function ChoixExercices({
       <div className="mt-4 space-y-6">
         {parGroupe.map(({ groupe: g, exercices }) => (
           <div key={g}>
-            <p className="surtitre mb-1.5">{g}</p>
+            <p className="mb-1 text-[13px] font-semibold">{g}</p>
             <ul>
               {exercices.map((e) => {
                 const actif = choisi(e.id, e.nom);
@@ -122,19 +123,19 @@ export function ChoixExercices({
                       type="button"
                       aria-pressed={actif}
                       onClick={() => basculer({ exerciceId: e.id, nom: e.nom, mesure: e.mesure })}
-                      className="flex w-full items-center gap-3 border-t border-trait py-2.5 text-left"
+                      className="flex w-full items-center gap-3 border-t border-trait py-3 text-left"
                     >
                       <span
-                        className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[4px] border transition-colors ${
-                          actif ? "border-jaune bg-jaune-vif text-sur-jaune" : "border-trait-vif"
+                        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-[5px] border-[1.5px] transition-colors ${
+                          actif ? "border-accent bg-accent text-sur-accent" : "border-trait-vif"
                         }`}
                       >
-                        {actif && <IconeCoche className="h-3 w-3" />}
+                        {actif && <IconeCoche className="h-3.5 w-3.5" />}
                       </span>
-                      <span className={`flex-1 text-[14px] ${actif ? "text-encre" : "text-brume"}`}>
+                      <span className={`flex-1 text-[15px] ${actif ? "font-semibold" : ""}`}>
                         {e.nom}
                       </span>
-                      <span className="text-[11px] text-brume-faible">
+                      <span className="text-[12px] text-brume">
                         {LIBELLE_MESURE[e.mesure]}
                       </span>
                     </button>
@@ -146,7 +147,7 @@ export function ChoixExercices({
         ))}
 
         {nomLibre && (
-          <div className="border border-dashed border-trait px-4 py-4">
+          <div className="rounded-boite bg-creux px-4 py-4">
             <p className="text-[13px] text-brume">
               {trouves.length === 0 ? "Rien dans la liste pour " : "Pas tout à fait ça ? Ajoute "}
               <span className="text-encre">« {nomLibre} »</span> tel quel.
@@ -174,7 +175,7 @@ export function ChoixExercices({
           ne le verrait plus qu'au compteur du bouton. */}
       {selection.some((s) => s.exerciceId === ID_PERSO) && (
         <div className="mt-6">
-          <p className="surtitre mb-1.5">Hors liste</p>
+          <p className="mb-1 text-[13px] font-semibold">Hors liste</p>
           <ul>
             {selection
               .filter((s) => s.exerciceId === ID_PERSO)
@@ -184,13 +185,13 @@ export function ChoixExercices({
                     type="button"
                     aria-pressed
                     onClick={() => basculer(s)}
-                    className="flex w-full items-center gap-3 border-t border-trait py-2.5 text-left"
+                    className="flex w-full items-center gap-3 border-t border-trait py-3 text-left"
                   >
-                    <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[4px] border border-jaune bg-jaune-vif text-sur-jaune">
-                      <IconeCoche className="h-3 w-3" />
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[5px] border-[1.5px] border-accent bg-accent text-sur-accent">
+                      <IconeCoche className="h-3.5 w-3.5" />
                     </span>
-                    <span className="flex-1 text-[14px]">{s.nom}</span>
-                    <span className="text-[11px] text-brume-faible">
+                    <span className="flex-1 text-[15px] font-semibold">{s.nom}</span>
+                    <span className="text-[12px] text-brume">
                       {LIBELLE_MESURE[s.mesure]}
                     </span>
                   </button>

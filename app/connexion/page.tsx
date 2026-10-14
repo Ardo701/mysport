@@ -45,8 +45,8 @@ export default function PageConnexion() {
         </p>
       </header>
 
-      <form onSubmit={envoyer} className="mt-10 space-y-3.5">
-        <p className="surtitre mb-5">Connexion</p>
+      <form onSubmit={envoyer} className="boite mt-10 space-y-3.5 p-5">
+        <h2 className="mb-1 text-[17px] font-semibold">Connexion</h2>
 
         <Champ
           libelle="Email"
@@ -75,7 +75,7 @@ export default function PageConnexion() {
         </Bouton>
       </form>
 
-      <footer className="mt-auto pt-12 text-[11px] leading-relaxed text-brume-faible lg:mt-14 lg:pt-0">
+      <footer className="mt-auto pt-12 text-[12px] leading-relaxed text-brume lg:mt-8 lg:pt-0">
         Application privée, sans inscription.
       </footer>
     </main>

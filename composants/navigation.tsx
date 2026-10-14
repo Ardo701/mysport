@@ -61,33 +61,29 @@ export function BarreNavigation() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-trait bg-fond/85 backdrop-blur-xl lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-trait bg-surface/95 backdrop-blur-xl lg:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <ul className="mx-auto flex max-w-[560px] items-stretch">
+      <ul className="mx-auto flex max-w-[560px] items-stretch px-2">
         {ONGLETS.map(({ href, libelle, Icone }) => {
           const actif = estActif(chemin, href);
           return (
             <li key={href} className="flex-1">
+              {/* L'onglet courant se reconnaît à son icône en couleur et à
+                  son libellé en gras, sans pastille ni trait autour. */}
               <Link
                 href={href}
                 aria-current={actif ? "page" : undefined}
-                className="relative flex flex-col items-center gap-1.5 px-1 pb-2.5 pt-3"
+                className="flex flex-col items-center gap-1 px-1 pb-2 pt-2.5"
               >
-                <span
-                  aria-hidden="true"
-                  className={`absolute inset-x-0 top-0 h-[2px] transition-opacity ${
-                    actif ? "bg-jaune-vif opacity-100" : "opacity-0"
-                  }`}
-                />
                 <Icone
-                  className={`h-[21px] w-[21px] transition-colors ${
-                    actif ? "text-jaune" : "text-brume-faible"
+                  className={`h-[22px] w-[22px] transition-colors ${
+                    actif ? "text-accent-texte" : "text-brume"
                   }`}
                 />
                 <span
-                  className={`text-[10px] leading-none transition-colors ${
-                    actif ? "text-encre" : "text-brume-faible"
+                  className={`text-[11px] leading-none transition-colors ${
+                    actif ? "font-semibold text-encre" : "font-medium text-brume"
                   }`}
                 >
                   {libelle}
@@ -107,42 +103,31 @@ export function BarreLaterale({ prenom }: { prenom?: string }) {
 
   return (
     <aside className="fixed inset-y-0 left-0 z-40 hidden w-[248px] flex-col border-r border-trait bg-surface lg:flex">
-      <div className="border-b border-trait px-6 pb-6 pt-8">
-        <p className="titre text-[21px] font-bold leading-none tracking-[-0.03em]">
-          MySport
-        </p>
-        <p className="mt-2 text-[11px] text-brume-faible">
-          Journal d'entraînement
-        </p>
+      <div className="px-6 pb-6 pt-8">
+        <p className="titre text-[22px] font-bold leading-none">MySport</p>
+        <p className="mt-1.5 text-[12px] text-brume">Journal d&apos;entraînement</p>
       </div>
 
-      <nav className="flex-1 overflow-y-auto py-6">
+      <nav className="flex-1 overflow-y-auto px-3 py-2">
         {GROUPES.map((groupe) => (
-          <div key={groupe.titre} className="mb-7 last:mb-0">
-            <p className="surtitre mb-2.5 px-6">{groupe.titre}</p>
-            <ul>
+          <div key={groupe.titre} className="mb-6 last:mb-0">
+            <p className="surtitre mb-1.5 px-3">{groupe.titre}</p>
+            <ul className="space-y-0.5">
               {groupe.onglets.map(({ href, libelle, Icone }) => {
                 const actif = estActif(chemin, href);
                 return (
                   <li key={href}>
-                    {/* La page courante se marque au filet, dans la marge :
-                        un aplat de couleur derrière chaque ligne active
-                        alourdit une colonne qu'on lit en permanence. */}
                     <Link
                       href={href}
                       aria-current={actif ? "page" : undefined}
-                      className={`group flex items-center gap-3 border-l-2 py-2.5 pl-[22px] pr-6 text-[13.5px] leading-none transition-colors ${
+                      className={`flex items-center gap-3 rounded-doux px-3 py-2.5 text-[14px] leading-none transition-colors ${
                         actif
-                          ? "border-l-jaune-vif text-encre"
-                          : "border-l-transparent text-brume hover:text-encre"
+                          ? "bg-creux font-semibold text-encre"
+                          : "font-medium text-brume hover:bg-creux hover:text-encre"
                       }`}
                     >
                       <Icone
-                        className={`h-4 w-4 shrink-0 transition-colors ${
-                          actif
-                            ? "text-encre"
-                            : "text-brume-faible group-hover:text-brume"
-                        }`}
+                        className={`h-[18px] w-[18px] shrink-0 ${actif ? "text-accent-texte" : ""}`}
                       />
                       {libelle}
                     </Link>
@@ -154,13 +139,8 @@ export function BarreLaterale({ prenom }: { prenom?: string }) {
         ))}
       </nav>
 
-      <div className="border-t border-trait px-4 py-4">
-        {prenom && (
-          <div className="mb-3.5 px-2">
-            <p className="surtitre mb-2">Connecté</p>
-            <p className="text-[14px] font-medium leading-none">{prenom}</p>
-          </div>
-        )}
+      <div className="border-t border-trait px-6 py-5">
+        {prenom && <p className="mb-3 text-[14px] font-semibold leading-none">{prenom}</p>}
         <BasculeTheme />
       </div>
     </aside>

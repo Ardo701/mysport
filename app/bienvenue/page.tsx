@@ -58,13 +58,13 @@ export default function PageBienvenue() {
   return (
     <main className="mx-auto min-h-dvh max-w-[560px] px-6 pb-10 pt-[max(3rem,env(safe-area-inset-top))] lg:pb-16 lg:pt-16">
       <header className="mb-8">
-        <p className="surtitre mb-3">Bienvenue</p>
+        <p className="mb-1.5 text-[13px] font-medium text-brume">Bienvenue</p>
         <h1 className="titre text-[30px] font-bold leading-[1.05]">
           Deux questions, et c&apos;est parti
         </h1>
       </header>
 
-      <div className="apparition space-y-3.5">
+      <div className="apparition boite space-y-3.5 p-5">
         <Champ
           libelle="Prénom"
           value={prenom}
@@ -81,7 +81,7 @@ export default function PageBienvenue() {
           max={POIDS_MAX}
           onValeur={setPoidsKg}
         />
-        <p className="text-[11px] leading-relaxed text-brume-faible">
+        <p className="text-[12px] leading-relaxed text-brume">
           Le poids sert uniquement à estimer les calories dépensées pendant tes
           séances. Tu pourras noter son évolution depuis le profil.
         </p>

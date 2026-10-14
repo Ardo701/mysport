@@ -235,7 +235,7 @@ function Reglage({
       <Carte className="lg:max-w-[560px]">
         <TitreSection titre="Réglages" />
 
-        <div className="space-y-5">
+        <div className="boite space-y-4 p-4">
           <ChampDuree
             libelle="Effort"
             secondes={effort}
@@ -255,15 +255,15 @@ function Reglage({
           />
         </div>
 
-        <div className="mt-7 flex items-end justify-between gap-4 border-t border-trait pt-4">
+        <div className="boite mt-3 flex items-end justify-between gap-4 p-4">
           <div>
-            <p className="surtitre mb-2">Durée totale</p>
-            <p className="chiffres titre text-[28px] font-semibold leading-none">
+            <p className="text-[13px] font-medium text-brume">Durée totale</p>
+            <p className="titre mt-1 text-[32px] font-bold leading-none">
               {formaterDuree(total)}
             </p>
           </div>
           {/* Les deux écarts au calcul de tête, dits avant qu'on les découvre. */}
-          <p className="text-right text-[12px] leading-relaxed text-brume-faible">
+          <p className="text-right text-[12px] leading-relaxed text-brume">
             + {PREPARATION_S} s pour te mettre en place
             <br />
             pas de pause après le dernier tour
@@ -281,7 +281,7 @@ function Reglage({
           Démarrer
         </Bouton>
 
-        <p className="mt-3 text-[11px] leading-relaxed text-brume-faible">
+        <p className="mt-3 text-[12px] leading-relaxed text-brume">
           Sur iPhone, le son suit le bouton silencieux : s&apos;il est enclenché, le
           minuteur ne sonnera pas. L&apos;écran reste allumé jusqu&apos;à la fin.
         </p>
@@ -297,12 +297,12 @@ const LIBELLES: Record<TypePhase, string> = {
 };
 
 /**
- * Le jaune est réservé à l'effort : posé par terre à deux mètres, le
+ * L'accent est réservé à l'effort : posé par terre à deux mètres, le
  * téléphone doit dire d'un coup d'œil s'il faut pousser ou souffler.
  */
 const COULEURS: Record<TypePhase, { texte: string; barre: string }> = {
   preparation: { texte: "text-encre", barre: "var(--color-trait-vif)" },
-  effort: { texte: "text-jaune", barre: "var(--color-jaune-vif)" },
+  effort: { texte: "text-accent-texte", barre: "var(--color-accent)" },
   pause: { texte: "text-brume", barre: "var(--color-brume-faible)" },
 };
 
@@ -331,12 +331,12 @@ function Decompte({
   return (
     <div className="mx-auto max-w-[640px] lg:pt-4">
       <div className="flex items-center justify-between gap-4">
-        <p className="surtitre">
+        <p className="text-[14px] font-semibold">
           {phase.type === "preparation"
             ? "Avant le premier tour"
             : `Tour ${phase.tour} / ${course.tours}`}
         </p>
-        <p className="chiffres text-[12px] text-brume">
+        <p className="chiffres text-[13px] text-brume">
           reste {formaterDuree(Math.ceil(totalRestant))}
         </p>
       </div>
@@ -357,9 +357,9 @@ function Decompte({
         {formaterDuree(secondesAffichees(position.restantMs))}
       </p>
 
-      <div className="mt-7 h-1 w-full bg-trait">
+      <div className="mt-7 h-2 w-full overflow-hidden rounded-full bg-piste">
         <div
-          className="h-full"
+          className="h-full rounded-full"
           style={{
             width: `${Math.min(1, Math.max(0, avancement)) * 100}%`,
             backgroundColor: COULEURS[phase.type].barre,
@@ -376,9 +376,9 @@ function Decompte({
             .map((p) => {
               const rempli = (ecouleMs / 1000 - p.debut) / p.duree;
               return (
-                <div key={p.tour} className="h-[3px] flex-1 bg-trait">
+                <div key={p.tour} className="h-1 flex-1 overflow-hidden rounded-full bg-piste">
                   <div
-                    className="h-full bg-jaune-vif"
+                    className="h-full rounded-full bg-accent"
                     style={{ width: `${Math.min(1, Math.max(0, rempli)) * 100}%` }}
                   />
                 </div>
@@ -422,8 +422,8 @@ function Fin({
 
   return (
     <div className="mx-auto max-w-[640px] lg:pt-4">
-      <p className="surtitre">Terminé</p>
-      <p className="titre mt-10 text-[44px] font-bold leading-none tracking-[-0.03em] text-jaune lg:text-[56px]">
+      <p className="text-[14px] font-semibold">Terminé</p>
+      <p className="titre mt-10 text-[44px] font-bold leading-none tracking-[-0.03em] text-accent-texte lg:text-[56px]">
         Bien joué.
       </p>
       <p className="mt-4 text-[15px] leading-relaxed text-brume">

@@ -114,7 +114,7 @@ export function BasculeTheme({ className = "" }: { className?: string }) {
     <div
       role="group"
       aria-label="Thème de l'application"
-      className={`flex gap-5 ${className}`}
+      className={`flex gap-[2px] rounded-boite bg-creux p-[3px] ${className}`}
     >
       {OPTIONS.map(({ cle, libelle, Icone }) => {
         const actif = theme === cle;
@@ -124,10 +124,10 @@ export function BasculeTheme({ className = "" }: { className?: string }) {
             type="button"
             onClick={() => choisir(cle)}
             aria-pressed={actif}
-            className={`flex items-center gap-1.5 border-b-2 pb-1 text-[12px] font-medium transition-colors ${
+            className={`flex h-9 flex-1 items-center justify-center gap-1.5 rounded-doux text-[13px] transition-colors ${
               actif
-                ? "border-b-jaune-vif text-encre"
-                : "border-b-transparent text-brume-faible hover:text-brume"
+                ? "bg-accent font-semibold text-sur-accent"
+                : "font-medium text-brume hover:text-encre"
             }`}
           >
             <Icone className="h-3.5 w-3.5" />
