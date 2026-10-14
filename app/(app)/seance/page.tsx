@@ -13,7 +13,7 @@ import {
   materielParDefaut,
   type Materiel,
 } from "@/convex/data/exercices";
-import { dureeRetenue, estimerKcal } from "@/convex/lib/calories";
+import { dureeConnue, dureeRetenue, estimerKcal } from "@/convex/lib/calories";
 import { ChampNombre } from "@/composants/champ-nombre";
 import { ChoixExercices, type ExerciceChoisi } from "@/composants/choix-exercices";
 import { IconeChevronDroite, IconeChevronGauche, IconeCroix, IconePlus } from "@/composants/icones";
@@ -106,6 +106,7 @@ function Formulaire() {
   if (!profil || !pret) return <Chargement />;
 
   const exercices = lignes.map(({ cle: _cle, ...e }) => e);
+  const connue = dureeConnue(dureeMin ?? 0, exercices);
   const duree = dureeRetenue(dureeMin ?? 0, exercices);
   const kcal = estimerKcal({ dureeMin: duree, exercices }, profil.poidsKg);
 
@@ -186,9 +187,10 @@ function Formulaire() {
               onValeur={setDureeMin}
             />
           </div>
-          {duree > (dureeMin ?? 0) && (
+          {connue && duree > (dureeMin ?? 0) && (
             <p className="mt-2 text-[12px] text-brume-faible">
-              Comptée {libelleDuree(duree)} : la somme des exercices chronométrés.
+              Comptée {libelleDuree(duree)} : les exercices notés prennent plus de
+              temps que la durée saisie.
             </p>
           )}
         </Carte>
@@ -251,18 +253,18 @@ function Formulaire() {
             <div>
               <p className="surtitre mb-2">Calories dépensées</p>
               <p className="chiffres titre text-[28px] font-semibold leading-none">
-                {duree > 0 ? kcal : "—"}
+                {connue ? kcal : "—"}
                 <span className="ml-1.5 text-[13px] font-normal text-brume-faible">kcal</span>
               </p>
             </div>
             <p className="text-right text-[12px] leading-relaxed text-brume-faible">
-              estimation selon les exercices,
+              selon les exercices, les séries,
               <br />
               la durée et ton poids ({profil.poidsKg} kg)
             </p>
           </div>
 
-          {duree <= 0 && (
+          {!connue && (
             <Message className="mt-4">Indique la durée de la séance pour l&apos;enregistrer.</Message>
           )}
           {erreur && <Message ton="erreur" className="mt-4">{erreur}</Message>}
@@ -270,7 +272,7 @@ function Formulaire() {
           <Bouton
             taille="large"
             className="mt-5"
-            disabled={envoi || duree <= 0 || !date}
+            disabled={envoi || !connue || !date}
             onClick={valider}
           >
             {envoi ? "Enregistrement…" : existante ? "Enregistrer les modifications" : "Enregistrer la séance"}

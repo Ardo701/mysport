@@ -26,15 +26,25 @@ la formule du Compendium of Physical Activities. Chaque exercice du catalogue
 (`convex/data/exercices.ts`) porte son MET ; pour la course, il se recalcule à
 partir de l'allure quand la distance est saisie.
 
-Seule la durée de la séance est connue, plus celle des exercices chronométrés.
-Le temps restant se répartit entre les autres exercices au prorata de leurs
-séries, et le temps qu'aucun exercice n'occupe compte comme une activité légère
-(échauffement, transitions). Le calcul vit dans `convex/lib/calories.ts`, que
-le serveur applique à l'enregistrement et l'écran de saisie à chaque frappe :
-le chiffre annoncé avant d'enregistrer est celui qui s'affiche ensuite.
+La séance se découpe en trois sortes de temps :
 
-L'estimation est figée avec la séance, au poids du moment : changer son poids
-dans le profil ne réécrit pas ce qu'ont coûté les séances passées.
+- **chronométré** — une course, un match : sa durée, au MET de l'activité ;
+- **travail** — le temps passé dans les séries (séries × répétitions × 3 s, ou
+  séries × secondes tenues pour le gainage), au MET de l'exercice, majoré par
+  la charge : soulever en plus l'équivalent de son poids double le coût ;
+- **récupération** — tout le reste de la durée saisie : repos entre les
+  séries, installation, transitions, à 3,5 MET.
+
+À durée égale, une série, une répétition ou un kilo de plus transforme du
+repos en effort : l'estimation ne peut que monter. La durée de la séance reste
+le levier principal.
+
+Le calcul vit dans `convex/lib/calories.ts`, que le serveur applique à
+l'enregistrement et l'écran de saisie à chaque frappe : le chiffre annoncé
+avant d'enregistrer est celui qui s'affiche ensuite. Il est figé avec la
+séance, au poids du moment, que la séance garde : changer son poids dans le
+profil ne réécrit pas les séances passées, et une formule corrigée peut les
+recalculer avec le poids qui était le leur.
 
 ## Pile technique
 

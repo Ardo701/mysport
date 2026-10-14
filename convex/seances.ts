@@ -1,7 +1,7 @@
 import { v, type Infer } from "convex/values";
 import { mutation, query, type QueryCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
-import { dureeRetenue, estimerKcal } from "./lib/calories";
+import { dureeConnue, dureeRetenue, estimerKcal } from "./lib/calories";
 import { utilisateurConnecte } from "./lib/session";
 import { exerciceValidator } from "./schema";
 
@@ -51,8 +51,9 @@ export const enregistrer = mutation({
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error("Date invalide");
 
     const propres = exercices.map(nettoyer);
-    const duree = dureeRetenue(positif(dureeMin) ?? 0, propres);
-    if (duree <= 0) throw new Error("Durée manquante");
+    const saisie = positif(dureeMin) ?? 0;
+    if (!dureeConnue(saisie, propres)) throw new Error("Durée manquante");
+    const duree = dureeRetenue(saisie, propres);
     if (duree > 24 * 60) throw new Error("Durée hors limites");
 
     const profil = await profilDe(ctx, userId);
@@ -62,6 +63,7 @@ export const enregistrer = mutation({
       exercices: propres,
       notes: notes?.trim() || undefined,
       kcal: estimerKcal({ dureeMin: duree, exercices: propres }, profil.poidsKg),
+      poidsKg: profil.poidsKg,
     };
 
     if (id) {

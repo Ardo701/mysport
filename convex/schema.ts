@@ -47,6 +47,12 @@ export default defineSchema({
      * pesée ultérieure ne doit pas réécrire ce qu'a coûté une séance passée.
      */
     kcal: v.number(),
+    /**
+     * Le poids qui a servi à l'estimation. Gardé pour pouvoir la refaire si la
+     * formule change, sans la fausser avec le poids d'aujourd'hui. Absent des
+     * toutes premières séances, rattrapées depuis le profil.
+     */
+    poidsKg: v.optional(v.number()),
   }).index("by_user_date", ["userId", "date"]),
 
   /**

@@ -18,8 +18,38 @@
  */
 
 import { internalMutation, type MutationCtx } from "./_generated/server";
+import { dureeRetenue, estimerKcal } from "./lib/calories";
 
-const RATTRAPAGES: { nom: string; executer: (ctx: MutationCtx) => Promise<string> }[] = [];
+const RATTRAPAGES: { nom: string; executer: (ctx: MutationCtx) => Promise<string> }[] = [
+  {
+    // Les premières séances ont été estimées en répartissant la durée entre
+    // les exercices au prorata des séries, sans les répétitions ni la charge.
+    // Elles sont recalculées avec le modèle travail + récupération, pour que
+    // les statistiques ne mélangent pas deux formules. Ces séances ne
+    // gardaient pas leur poids : celui du profil, saisi le même jour, le
+    // remplace sans erreur notable.
+    nom: "kcal-travail-et-recuperation",
+    async executer(ctx) {
+      let touchees = 0;
+      for (const seance of await ctx.db.query("seances").collect()) {
+        const profil = await ctx.db
+          .query("profils")
+          .withIndex("by_user", (q) => q.eq("userId", seance.userId))
+          .unique();
+        const poidsKg = seance.poidsKg ?? profil?.poidsKg;
+        if (!poidsKg) continue;
+        const dureeMin = dureeRetenue(seance.dureeMin, seance.exercices);
+        await ctx.db.patch(seance._id, {
+          dureeMin,
+          poidsKg,
+          kcal: estimerKcal({ dureeMin, exercices: seance.exercices }, poidsKg),
+        });
+        touchees += 1;
+      }
+      return `${touchees} séance(s)`;
+    },
+  },
+];
 
 export const appliquer = internalMutation({
   args: {},
