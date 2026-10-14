@@ -213,6 +213,33 @@ code {
   background-color: var(--color-creux-vif);
 }
 
+/*
+ * Tous les champs d'une ligne à la même hauteur.
+ *
+ * Safari sur iPhone dessine ses champs date et heure à sa façon : moins hauts
+ * que les autres, et avec une largeur minimale qui déborde de leur colonne
+ * pour passer sous le champ voisin. On leur retire l'apparence native, on les
+ * autorise à rétrécir et on cale leur texte à gauche, comme partout ailleurs.
+ */
+input.champ,
+select.champ {
+  height: 48px;
+}
+
+input[type="date"].champ,
+input[type="time"].champ {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  min-width: 0;
+}
+
+input[type="date"]::-webkit-date-and-time-value,
+input[type="time"]::-webkit-date-and-time-value {
+  margin: 0;
+  text-align: left;
+}
+
 /* Champs heure et date : l'indicateur natif est noir, il faut l'inverser sur
    fond sombre — et surtout pas sur fond clair, où il disparaîtrait. */
 input[type="time"]::-webkit-calendar-picker-indicator,
