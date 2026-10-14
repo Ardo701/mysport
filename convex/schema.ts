@@ -2,6 +2,7 @@ import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 import { MATERIELS } from "./data/exercices";
+import { RESSENTIS_APRES, RESSENTIS_AVANT } from "./data/ressentis";
 
 /** Un exercice d'une séance, tel que saisi. */
 export const exerciceValidator = v.object({
@@ -24,6 +25,9 @@ export const exerciceValidator = v.object({
   dureeMin: v.optional(v.number()),
   distanceKm: v.optional(v.number()),
 });
+
+export const ressentiAvantValidator = v.union(...RESSENTIS_AVANT.map((r) => v.literal(r.cle)));
+export const ressentiApresValidator = v.union(...RESSENTIS_APRES.map((r) => v.literal(r.cle)));
 
 export default defineSchema({
   ...authTables,
@@ -51,6 +55,9 @@ export default defineSchema({
     dureeMin: v.number(),
     exercices: v.array(exerciceValidator),
     notes: v.optional(v.string()),
+    /** L'état d'esprit en arrivant, et celui en repartant (`convex/data/ressentis.ts`). */
+    ressentiAvant: v.optional(ressentiAvantValidator),
+    ressentiApres: v.optional(ressentiApresValidator),
     /**
      * Estimation faite avec le poids en vigueur à la date de la séance. Une
      * pesée ajoutée ou corrigée la recalcule ; une pesée plus récente que la

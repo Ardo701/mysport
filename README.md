@@ -11,6 +11,8 @@ deux colonnes à partir de 1024 px.
   gainage, cardio, sports, mobilité). Le détail est facultatif : séries,
   répétitions et charge pour la musculation, secondes pour le gainage, durée et
   distance pour le cardio. Un exercice absent du catalogue s'ajoute par son nom.
+  Deux échelles, facultatives elles aussi, notent le ressenti avant la séance
+  (de « à fond » à « fatigué ») et après (de « au top » à « vidé »).
 - **Statistiques** — sur 4 semaines, 3 mois, 12 mois ou tout l'historique :
   dépense moyenne par semaine, par séance et par jour, nombre de séances et de
   jours actifs, temps total, calories semaine par semaine, calendrier du mois

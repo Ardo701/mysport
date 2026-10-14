@@ -15,6 +15,12 @@ import {
 } from "@/convex/data/exercices";
 import { dureeConnue, dureeRetenue, estimerKcal } from "@/convex/lib/calories";
 import { poidsALaDate } from "@/convex/lib/poids";
+import {
+  RESSENTIS_APRES,
+  RESSENTIS_AVANT,
+  type RessentiApres,
+  type RessentiAvant,
+} from "@/convex/data/ressentis";
 import { ChampNombre } from "@/composants/champ-nombre";
 import { ChoixExercices, type ExerciceChoisi } from "@/composants/choix-exercices";
 import { IconeChevronDroite, IconeChevronGauche, IconeCroix, IconePlus } from "@/composants/icones";
@@ -24,11 +30,15 @@ import {
   Chargement,
   EnTetePage,
   EtatVide,
+  GroupeOptions,
   Message,
   TitreSection,
 } from "@/composants/ui";
 import { aujourdhuiISO, libelleRelatif } from "@/lib/dates";
 import { libelleDuree, nombre, type ExerciceSaisi } from "@/lib/seances";
+
+const OPTIONS_AVANT = RESSENTIS_AVANT.map((r) => ({ valeur: r.cle, libelle: r.libelle }));
+const OPTIONS_APRES = RESSENTIS_APRES.map((r) => ({ valeur: r.cle, libelle: r.libelle }));
 
 /** Un exercice en cours de saisie ; la clé ne sert qu'à React et n'est pas enregistrée. */
 type Ligne = ExerciceSaisi & { cle: string };
@@ -59,6 +69,8 @@ function Formulaire() {
   const [dureeMin, setDureeMin] = useState<number | undefined>(undefined);
   const [lignes, setLignes] = useState<Ligne[]>([]);
   const [notes, setNotes] = useState("");
+  const [ressentiAvant, setRessentiAvant] = useState<RessentiAvant | undefined>(undefined);
+  const [ressentiApres, setRessentiApres] = useState<RessentiApres | undefined>(undefined);
   const [pret, setPret] = useState(false);
   const [choixOuvert, setChoixOuvert] = useState(false);
   const [envoi, setEnvoi] = useState(false);
@@ -85,6 +97,8 @@ function Formulaire() {
         })),
       );
       setNotes(existante.notes ?? "");
+      setRessentiAvant(existante.ressentiAvant);
+      setRessentiApres(existante.ressentiApres);
       setPret(true);
     }
   }, [id, existante, pret]);
@@ -138,6 +152,8 @@ function Formulaire() {
         dureeMin: dureeMin ?? 0,
         exercices,
         notes: notes.trim() || undefined,
+        ressentiAvant,
+        ressentiApres,
       });
       router.push("/journal");
     } catch {
@@ -236,6 +252,31 @@ function Formulaire() {
             <IconePlus className="h-4 w-4" />
             Ajouter des exercices
           </Bouton>
+        </Carte>
+
+        <Carte>
+          <TitreSection titre="Ressenti" />
+          <div className="space-y-5">
+            <GroupeOptions
+              libelle="Avant la séance"
+              options={OPTIONS_AVANT}
+              valeur={ressentiAvant}
+              onChange={setRessentiAvant}
+              colonnes={5}
+              facultatif
+            />
+            <GroupeOptions
+              libelle="Après la séance"
+              options={OPTIONS_APRES}
+              valeur={ressentiApres}
+              onChange={setRessentiApres}
+              colonnes={5}
+              facultatif
+            />
+          </div>
+          <p className="mt-2.5 text-[11px] text-brume-faible">
+            Facultatif. Touche à nouveau un choix pour l&apos;effacer.
+          </p>
         </Carte>
 
         <Carte>

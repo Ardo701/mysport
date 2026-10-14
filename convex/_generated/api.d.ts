@@ -10,6 +10,7 @@
 
 import type * as auth from "../auth.js";
 import type * as data_exercices from "../data/exercices.js";
+import type * as data_ressentis from "../data/ressentis.js";
 import type * as http from "../http.js";
 import type * as lib_calories from "../lib/calories.js";
 import type * as lib_poids from "../lib/poids.js";
@@ -28,6 +29,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   "data/exercices": typeof data_exercices;
+  "data/ressentis": typeof data_ressentis;
   http: typeof http;
   "lib/calories": typeof lib_calories;
   "lib/poids": typeof lib_poids;

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { IconeChevronDroite } from "./icones";
+import { libelleRessentiApres, libelleRessentiAvant } from "@/convex/data/ressentis";
 import { detailExercice, libelleDuree, resumeExercices, type Seance } from "@/lib/seances";
 
 /**
@@ -40,7 +41,13 @@ export function LigneSeance({ seance }: { seance: Seance }) {
  * quand on se demande ce qu'on a fait tel jour, et avec quelle charge.
  */
 export function DetailSeance({ seance }: { seance: Seance }) {
-  if (seance.exercices.length === 0 && !seance.notes) return null;
+  const ressenti = [
+    seance.ressentiAvant && `avant : ${libelleRessentiAvant(seance.ressentiAvant).toLowerCase()}`,
+    seance.ressentiApres && `après : ${libelleRessentiApres(seance.ressentiApres).toLowerCase()}`,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  if (seance.exercices.length === 0 && !seance.notes && !ressenti) return null;
   return (
     <div className="mb-2 ml-14">
       <ul className="space-y-1.5">
@@ -54,6 +61,9 @@ export function DetailSeance({ seance }: { seance: Seance }) {
           );
         })}
       </ul>
+      {ressenti && (
+        <p className="mt-2.5 text-[12px] text-brume first-letter:uppercase">{ressenti}</p>
+      )}
       {seance.notes && (
         <p className="mt-2.5 text-[12px] italic leading-relaxed text-brume-faible">
           {seance.notes}

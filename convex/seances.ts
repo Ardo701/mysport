@@ -4,7 +4,7 @@ import type { Id } from "./_generated/dataModel";
 import { dureeConnue, dureeRetenue, estimerKcal } from "./lib/calories";
 import { utilisateurConnecte } from "./lib/session";
 import { poidsDuJour } from "./pesees";
-import { exerciceValidator } from "./schema";
+import { exerciceValidator, ressentiApresValidator, ressentiAvantValidator } from "./schema";
 
 /**
  * Toutes les séances, de la plus récente à la plus ancienne.
@@ -46,8 +46,10 @@ export const enregistrer = mutation({
     dureeMin: v.number(),
     exercices: v.array(exerciceValidator),
     notes: v.optional(v.string()),
+    ressentiAvant: v.optional(ressentiAvantValidator),
+    ressentiApres: v.optional(ressentiApresValidator),
   },
-  handler: async (ctx, { id, date, dureeMin, exercices, notes }) => {
+  handler: async (ctx, { id, date, dureeMin, exercices, notes, ressentiAvant, ressentiApres }) => {
     const userId = await utilisateurConnecte(ctx);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error("Date invalide");
 
@@ -65,6 +67,8 @@ export const enregistrer = mutation({
       dureeMin: duree,
       exercices: propres,
       notes: notes?.trim() || undefined,
+      ressentiAvant,
+      ressentiApres,
       kcal: estimerKcal({ dureeMin: duree, exercices: propres }, poidsKg),
       poidsKg,
     };

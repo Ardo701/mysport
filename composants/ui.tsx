@@ -108,6 +108,10 @@ export function Champ({
  * L'option retenue est cerclée d'un double filet jaune plutôt que remplie
  * d'un voile de couleur : sur une page qui ne s'autorise qu'un aplat jaune,
  * la sélection se marque au trait.
+ *
+ * Facultatif, un choix se retire en touchant à nouveau l'option retenue. À
+ * cinq colonnes — une échelle tenue sur une ligne de téléphone —, les
+ * libellés se centrent et les marges se resserrent.
  */
 export function GroupeOptions<T extends string>({
   libelle,
@@ -115,14 +119,17 @@ export function GroupeOptions<T extends string>({
   valeur,
   onChange,
   colonnes = 2,
+  facultatif = false,
 }: {
   libelle?: string;
-  options: { valeur: T; libelle: string; detail?: string }[];
-  valeur: T;
-  onChange: (v: T) => void;
-  colonnes?: 1 | 2 | 3;
+  options: readonly { valeur: T; libelle: string; detail?: string }[];
+  valeur: T | undefined;
+  onChange: (v: T | undefined) => void;
+  colonnes?: 1 | 2 | 3 | 5;
+  facultatif?: boolean;
 }) {
-  const grille = { 1: "grid-cols-1", 2: "grid-cols-2", 3: "grid-cols-3" }[colonnes];
+  const grille = { 1: "grid-cols-1", 2: "grid-cols-2", 3: "grid-cols-3", 5: "grid-cols-5" }[colonnes];
+  const serre = colonnes === 5;
   return (
     <div>
       {libelle && <span className="surtitre mb-2 block">{libelle}</span>}
@@ -133,14 +140,15 @@ export function GroupeOptions<T extends string>({
             <button
               key={o.valeur}
               type="button"
-              onClick={() => onChange(o.valeur)}
-              className={`px-3 py-3 text-left transition-colors ${
+              aria-pressed={actif}
+              onClick={() => onChange(facultatif && actif ? undefined : o.valeur)}
+              className={`transition-colors ${serre ? "px-1 py-3 text-center" : "px-3 py-3 text-left"} ${
                 actif
                   ? "bg-fond text-encre shadow-[inset_0_2px_0_0_var(--color-jaune)]"
                   : "bg-fond text-brume hover:text-encre"
               }`}
             >
-              <span className="block text-[13px] font-medium leading-tight">
+              <span className={`block font-medium leading-tight ${serre ? "text-[12px]" : "text-[13px]"}`}>
                 {o.libelle}
               </span>
               {o.detail && (
@@ -303,7 +311,7 @@ export function Colonnes({
 }) {
   return (
     <div
-      className={`grid items-start gap-x-14 gap-y-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] ${className}`}
+      className={`grid grid-cols-1 items-start gap-x-14 gap-y-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] ${className}`}
     >
       {children}
     </div>
