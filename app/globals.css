@@ -101,6 +101,16 @@ body {
 }
 
 /*
+ * La page est rendue en français au build. Quand l'appareil parle anglais, le
+ * script d'amorçage pose cet attribut, et la page reste masquée le temps que
+ * React la réécrive : un fond vide plutôt qu'un éclair de français
+ * (composants/langue.tsx).
+ */
+html[data-attente-langue] body {
+  visibility: hidden;
+}
+
+/*
  * Le curseur main sur ce qui se clique.
  *
  * Tailwind v4 a aligné son preflight sur la feuille de style du navigateur, où

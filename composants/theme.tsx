@@ -2,6 +2,7 @@
 
 import { useCallback, useSyncExternalStore } from "react";
 import { IconeLune, IconeSoleil } from "./icones";
+import { useLangue } from "./langue";
 
 export type Theme = "clair" | "sombre";
 
@@ -83,7 +84,7 @@ function instantaneServeur(): null {
   return null;
 }
 
-/** Thème courant — null le temps de l'hydratation — et moyen d'en changer. */
+/** Thème courant (null le temps de l'hydratation) et moyen d'en changer. */
 export function useTheme() {
   const theme = useSyncExternalStore(abonner, instantane, instantaneServeur);
 
@@ -101,22 +102,23 @@ export function useTheme() {
   return { theme, choisir };
 }
 
-const OPTIONS: { cle: Theme; libelle: string; Icone: typeof IconeLune }[] = [
-  { cle: "sombre", libelle: "Sombre", Icone: IconeLune },
-  { cle: "clair", libelle: "Clair", Icone: IconeSoleil },
+const OPTIONS: { cle: Theme; fr: string; en: string; Icone: typeof IconeLune }[] = [
+  { cle: "sombre", fr: "Sombre", en: "Dark", Icone: IconeLune },
+  { cle: "clair", fr: "Clair", en: "Light", Icone: IconeSoleil },
 ];
 
 /** Bascule sombre / clair, dessinée comme les autres sélecteurs de l'application. */
 export function BasculeTheme({ className = "" }: { className?: string }) {
   const { theme, choisir } = useTheme();
+  const { t } = useLangue();
 
   return (
     <div
       role="group"
-      aria-label="Thème de l'application"
+      aria-label={t("Thème de l'application", "App theme")}
       className={`flex gap-[2px] rounded-boite bg-creux p-[3px] ${className}`}
     >
-      {OPTIONS.map(({ cle, libelle, Icone }) => {
+      {OPTIONS.map(({ cle, fr, en, Icone }) => {
         const actif = theme === cle;
         return (
           <button
@@ -131,7 +133,7 @@ export function BasculeTheme({ className = "" }: { className?: string }) {
             }`}
           >
             <Icone className="h-3.5 w-3.5" />
-            {libelle}
+            {t(fr, en)}
           </button>
         );
       })}

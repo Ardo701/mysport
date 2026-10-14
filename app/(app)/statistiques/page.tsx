@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { api } from "@/convex/_generated/api";
 import { ChiffreVedette, GrilleStats, PaireStats, Stat } from "@/composants/jauges";
 import { IconeChevronDroite, IconeChevronGauche, IconePlus } from "@/composants/icones";
+import { useLangue, type Langue } from "@/composants/langue";
 import { DetailSeance, LigneRepos, LigneSeance } from "@/composants/seance";
 import {
   ActionTete,
@@ -18,13 +19,14 @@ import {
   Onglets,
   TitreSection,
 } from "@/composants/ui";
+import type { Texte } from "@/convex/data/langues";
 import {
-  JOURS_COURTS,
   ajouterJours,
   aujourdhuiISO,
   debutDeMois,
   differenceEnJours,
   jourDeLaSemaine,
+  joursCourts,
   libelleDate,
   libelleDateCourt,
   libelleJour,
@@ -32,10 +34,12 @@ import {
   lundiDeLaSemaine,
 } from "@/lib/dates";
 import {
+  compteSeances,
   entre,
   exercicesFrequents,
   libelleDuree,
   nombre,
+  nomExercice,
   parSemaine,
   repartition,
   totaux,
@@ -46,18 +50,19 @@ import {
 type Periode = "semaine" | "mois" | "3m" | "an" | "tout";
 
 /** En semaines entières : une moyenne par semaine sur des semaines tronquées tomberait faux. */
-const PERIODES: { cle: Periode; libelle: string; semaines?: number }[] = [
-  { cle: "semaine", libelle: "Semaine" },
-  { cle: "mois", libelle: "Mois", semaines: 4 },
-  { cle: "3m", libelle: "3 mois", semaines: 13 },
-  { cle: "an", libelle: "1 an", semaines: 52 },
-  { cle: "tout", libelle: "Tout" },
+const PERIODES: { cle: Periode; libelle: Texte; semaines?: number }[] = [
+  { cle: "semaine", libelle: { fr: "Semaine", en: "Week" } },
+  { cle: "mois", libelle: { fr: "Mois", en: "Month" }, semaines: 4 },
+  { cle: "3m", libelle: { fr: "3 mois", en: "3 months" }, semaines: 13 },
+  { cle: "an", libelle: { fr: "1 an", en: "1 year" }, semaines: 52 },
+  { cle: "tout", libelle: { fr: "Tout", en: "All" } },
 ];
 
 /** Au-delà, les barres deviendraient des fils : on montre les deux dernières années. */
 const SEMAINES_MAX_GRAPHIQUE = 104;
 
 export default function PageStatistiques() {
+  const { langue, t } = useLangue();
   const [aujourdhui, setAujourdhui] = useState<string | null>(null);
   useEffect(() => setAujourdhui(aujourdhuiISO()), []);
   const [periode, setPeriode] = useState<Periode>("semaine");
@@ -70,7 +75,7 @@ export default function PageStatistiques() {
   if (!aujourdhui || seances === undefined) return <Chargement />;
 
   const ajouter = (
-    <ActionTete href="/seance" libelle="Ajouter une séance">
+    <ActionTete href="/seance" libelle={t("Ajouter une séance", "Add a workout")}>
       <IconePlus className="h-[22px] w-[22px]" />
     </ActionTete>
   );
@@ -78,11 +83,14 @@ export default function PageStatistiques() {
   if (seances.length === 0) {
     return (
       <div className="lg:max-w-[640px]">
-        <EnTetePage titre="Statistiques" />
+        <EnTetePage titre={t("Statistiques", "Statistics")} />
         <EtatVide
-          titre="Pas encore de statistiques"
-          detail="Elles se calculent à partir des séances que tu notes : jours d'entraînement, temps passé, calories dépensées."
-          action={<BoutonLien href="/seance">Ajouter une séance</BoutonLien>}
+          titre={t("Pas encore de statistiques", "No statistics yet")}
+          detail={t(
+            "Elles se calculent à partir des séances que tu notes : jours d'entraînement, temps passé, calories dépensées.",
+            "They are worked out from the workouts you log: training days, time spent, calories burned.",
+          )}
+          action={<BoutonLien href="/seance">{t("Ajouter une séance", "Add a workout")}</BoutonLien>}
         />
       </div>
     );
@@ -99,11 +107,11 @@ export default function PageStatistiques() {
 
   return (
     <div>
-      <EnTetePage titre="Statistiques" action={ajouter} />
+      <EnTetePage titre={t("Statistiques", "Statistics")} action={ajouter} />
 
       <Onglets
         className="mb-6 lg:max-w-[520px]"
-        options={PERIODES.map((p) => ({ cle: p.cle, libelle: p.libelle }))}
+        options={PERIODES.map((p) => ({ cle: p.cle, libelle: p.libelle[langue] }))}
         valeur={periode}
         onChange={setPeriode}
       />
@@ -140,13 +148,14 @@ function VuePeriode({
   debut: string;
   nombreSemaines: number;
 }) {
+  const { langue, t } = useLangue();
   const dansPeriode = entre(seances, debut, aujourdhui);
-  const t = totaux(dansPeriode);
+  const total = totaux(dansPeriode);
   // La semaine en cours n'est pas finie : on divise par les jours réellement
   // écoulés, pas par un nombre rond de semaines qui ferait baisser la moyenne
   // chaque lundi.
   const joursEcoules = differenceEnJours(debut, aujourdhui) + 1;
-  const parSemaineMoyenne = (t.kcal / joursEcoules) * 7;
+  const parSemaineMoyenne = (total.kcal / joursEcoules) * 7;
 
   const semaines = parSemaine(
     seances,
@@ -159,35 +168,41 @@ function VuePeriode({
     <Colonnes>
       <Colonne>
         <ChiffreVedette
-          libelle="Moyenne par semaine"
-          valeur={Math.round(parSemaineMoyenne).toLocaleString("fr-FR")}
+          libelle={t("Moyenne par semaine", "Weekly average")}
+          valeur={nombre(Math.round(parSemaineMoyenne), langue)}
           unite="kcal"
         >
           <p className="mt-2 text-[13px] text-brume">
-            Depuis le {libelleJour(debut)} · {t.seances} séance{t.seances > 1 ? "s" : ""}
+            {t(`Depuis le ${libelleJour(debut, langue)}`, `Since ${libelleJour(debut, langue)}`)} ·{" "}
+            {compteSeances(total.seances, langue)}
           </p>
-          <PaireMoyennes totaux={t} jours={joursEcoules} />
+          <PaireMoyennes totaux={total} jours={joursEcoules} />
         </ChiffreVedette>
 
         <GraphiqueBarres
-          titre="Calories par semaine"
+          titre={t("Calories par semaine", "Calories per week")}
           barres={semaines.map((s) => ({
             cle: s.lundi,
-            titre: `Semaine du ${libelleDateCourt(s.lundi)}`,
+            titre: t(
+              `Semaine du ${libelleDateCourt(s.lundi, langue)}`,
+              `Week of ${libelleDateCourt(s.lundi, langue)}`,
+            ),
             kcal: s.kcal,
             seances: s.seances,
           }))}
           moyenne={parSemaineMoyenne}
           parDefaut={{
-            titre: "Cette semaine",
+            titre: t("Cette semaine", "This week"),
             kcal: semaines.at(-1)!.kcal,
             seances: semaines.at(-1)!.seances,
           }}
           axe={
             <div className="chiffres mt-2 flex justify-between text-[11px] text-brume">
-              <span>{libelleDateCourt(semaines[0].lundi)}</span>
-              {semaines.length > 4 && <span>{libelleDateCourt(semaines[milieu].lundi)}</span>}
-              <span>{libelleDateCourt(semaines.at(-1)!.lundi)}</span>
+              <span>{libelleDateCourt(semaines[0].lundi, langue)}</span>
+              {semaines.length > 4 && (
+                <span>{libelleDateCourt(semaines[milieu].lundi, langue)}</span>
+              )}
+              <span>{libelleDateCourt(semaines.at(-1)!.lundi, langue)}</span>
             </div>
           }
         />
@@ -197,12 +212,19 @@ function VuePeriode({
 
       <Colonne>
         <Carte>
-          <TitreSection titre="Sur la période" />
+          <TitreSection titre={t("Sur la période", "Over the period")} />
           <GrilleStats>
-            <Stat libelle="Séances" valeur={t.seances} />
-            <Stat libelle="Séances par semaine" valeur={nombre((t.seances / joursEcoules) * 7)} />
-            <StatsVolume totaux={t} jours={joursEcoules} />
-            <Stat libelle="Dépense totale" valeur={t.kcal.toLocaleString("fr-FR")} unite="kcal" />
+            <Stat libelle={t("Séances", "Workouts")} valeur={nombre(total.seances, langue)} />
+            <Stat
+              libelle={t("Séances par semaine", "Workouts per week")}
+              valeur={nombre((total.seances / joursEcoules) * 7, langue)}
+            />
+            <StatsVolume totaux={total} jours={joursEcoules} />
+            <Stat
+              libelle={t("Dépense totale", "Total burned")}
+              valeur={nombre(total.kcal, langue)}
+              unite="kcal"
+            />
           </GrilleStats>
         </Carte>
 
@@ -231,6 +253,7 @@ function VueSemaine({
   lundiMin: string;
   onLundi: (lundi: string) => void;
 }) {
+  const { langue, t } = useLangue();
   const dimanche = ajouterJours(lundi, 6);
   /** Semaines écoulées depuis celle affichée : 0 pour la semaine en cours. */
   const ecart = differenceEnJours(lundi, lundiDeLaSemaine(aujourdhui)) / 7;
@@ -240,7 +263,7 @@ function VueSemaine({
   const joursEcoules = enCours ? differenceEnJours(lundi, aujourdhui) + 1 : 7;
 
   const deLaSemaine = entre(seances, lundi, dimanche);
-  const t = totaux(deLaSemaine);
+  const total = totaux(deLaSemaine);
   const precedente = totaux(entre(seances, ajouterJours(lundi, -7), ajouterJours(lundi, -1)));
 
   const jours = Array.from({ length: 7 }, (_, i) => {
@@ -260,20 +283,24 @@ function VueSemaine({
     <>
       <div className="mb-7 flex items-center justify-between gap-3 lg:max-w-[520px]">
         <BoutonFleche
-          libelle="Semaine précédente"
+          libelle={t("Semaine précédente", "Previous week")}
           disabled={lundi <= lundiMin}
           onClick={() => onLundi(ajouterJours(lundi, -7))}
         >
           <IconeChevronGauche className="h-[18px] w-[18px]" />
         </BoutonFleche>
         <div className="text-center">
-          <p className="text-[16px] font-semibold">{libelleSemaine(lundi)}</p>
+          <p className="text-[16px] font-semibold">{libelleSemaine(lundi, langue)}</p>
           <p className="text-[13px] text-brume">
-            {enCours ? "Cette semaine" : ecart === 1 ? "Semaine dernière" : `Il y a ${ecart} semaines`}
+            {enCours
+              ? t("Cette semaine", "This week")
+              : ecart === 1
+                ? t("Semaine dernière", "Last week")
+                : t(`Il y a ${ecart} semaines`, `${ecart} weeks ago`)}
           </p>
         </div>
         <BoutonFleche
-          libelle="Semaine suivante"
+          libelle={t("Semaine suivante", "Next week")}
           disabled={enCours}
           onClick={() => onLundi(ajouterJours(lundi, 7))}
         >
@@ -284,27 +311,31 @@ function VueSemaine({
       <Colonnes>
         <Colonne>
           <ChiffreVedette
-            libelle="Dépense de la semaine"
-            valeur={t.kcal.toLocaleString("fr-FR")}
+            libelle={t("Dépense de la semaine", "Burned this week")}
+            valeur={nombre(total.kcal, langue)}
             unite="kcal"
           >
             <p className="mt-2 text-[13px] text-brume">
-              {comparaison(t.kcal, precedente.kcal)}
+              {comparaison(total.kcal, precedente.kcal, langue)}
             </p>
-            <PaireMoyennes totaux={t} jours={joursEcoules} />
+            <PaireMoyennes totaux={total} jours={joursEcoules} />
           </ChiffreVedette>
 
           <GraphiqueBarres
-            titre="Calories par jour"
+            titre={t("Calories par jour", "Calories per day")}
             barres={jours.map((j) => ({
               cle: j.date,
-              titre: libelleDate(j.date),
+              titre: libelleDate(j.date, langue),
               kcal: j.kcal,
               seances: j.seances.length,
               avenir: j.avenir,
             }))}
-            moyenne={t.kcal / joursEcoules}
-            parDefaut={{ titre: "Toute la semaine", kcal: t.kcal, seances: t.seances }}
+            moyenne={total.kcal / joursEcoules}
+            parDefaut={{
+              titre: t("Toute la semaine", "The whole week"),
+              kcal: total.kcal,
+              seances: total.seances,
+            }}
             axe={
               <div className="mt-2 flex gap-2">
                 {jours.map((j, i) => (
@@ -314,7 +345,7 @@ function VueSemaine({
                       j.date === aujourdhui ? "text-encre" : "text-brume"
                     }`}
                   >
-                    {JOURS_COURTS[i]}
+                    {joursCourts(langue)[i]}
                   </span>
                 ))}
               </div>
@@ -323,8 +354,8 @@ function VueSemaine({
 
           <Carte>
             <TitreSection
-              titre="Jour par jour"
-              action={`${t.seances} séance${t.seances > 1 ? "s" : ""}`}
+              titre={t("Jour par jour", "Day by day")}
+              action={compteSeances(total.seances, langue)}
             />
             <div className="boite divide-y divide-trait overflow-hidden">
               {jours.map((j) =>
@@ -340,10 +371,10 @@ function VueSemaine({
 
         <Colonne>
           <Carte>
-            <TitreSection titre="Sur la semaine" />
+            <TitreSection titre={t("Sur la semaine", "Over the week")} />
             <GrilleStats>
-              <Stat libelle="Séances" valeur={t.seances} />
-              <StatsVolume totaux={t} jours={joursEcoules} />
+              <Stat libelle={t("Séances", "Workouts")} valeur={nombre(total.seances, langue)} />
+              <StatsVolume totaux={total} jours={joursEcoules} />
             </GrilleStats>
           </Carte>
 
@@ -354,25 +385,33 @@ function VueSemaine({
   );
 }
 
-/** « 5 au 11 octobre », ou « 28 septembre au 4 octobre » quand la semaine change de mois. */
-function libelleSemaine(lundi: string) {
+/**
+ * « 5 au 11 octobre », ou « 28 septembre au 4 octobre » quand la semaine
+ * change de mois ; « 5 to 11 October » en anglais.
+ */
+function libelleSemaine(lundi: string, langue: Langue) {
   const dimanche = ajouterJours(lundi, 6);
   const debut =
-    lundi.slice(0, 7) === dimanche.slice(0, 7) ? String(Number(lundi.slice(8))) : libelleJour(lundi);
-  return `${debut} au ${libelleJour(dimanche)}`;
+    lundi.slice(0, 7) === dimanche.slice(0, 7)
+      ? String(Number(lundi.slice(8)))
+      : libelleJour(lundi, langue);
+  return `${debut} ${langue === "fr" ? "au" : "to"} ${libelleJour(dimanche, langue)}`;
 }
 
 /** « +21 % par rapport à la semaine précédente (958 kcal) ». */
-function comparaison(kcal: number, avant: number): ReactNode {
-  if (avant === 0) return "Aucune séance la semaine précédente";
+function comparaison(kcal: number, avant: number, langue: Langue): ReactNode {
+  const fr = langue === "fr";
+  if (avant === 0) return fr ? "Aucune séance la semaine précédente" : "No workouts the week before";
   const ecart = Math.round(((kcal - avant) / avant) * 100);
   return (
     <>
       <span className="font-semibold text-encre">
         {ecart > 0 ? "+" : ecart < 0 ? "−" : ""}
-        {Math.abs(ecart)} %
+        {Math.abs(ecart)}
+        {fr ? " %" : "%"}
       </span>{" "}
-      par rapport à la semaine précédente ({avant.toLocaleString("fr-FR")} kcal)
+      {fr ? "par rapport à la semaine précédente" : "compared with the week before"} (
+      {nombre(avant, langue)} kcal)
     </>
   );
 }
@@ -402,32 +441,38 @@ function BoutonFleche({
 }
 
 /** Par séance et par jour : les deux moyennes qui précisent le chiffre principal. */
-function PaireMoyennes({ totaux: t, jours }: { totaux: Totaux; jours: number }) {
+function PaireMoyennes({ totaux: total, jours }: { totaux: Totaux; jours: number }) {
+  const { langue, t } = useLangue();
   return (
     <PaireStats
       gauche={{
-        valeur: t.seances > 0 ? Math.round(t.kcal / t.seances).toLocaleString("fr-FR") : "—",
-        unite: t.seances > 0 ? "kcal" : undefined,
-        libelle: "par séance",
+        valeur: total.seances > 0 ? nombre(Math.round(total.kcal / total.seances), langue) : "—",
+        unite: total.seances > 0 ? "kcal" : undefined,
+        libelle: t("par séance", "per workout"),
       }}
       droite={{
-        valeur: Math.round(t.kcal / jours).toLocaleString("fr-FR"),
+        valeur: nombre(Math.round(total.kcal / jours), langue),
         unite: "kcal",
-        libelle: "par jour, repos compris",
+        libelle: t("par jour, repos compris", "per day, rest days included"),
       }}
     />
   );
 }
 
 /** Jours actifs, temps et durée : ce que les deux vues comptent de la même façon. */
-function StatsVolume({ totaux: t, jours }: { totaux: Totaux; jours: number }) {
+function StatsVolume({ totaux: total, jours }: { totaux: Totaux; jours: number }) {
+  const { langue, t } = useLangue();
   return (
     <>
-      <Stat libelle="Jours actifs" valeur={t.jours} unite={`sur ${jours}`} />
-      <Stat libelle="Temps total" valeur={libelleDuree(t.dureeMin)} />
       <Stat
-        libelle="Durée moyenne"
-        valeur={t.seances > 0 ? libelleDuree(t.dureeMin / t.seances) : "—"}
+        libelle={t("Jours actifs", "Active days")}
+        valeur={nombre(total.jours, langue)}
+        unite={t(`sur ${jours}`, `of ${jours}`)}
+      />
+      <Stat libelle={t("Temps total", "Total time")} valeur={libelleDuree(total.dureeMin, langue)} />
+      <Stat
+        libelle={t("Durée moyenne", "Average duration")}
+        valeur={total.seances > 0 ? libelleDuree(total.dureeMin / total.seances, langue) : "—"}
       />
     </>
   );
@@ -450,19 +495,22 @@ function LigneJauge({ libelle, detail, part }: { libelle: string; detail: string
 
 /** Où sont passées les calories : musculation, cardio et sports, séances sans détail. */
 function Repartition({ seances }: { seances: Seance[] }) {
+  const { langue, t } = useLangue();
   const parts = repartition(seances);
   const total = parts.musculation + parts.cardio + parts.sansDetail;
   const lignes = [
-    { libelle: "Musculation", kcal: parts.musculation },
-    { libelle: "Cardio et sports", kcal: parts.cardio },
-    { libelle: "Séances sans détail", kcal: parts.sansDetail },
+    { libelle: t("Musculation", "Strength training"), kcal: parts.musculation },
+    { libelle: t("Cardio et sports", "Cardio and sports"), kcal: parts.cardio },
+    { libelle: t("Séances sans détail", "Workouts with no details"), kcal: parts.sansDetail },
   ].filter((l) => l.kcal > 0);
 
   return (
     <Carte>
-      <TitreSection titre="Répartition de la dépense" />
+      <TitreSection titre={t("Répartition de la dépense", "Where the calories went")} />
       {total === 0 ? (
-        <p className="boite px-4 py-4 text-[13px] text-brume">Aucune dépense sur la période.</p>
+        <p className="boite px-4 py-4 text-[13px] text-brume">
+          {t("Aucune dépense sur la période.", "Nothing burned over the period.")}
+        </p>
       ) : (
         <div className="boite space-y-4 p-4">
           {lignes.map((l) => {
@@ -471,7 +519,7 @@ function Repartition({ seances }: { seances: Seance[] }) {
               <LigneJauge
                 key={l.libelle}
                 libelle={l.libelle}
-                detail={`${Math.round(l.kcal).toLocaleString("fr-FR")} kcal · ${Math.round(part)} %`}
+                detail={`${nombre(Math.round(l.kcal), langue)} kcal · ${Math.round(part)}${t(" %", "%")}`}
                 part={part}
               />
             );
@@ -483,21 +531,22 @@ function Repartition({ seances }: { seances: Seance[] }) {
 }
 
 function ExercicesFrequents({ seances }: { seances: Seance[] }) {
+  const { langue, t } = useLangue();
   const frequents = exercicesFrequents(seances, 8);
   return (
     <Carte>
-      <TitreSection titre="Exercices les plus faits" />
+      <TitreSection titre={t("Exercices les plus faits", "Most frequent exercises")} />
       {frequents.length === 0 ? (
         <p className="boite px-4 py-4 text-[13px] text-brume">
-          Aucun exercice détaillé sur la période.
+          {t("Aucun exercice détaillé sur la période.", "No exercises logged over the period.")}
         </p>
       ) : (
         <div className="boite space-y-4 p-4">
           {frequents.map((e) => (
             <LigneJauge
-              key={e.nom}
-              libelle={e.nom}
-              detail={`${e.seances} séance${e.seances > 1 ? "s" : ""}`}
+              key={e.cle}
+              libelle={nomExercice(e, langue)}
+              detail={compteSeances(e.seances, langue)}
               part={(e.seances / frequents[0].seances) * 100}
             />
           ))}
@@ -537,6 +586,7 @@ function GraphiqueBarres({
   parDefaut: { titre: string; kcal: number; seances: number };
   axe: ReactNode;
 }) {
+  const { langue, t } = useLangue();
   const [designee, setDesignee] = useState<number | null>(null);
   const max = Math.max(moyenne, ...barres.map((b) => b.kcal), 1) * 1.1;
   const lue = designee === null ? parDefaut : barres[designee];
@@ -553,10 +603,10 @@ function GraphiqueBarres({
         </div>
         <div className="shrink-0 text-right">
           <p className="titre text-[19px] font-semibold leading-tight">
-            {lue.kcal.toLocaleString("fr-FR")} kcal
+            {nombre(lue.kcal, langue)} kcal
           </p>
           <p className="text-[12px] text-brume">
-            {lue.seances === 0 ? "Repos" : `${lue.seances} séance${lue.seances > 1 ? "s" : ""}`}
+            {lue.seances === 0 ? t("Repos", "Rest") : compteSeances(lue.seances, langue)}
           </p>
         </div>
       </div>
@@ -568,7 +618,7 @@ function GraphiqueBarres({
             style={{ bottom: `${(moyenne / max) * 100}%` }}
           >
             <span className="absolute -top-[19px] right-0 bg-surface pl-1.5 text-[11px] font-medium text-brume">
-              moyenne {Math.round(moyenne).toLocaleString("fr-FR")}
+              {t("moyenne", "average")} {nombre(Math.round(moyenne), langue)}
             </span>
           </div>
         )}
@@ -578,7 +628,10 @@ function GraphiqueBarres({
               key={b.cle}
               type="button"
               disabled={b.avenir}
-              aria-label={`${b.titre} : ${b.kcal} kcal, ${b.seances} séances`}
+              aria-label={t(
+                `${b.titre} : ${b.kcal} kcal, ${compteSeances(b.seances, langue)}`,
+                `${b.titre}: ${b.kcal} kcal, ${compteSeances(b.seances, langue)}`,
+              )}
               onMouseEnter={() => setDesignee(i)}
               onFocus={() => setDesignee(i)}
               onClick={() => setDesignee(i)}
@@ -610,6 +663,7 @@ function GraphiqueBarres({
 
 /** Le mois en grille : un jour coloré est un jour d'entraînement, le toucher montre la séance. */
 function Calendrier({ seances, aujourdhui }: { seances: Seance[]; aujourdhui: string }) {
+  const { langue, t } = useLangue();
   const moisCourant = debutDeMois(aujourdhui);
   const [mois, setMois] = useState(moisCourant);
   const [jour, setJour] = useState<string | null>(null);
@@ -634,18 +688,24 @@ function Calendrier({ seances, aujourdhui }: { seances: Seance[]; aujourdhui: st
   return (
     <Carte>
       <TitreSection
-        titre="Jour par jour"
-        action={`${duMois.length} séance${duMois.length > 1 ? "s" : ""}`}
+        titre={t("Jour par jour", "Day by day")}
+        action={compteSeances(duMois.length, langue)}
       />
 
       <div className="boite p-4">
         <div className="mb-3 flex items-center justify-between">
-          <BoutonFleche libelle="Mois précédent" disabled={false} onClick={() => changerDeMois(-1)}>
+          <BoutonFleche
+            libelle={t("Mois précédent", "Previous month")}
+            disabled={false}
+            onClick={() => changerDeMois(-1)}
+          >
             <IconeChevronGauche className="h-[18px] w-[18px]" />
           </BoutonFleche>
-          <p className="text-[15px] font-semibold first-letter:uppercase">{libelleMois(mois)}</p>
+          <p className="text-[15px] font-semibold first-letter:uppercase">
+            {libelleMois(mois, langue)}
+          </p>
           <BoutonFleche
-            libelle="Mois suivant"
+            libelle={t("Mois suivant", "Next month")}
             disabled={mois >= moisCourant}
             onClick={() => changerDeMois(1)}
           >
@@ -654,7 +714,7 @@ function Calendrier({ seances, aujourdhui }: { seances: Seance[]; aujourdhui: st
         </div>
 
         <div className="grid grid-cols-7 gap-1">
-          {JOURS_COURTS.map((l, i) => (
+          {joursCourts(langue).map((l, i) => (
             <span key={i} className="pb-1 text-center text-[11px] font-semibold text-brume">
               {l}
             </span>
@@ -673,7 +733,7 @@ function Calendrier({ seances, aujourdhui }: { seances: Seance[]; aujourdhui: st
                 type="button"
                 disabled={!actif}
                 aria-pressed={actif ? choisi : undefined}
-                aria-label={`${libelleDate(date)}${actif ? ", séance" : ""}`}
+                aria-label={`${libelleDate(date, langue)}${actif ? t(", séance", ", workout") : ""}`}
                 onClick={() => setJour(choisi ? null : date)}
                 className={`chiffres flex h-10 items-center justify-center rounded-doux text-[14px] transition-colors ${
                   actif
@@ -694,8 +754,11 @@ function Calendrier({ seances, aujourdhui }: { seances: Seance[]; aujourdhui: st
         {choisies.length === 0 && (
           <p className="mt-4 text-[13px] text-brume">
             {duMois.length > 0
-              ? "Touche un jour en couleur pour revoir la séance."
-              : "Aucune séance ce mois-ci."}
+              ? t(
+                  "Touche un jour en couleur pour revoir la séance.",
+                  "Tap a coloured day to see its workout.",
+                )
+              : t("Aucune séance ce mois-ci.", "No workouts this month.")}
           </p>
         )}
       </div>

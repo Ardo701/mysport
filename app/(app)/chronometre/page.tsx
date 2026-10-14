@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, type ComponentProps } from "react";
+import type { Texte } from "@/convex/data/langues";
+import { useLangue } from "@/composants/langue";
 import { Bouton, Carte, Champ, EnTetePage, Message, TitreSection } from "@/composants/ui";
 import {
   LIMITES,
@@ -215,40 +217,44 @@ function Reglage({
   onChange: (r: Reglages) => void;
   onDemarrer: () => void;
 }) {
+  const { t } = useLangue();
   const { effort, pause, tours } = reglages;
   const total = tours * effort + Math.max(0, tours - 1) * pause;
   const probleme =
     effort === 0
-      ? "Donne au moins une seconde à l'effort."
+      ? t("Donne au moins une seconde à l'effort.", "Give the work phase at least one second.")
       : tours === 0
-        ? "Il faut au moins un tour."
+        ? t("Il faut au moins un tour.", "You need at least one round.")
         : null;
 
   return (
     <div>
       <EnTetePage
-        surtitre="Minuteur d'intervalles"
-        titre="Chronomètre"
-        detail="Un temps d'effort, un temps de pause, autant de tours que tu veux. Ça sonne à chaque changement, avec un décompte sur les trois dernières secondes."
+        surtitre={t("Minuteur d'intervalles", "Interval timer")}
+        titre={t("Chronomètre", "Timer")}
+        detail={t(
+          "Un temps d'effort, un temps de pause, autant de tours que tu veux. Ça sonne à chaque changement, avec un décompte sur les trois dernières secondes.",
+          "A work time, a rest time, as many rounds as you like. It beeps at every change, with a countdown over the last three seconds.",
+        )}
       />
 
       <Carte className="lg:max-w-[560px]">
-        <TitreSection titre="Réglages" />
+        <TitreSection titre={t("Réglages", "Settings")} />
 
         <div className="boite space-y-4 p-4">
           <ChampDuree
-            libelle="Effort"
+            libelle={t("Effort", "Work")}
             secondes={effort}
             onChange={(s) => onChange({ ...reglages, effort: s })}
           />
           <ChampDuree
-            libelle="Pause"
+            libelle={t("Pause", "Rest")}
             secondes={pause}
             onChange={(s) => onChange({ ...reglages, pause: s })}
           />
           <ChampNombre
-            libelle="Tours"
-            suffixe="tours"
+            libelle={t("Tours", "Rounds")}
+            suffixe={t("tours", "rounds")}
             valeur={tours}
             max={LIMITES.toursMax}
             onValeur={(n) => onChange({ ...reglages, tours: n })}
@@ -257,16 +263,19 @@ function Reglage({
 
         <div className="boite mt-3 flex items-end justify-between gap-4 p-4">
           <div>
-            <p className="text-[13px] font-medium text-brume">Durée totale</p>
+            <p className="text-[13px] font-medium text-brume">{t("Durée totale", "Total time")}</p>
             <p className="titre mt-1 text-[32px] font-bold leading-none">
               {formaterDuree(total)}
             </p>
           </div>
           {/* Les deux écarts au calcul de tête, dits avant qu'on les découvre. */}
           <p className="text-right text-[12px] leading-relaxed text-brume">
-            + {PREPARATION_S} s pour te mettre en place
+            {t(
+              `+ ${PREPARATION_S} s pour te mettre en place`,
+              `+ ${PREPARATION_S} s to get in position`,
+            )}
             <br />
-            pas de pause après le dernier tour
+            {t("pas de pause après le dernier tour", "no rest after the last round")}
           </p>
         </div>
 
@@ -278,22 +287,24 @@ function Reglage({
           disabled={probleme !== null}
           onClick={onDemarrer}
         >
-          Démarrer
+          {t("Démarrer", "Start")}
         </Bouton>
 
         <p className="mt-3 text-[12px] leading-relaxed text-brume">
-          Sur iPhone, le son suit le bouton silencieux : s&apos;il est enclenché, le
-          minuteur ne sonnera pas. L&apos;écran reste allumé jusqu&apos;à la fin.
+          {t(
+            "Sur iPhone, le son suit le bouton silencieux : s'il est enclenché, le minuteur ne sonnera pas. L'écran reste allumé jusqu'à la fin.",
+            "On iPhone, the sound follows the silent switch: if it is on, the timer will not beep. The screen stays on until the end.",
+          )}
         </p>
       </Carte>
     </div>
   );
 }
 
-const LIBELLES: Record<TypePhase, string> = {
-  preparation: "En place",
-  effort: "Effort",
-  pause: "Pause",
+const LIBELLES: Record<TypePhase, Texte> = {
+  preparation: { fr: "En place", en: "Get ready" },
+  effort: { fr: "Effort", en: "Work" },
+  pause: { fr: "Pause", en: "Rest" },
 };
 
 /**
@@ -319,6 +330,7 @@ function Decompte({
   onPasser: () => void;
   onArreter: () => void;
 }) {
+  const { langue, t } = useLangue();
   const position = situer(course.phases, ecouleMs);
   if (!position) return null;
 
@@ -333,11 +345,14 @@ function Decompte({
       <div className="flex items-center justify-between gap-4">
         <p className="text-[14px] font-semibold">
           {phase.type === "preparation"
-            ? "Avant le premier tour"
-            : `Tour ${phase.tour} / ${course.tours}`}
+            ? t("Avant le premier tour", "Before the first round")
+            : t(`Tour ${phase.tour} / ${course.tours}`, `Round ${phase.tour} / ${course.tours}`)}
         </p>
         <p className="chiffres text-[13px] text-brume">
-          reste {formaterDuree(Math.ceil(totalRestant))}
+          {t(
+            `reste ${formaterDuree(Math.ceil(totalRestant))}`,
+            `${formaterDuree(Math.ceil(totalRestant))} left`,
+          )}
         </p>
       </div>
 
@@ -345,7 +360,7 @@ function Decompte({
         aria-live="polite"
         className={`titre mt-10 text-[44px] font-bold leading-none tracking-[-0.03em] lg:text-[56px] ${COULEURS[phase.type].texte}`}
       >
-        {enPause ? "En pause" : LIBELLES[phase.type]}
+        {enPause ? t("En pause", "Paused") : LIBELLES[phase.type][langue]}
       </p>
 
       <p
@@ -389,19 +404,22 @@ function Decompte({
 
       <p className="mt-5 text-[13px] text-brume">
         {suivante
-          ? `Ensuite : ${LIBELLES[suivante.type].toLowerCase()}, ${formaterDuree(suivante.duree)}`
-          : "Dernière ligne droite."}
+          ? t(
+              `Ensuite : ${LIBELLES[suivante.type].fr.toLowerCase()}, ${formaterDuree(suivante.duree)}`,
+              `Next: ${LIBELLES[suivante.type].en.toLowerCase()}, ${formaterDuree(suivante.duree)}`,
+            )
+          : t("Dernière ligne droite.", "Home stretch.")}
       </p>
 
       <div className="mt-10 grid grid-cols-[1.4fr_1fr_1fr] gap-2">
         <Bouton taille="large" onClick={onPause}>
-          {enPause ? "Reprendre" : "Pause"}
+          {enPause ? t("Reprendre", "Resume") : t("Pause", "Pause")}
         </Bouton>
         <Bouton taille="large" variante="secondaire" onClick={onPasser}>
-          Passer
+          {t("Passer", "Skip")}
         </Bouton>
         <Bouton taille="large" variante="fantome" onClick={onArreter}>
-          Arrêter
+          {t("Arrêter", "Stop")}
         </Bouton>
       </div>
     </div>
@@ -417,27 +435,33 @@ function Fin({
   onRecommencer: () => void;
   onModifier: () => void;
 }) {
+  const { t } = useLangue();
   const effort = course.phases.find((p) => p.type === "effort");
   const total = dureeTotale(course.phases) - PREPARATION_S;
 
   return (
     <div className="mx-auto max-w-[640px] lg:pt-4">
-      <p className="text-[14px] font-semibold">Terminé</p>
+      <p className="text-[14px] font-semibold">{t("Terminé", "Done")}</p>
       <p className="titre mt-10 text-[44px] font-bold leading-none tracking-[-0.03em] text-accent-texte lg:text-[56px]">
-        Bien joué.
+        {t("Bien joué.", "Well done.")}
       </p>
       <p className="mt-4 text-[15px] leading-relaxed text-brume">
-        {course.tours} {course.tours > 1 ? "tours" : "tour"}
-        {effort ? ` de ${formaterDuree(effort.duree)} d'effort` : ""}, {formaterDuree(total)}{" "}
-        au total.
+        {t(
+          `${course.tours} ${course.tours > 1 ? "tours" : "tour"}${
+            effort ? ` de ${formaterDuree(effort.duree)} d'effort` : ""
+          }, ${formaterDuree(total)} au total.`,
+          `${course.tours} ${course.tours > 1 ? "rounds" : "round"}${
+            effort ? ` of ${formaterDuree(effort.duree)} work` : ""
+          }, ${formaterDuree(total)} in total.`,
+        )}
       </p>
 
       <div className="mt-10 grid grid-cols-2 gap-2">
         <Bouton taille="large" onClick={onRecommencer}>
-          Recommencer
+          {t("Recommencer", "Go again")}
         </Bouton>
         <Bouton taille="large" variante="secondaire" onClick={onModifier}>
-          Modifier
+          {t("Modifier", "Edit")}
         </Bouton>
       </div>
     </div>
@@ -453,6 +477,7 @@ function ChampDuree({
   secondes: number;
   onChange: (secondes: number) => void;
 }) {
+  const { t } = useLangue();
   const minutes = Math.floor(secondes / 60);
   const reste = secondes % 60;
   return (
@@ -467,7 +492,7 @@ function ChampDuree({
           onValeur={(m) => onChange(m * 60 + reste)}
         />
         <ChampNombre
-          aria-label={`${libelle}, secondes`}
+          aria-label={t(`${libelle}, secondes`, `${libelle}, seconds`)}
           suffixe="s"
           valeur={reste}
           max={59}

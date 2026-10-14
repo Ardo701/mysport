@@ -26,8 +26,8 @@
 
 <br>
 
-> The app's interface is in French. The code identifiers and comments are in
-> French too.
+> The interface is in French and English. The code identifiers and comments
+> are in French.
 
 ## What it does
 
@@ -36,9 +36,8 @@
   cardio, sports, mobility). Sets, reps, equipment and load are optional, as is
   the distance for cardio. An exercise missing from the catalog can be added by
   name.
-- **How it felt.** Two optional scales, before the workout (from "à fond",
-  fired up, to "fatigué", tired) and after (from "au top", great, to "vidé",
-  drained).
+- **How it felt.** Two optional scales, before the workout (from "pumped" to
+  "tired") and after (from "great" to "drained").
 - **Statistics.** Week by week: calories burned compared with the previous
   week, calories day by day, and each day with its workouts or its rest. Over a
   month, 3 months, a year or the whole history: averages, one bar per week, the
@@ -50,7 +49,33 @@
 - **Weight.** Dated weigh-ins, logged from the profile. Each workout is
   estimated with the weight you had on that day.
 - **App.** Installable on a phone's home screen or on a computer, where it
-  opens in its own window. Dark or light theme.
+  opens in its own window. Dark or light theme, French or English.
+
+## Languages
+
+The app follows the device's language: French on a phone set to French,
+English everywhere else. The profile has a switch, and so does the sign-in
+page, and the choice is remembered on that device.
+
+There is no translation library. Each piece of text sits where it is
+displayed, French first and English second:
+
+```tsx
+const { t, langue } = useLangue();
+<TitreSection titre={t("Cette semaine", "This week")} />
+```
+
+so a translation is read next to its original, and a text without one does
+not compile. Dates and numbers go through `Intl` with `fr-FR` or `en-GB`
+(Monday-first weeks and kilos, like the rest of the app). Catalog data
+carries both languages: every exercise has a French and an English name, as
+do the muscle groups, the equipment and the feelings. Workouts store the
+exercise's id, so a workout logged in French reads in English.
+
+The pages are prerendered in French. On an English device, a script at the
+top of the page sets `lang="en"` before the first render and keeps the page
+hidden until React has rewritten it, so the French never flashes by
+([`composants/langue.tsx`](composants/langue.tsx)).
 
 ## How calories are estimated
 
@@ -140,7 +165,7 @@ app/
   connexion/        sign-in
 composants/         UI: buttons, selectors, lists, exercise picker
 convex/
-  data/             exercise and feeling catalogs
+  data/             exercise and feeling catalogs, in both languages
   lib/              calories, weight on a date, session
   seances.ts        reading and saving workouts
   pesees.ts         weigh-ins, and recalculating the workouts they affect

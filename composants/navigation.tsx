@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { Texte } from "@/convex/data/langues";
 import {
   IconeAccueil,
   IconeCalendrier,
@@ -9,41 +10,50 @@ import {
   IconeCourbe,
   IconeProfil,
 } from "./icones";
+import { useLangue } from "./langue";
 import { BasculeTheme } from "./theme";
 
 type Onglet = {
   href: string;
-  libelle: string;
+  libelle: Texte;
   Icone: (p: { className?: string }) => React.ReactElement;
 };
 
 /** Les cinq destinations du pouce : toute l'application tient dans la barre. */
 const ONGLETS: Onglet[] = [
-  { href: "/", libelle: "Aujourd'hui", Icone: IconeAccueil },
-  { href: "/journal", libelle: "Journal", Icone: IconeCalendrier },
-  { href: "/statistiques", libelle: "Stats", Icone: IconeCourbe },
-  { href: "/chronometre", libelle: "Chrono", Icone: IconeChrono },
-  { href: "/profil", libelle: "Profil", Icone: IconeProfil },
+  { href: "/", libelle: { fr: "Aujourd'hui", en: "Today" }, Icone: IconeAccueil },
+  { href: "/journal", libelle: { fr: "Journal", en: "Log" }, Icone: IconeCalendrier },
+  { href: "/statistiques", libelle: { fr: "Stats", en: "Stats" }, Icone: IconeCourbe },
+  { href: "/chronometre", libelle: { fr: "Chrono", en: "Timer" }, Icone: IconeChrono },
+  { href: "/profil", libelle: { fr: "Profil", en: "Profile" }, Icone: IconeProfil },
 ];
 
 /**
  * Sur grand écran, les mêmes pages, rangées par usage : ce qu'on fait pendant
  * l'entraînement, et ce qu'on relit après.
  */
-const GROUPES: { titre: string; onglets: Onglet[] }[] = [
+const GROUPES: { titre: Texte; onglets: Onglet[] }[] = [
   {
-    titre: "Entraînement",
+    titre: { fr: "Entraînement", en: "Training" },
     onglets: [
-      { href: "/", libelle: "Tableau de bord", Icone: IconeAccueil },
-      { href: "/journal", libelle: "Journal", Icone: IconeCalendrier },
-      { href: "/chronometre", libelle: "Chronomètre", Icone: IconeChrono },
+      { href: "/", libelle: { fr: "Tableau de bord", en: "Dashboard" }, Icone: IconeAccueil },
+      { href: "/journal", libelle: { fr: "Journal", en: "Log" }, Icone: IconeCalendrier },
+      {
+        href: "/chronometre",
+        libelle: { fr: "Chronomètre", en: "Interval timer" },
+        Icone: IconeChrono,
+      },
     ],
   },
   {
-    titre: "Suivi",
+    titre: { fr: "Suivi", en: "Progress" },
     onglets: [
-      { href: "/statistiques", libelle: "Statistiques", Icone: IconeCourbe },
-      { href: "/profil", libelle: "Profil", Icone: IconeProfil },
+      {
+        href: "/statistiques",
+        libelle: { fr: "Statistiques", en: "Statistics" },
+        Icone: IconeCourbe,
+      },
+      { href: "/profil", libelle: { fr: "Profil", en: "Profile" }, Icone: IconeProfil },
     ],
   },
 ];
@@ -58,6 +68,7 @@ function estActif(chemin: string, href: string) {
 /** Navigation basse, réservée au téléphone et à la tablette en portrait. */
 export function BarreNavigation() {
   const chemin = usePathname();
+  const { langue } = useLangue();
 
   return (
     <nav
@@ -86,7 +97,7 @@ export function BarreNavigation() {
                     actif ? "font-semibold text-encre" : "font-medium text-brume"
                   }`}
                 >
-                  {libelle}
+                  {libelle[langue]}
                 </span>
               </Link>
             </li>
@@ -100,18 +111,21 @@ export function BarreNavigation() {
 /** Colonne de navigation fixe, affichée à partir du format ordinateur. */
 export function BarreLaterale({ prenom }: { prenom?: string }) {
   const chemin = usePathname();
+  const { langue, t } = useLangue();
 
   return (
     <aside className="fixed inset-y-0 left-0 z-40 hidden w-[248px] flex-col border-r border-trait bg-surface lg:flex">
       <div className="px-6 pb-6 pt-8">
         <p className="titre text-[22px] font-bold leading-none">MySport</p>
-        <p className="mt-1.5 text-[12px] text-brume">Journal d&apos;entraînement</p>
+        <p className="mt-1.5 text-[12px] text-brume">
+          {t("Journal d'entraînement", "Training log")}
+        </p>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 py-2">
         {GROUPES.map((groupe) => (
-          <div key={groupe.titre} className="mb-6 last:mb-0">
-            <p className="surtitre mb-1.5 px-3">{groupe.titre}</p>
+          <div key={groupe.titre.fr} className="mb-6 last:mb-0">
+            <p className="surtitre mb-1.5 px-3">{groupe.titre[langue]}</p>
             <ul className="space-y-0.5">
               {groupe.onglets.map(({ href, libelle, Icone }) => {
                 const actif = estActif(chemin, href);
@@ -129,7 +143,7 @@ export function BarreLaterale({ prenom }: { prenom?: string }) {
                       <Icone
                         className={`h-[18px] w-[18px] shrink-0 ${actif ? "text-accent-texte" : ""}`}
                       />
-                      {libelle}
+                      {libelle[langue]}
                     </Link>
                   </li>
                 );

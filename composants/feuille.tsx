@@ -2,6 +2,7 @@
 
 import { useEffect, type ReactNode } from "react";
 import { IconeCroix } from "./icones";
+import { useLangue } from "./langue";
 
 /** Panneau glissant depuis le bas, adapté à une utilisation au pouce. */
 export function Feuille({
@@ -17,6 +18,8 @@ export function Feuille({
   surtitre?: string;
   children: ReactNode;
 }) {
+  const { t } = useLangue();
+
   useEffect(() => {
     if (!ouverte) return;
     const precedent = document.body.style.overflow;
@@ -36,7 +39,7 @@ export function Feuille({
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end lg:justify-center lg:p-8">
       <button
-        aria-label="Fermer"
+        aria-label={t("Fermer", "Close")}
         onClick={onFermer}
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
       />
@@ -53,7 +56,7 @@ export function Feuille({
           </div>
           <button
             onClick={onFermer}
-            aria-label="Fermer"
+            aria-label={t("Fermer", "Close")}
             className="-mr-2 -mt-1.5 flex h-9 w-9 items-center justify-center rounded-doux text-brume transition-colors hover:bg-creux hover:text-encre"
           >
             <IconeCroix className="h-5 w-5" />

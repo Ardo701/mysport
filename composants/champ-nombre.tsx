@@ -1,16 +1,19 @@
 "use client";
 
 import { useEffect, useState, type ComponentProps } from "react";
+import { useLangue } from "./langue";
 import { Champ } from "./ui";
 
 /**
- * Champ numérique facultatif, qui tolère d'être vide et accepte la virgule.
+ * Champ numérique facultatif, qui tolère d'être vide et accepte la virgule
+ * comme le point. Il écrit les décimales à la manière de la langue : 72,5 en
+ * français, 72.5 en anglais.
  *
  * Calé directement sur la valeur, il réécrirait le chiffre en place à chaque
  * frappe : impossible de vider le champ, et « 2, » redeviendrait « 2 » avant
  * qu'on ait tapé la décimale. Le texte tapé vit donc à part, et ne se recale
- * que lorsque la valeur change pour une autre raison — séance rechargée, ou
- * nombre ramené sous son plafond.
+ * que lorsque la valeur change pour une autre raison : séance rechargée,
+ * nombre ramené sous son plafond, ou langue changée.
  */
 export function ChampNombre({
   valeur,
@@ -24,11 +27,19 @@ export function ChampNombre({
   max: number;
   decimales?: boolean;
 }) {
-  const [texte, setTexte] = useState(valeur === undefined ? "" : formater(valeur));
+  const { langue } = useLangue();
+  const separateur = langue === "fr" ? "," : ".";
+  const [texte, setTexte] = useState(valeur === undefined ? "" : formater(valeur, separateur));
 
   useEffect(() => {
-    setTexte((t) => (lire(t) === valeur ? t : valeur === undefined ? "" : formater(valeur)));
-  }, [valeur]);
+    setTexte((t) =>
+      lire(t) === valeur && !t.includes(separateur === "," ? "." : ",")
+        ? t
+        : valeur === undefined
+          ? ""
+          : formater(valeur, separateur),
+    );
+  }, [valeur, separateur]);
 
   return (
     <Champ
@@ -38,9 +49,9 @@ export function ChampNombre({
       value={texte}
       onFocus={(e) => e.currentTarget.select()}
       onChange={(e) => {
-        const brut = e.target.value.replace(".", ",");
+        const brut = e.target.value.replace(/[.,]/g, separateur);
         const filtre = decimales
-          ? brut.replace(/[^\d,]/g, "").replace(/,(?=.*,)/g, "")
+          ? brut.replace(/[^\d.,]/g, "").replace(/[.,](?=.*[.,])/g, "")
           : brut.replace(/\D/g, "");
         setTexte(filtre);
         const n = lire(filtre);
@@ -55,6 +66,6 @@ function lire(texte: string): number | undefined {
   return Number.isFinite(n) ? n : undefined;
 }
 
-function formater(n: number): string {
-  return String(n).replace(".", ",");
+function formater(n: number, separateur: string): string {
+  return String(n).replace(".", separateur);
 }

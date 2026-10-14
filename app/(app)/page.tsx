@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { api } from "@/convex/_generated/api";
 import { GrilleStats, Stat } from "@/composants/jauges";
 import { IconeChevronDroite, IconeChrono, IconePlus } from "@/composants/icones";
+import { useLangue, type Langue } from "@/composants/langue";
 import { LigneSeance } from "@/composants/seance";
 import {
   BoutonLien,
@@ -17,18 +18,20 @@ import {
   TitreSection,
 } from "@/composants/ui";
 import {
-  JOURS_COURTS,
   ajouterJours,
   aujourdhuiISO,
+  joursCourts,
   libelleDate,
   lundiDeLaSemaine,
 } from "@/lib/dates";
 import { entre, libelleDuree, nombre, totaux } from "@/lib/seances";
 
-function salutation() {
+function salutation(langue: Langue) {
   const h = new Date().getHours();
-  if (h < 5 || h >= 18) return "Bonsoir";
-  return "Bonjour";
+  if (langue === "fr") return h < 5 || h >= 18 ? "Bonsoir" : "Bonjour";
+  if (h >= 5 && h < 12) return "Good morning";
+  if (h >= 12 && h < 18) return "Good afternoon";
+  return "Good evening";
 }
 
 export default function PageAccueil() {
@@ -37,6 +40,7 @@ export default function PageAccueil() {
   const [aujourdhui, setAujourdhui] = useState<string | null>(null);
   useEffect(() => setAujourdhui(aujourdhuiISO()), []);
 
+  const { langue, t } = useLangue();
   const profil = useQuery(api.profils.monProfil);
   const seances = useQuery(api.seances.mesSeances);
 
@@ -54,17 +58,17 @@ export default function PageAccueil() {
   return (
     <div>
       <EnTetePage
-        surtitre={libelleDate(aujourdhui)}
-        titre={`${salutation()}, ${profil.prenom}`}
+        surtitre={libelleDate(aujourdhui, langue)}
+        titre={`${salutation(langue)}, ${profil.prenom}`}
       />
 
       <Colonnes>
         <Colonne>
           <Carte>
-            <TitreSection titre="Cette semaine" />
+            <TitreSection titre={t("Cette semaine", "This week")} />
             <div className="boite p-4">
               <div className="grid grid-cols-7 gap-1.5">
-                {JOURS_COURTS.map((lettre, i) => {
+                {joursCourts(langue).map((lettre, i) => {
                   const jour = ajouterJours(lundi, i);
                   const actif = joursActifs.has(jour);
                   const estAujourdhui = jour === aujourdhui;
@@ -79,7 +83,7 @@ export default function PageAccueil() {
                         {Number(jour.slice(8))}
                       </span>
                       <span
-                        aria-label={actif ? "séance" : undefined}
+                        aria-label={actif ? t("séance", "workout") : undefined}
                         className={`mt-1 h-1.5 w-full rounded-full ${actif ? "bg-accent" : "bg-piste"}`}
                       />
                     </div>
@@ -88,9 +92,15 @@ export default function PageAccueil() {
               </div>
               <div className="mt-4 grid grid-cols-3 border-t border-trait pt-3.5">
                 {[
-                  { libelle: "séances", valeur: String(semaine.seances) },
-                  { libelle: "de sport", valeur: libelleDuree(semaine.dureeMin) },
-                  { libelle: "kcal", valeur: semaine.kcal.toLocaleString("fr-FR") },
+                  {
+                    libelle:
+                      langue === "fr"
+                        ? semaine.seances > 1 ? "séances" : "séance"
+                        : semaine.seances === 1 ? "workout" : "workouts",
+                    valeur: String(semaine.seances),
+                  },
+                  { libelle: t("de sport", "of exercise"), valeur: libelleDuree(semaine.dureeMin, langue) },
+                  { libelle: "kcal", valeur: nombre(semaine.kcal, langue) },
                 ].map((s, i) => (
                   <div key={s.libelle} className={i > 0 ? "border-l border-trait pl-3.5" : ""}>
                     <p className="titre text-[22px] font-semibold leading-tight">{s.valeur}</p>
@@ -103,24 +113,26 @@ export default function PageAccueil() {
 
           <BoutonLien href="/seance" taille="large">
             <IconePlus className="h-[18px] w-[18px]" />
-            Ajouter une séance
+            {t("Ajouter une séance", "Add a workout")}
           </BoutonLien>
 
           <Carte>
             <TitreSection
-              titre="Dernières séances"
+              titre={t("Dernières séances", "Latest workouts")}
               action={
                 seances.length > 0 ? (
                   <Link href="/journal" className="transition-colors hover:text-encre">
-                    Tout le journal
+                    {t("Tout le journal", "Full log")}
                   </Link>
                 ) : undefined
               }
             />
             {seances.length === 0 ? (
               <p className="boite px-4 py-4 text-[13px] leading-relaxed text-brume">
-                Rien pour l&apos;instant. Chaque séance notée alimente le journal et
-                les statistiques.
+                {t(
+                  "Rien pour l'instant. Chaque séance notée alimente le journal et les statistiques.",
+                  "Nothing yet. Every workout you log feeds the log and the statistics.",
+                )}
               </p>
             ) : (
               <div className="boite divide-y divide-trait overflow-hidden">
@@ -135,36 +147,39 @@ export default function PageAccueil() {
         <Colonne>
           <Carte>
             <TitreSection
-              titre="30 derniers jours"
+              titre={t("30 derniers jours", "Last 30 days")}
               action={
                 <Link href="/statistiques" className="transition-colors hover:text-encre">
-                  Statistiques
+                  {t("Statistiques", "Statistics")}
                 </Link>
               }
             />
             {recent.seances === 0 ? (
               <p className="boite px-4 py-4 text-[13px] leading-relaxed text-brume">
-                Les moyennes apparaîtront après ta première séance.
+                {t(
+                  "Les moyennes apparaîtront après ta première séance.",
+                  "Averages will show up after your first workout.",
+                )}
               </p>
             ) : (
               <GrilleStats>
                 <Stat
-                  libelle="Par séance"
-                  valeur={Math.round(recent.kcal / recent.seances).toLocaleString("fr-FR")}
+                  libelle={t("Par séance", "Per workout")}
+                  valeur={nombre(Math.round(recent.kcal / recent.seances), langue)}
                   unite="kcal"
                 />
                 <Stat
-                  libelle="Par semaine"
-                  valeur={Math.round(recent.kcal / semainesRecentes).toLocaleString("fr-FR")}
+                  libelle={t("Par semaine", "Per week")}
+                  valeur={nombre(Math.round(recent.kcal / semainesRecentes), langue)}
                   unite="kcal"
                 />
                 <Stat
-                  libelle="Séances par semaine"
-                  valeur={nombre(recent.seances / semainesRecentes)}
+                  libelle={t("Séances par semaine", "Workouts per week")}
+                  valeur={nombre(recent.seances / semainesRecentes, langue)}
                 />
                 <Stat
-                  libelle="Durée moyenne"
-                  valeur={libelleDuree(recent.dureeMin / recent.seances)}
+                  libelle={t("Durée moyenne", "Average duration")}
+                  valeur={libelleDuree(recent.dureeMin / recent.seances, langue)}
                 />
               </GrilleStats>
             )}
@@ -175,7 +190,9 @@ export default function PageAccueil() {
             className="boite flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-creux"
           >
             <IconeChrono className="h-5 w-5 text-accent-texte" />
-            <span className="flex-1 text-[15px] font-medium">Chronomètre d&apos;intervalles</span>
+            <span className="flex-1 text-[15px] font-medium">
+              {t("Chronomètre d'intervalles", "Interval timer")}
+            </span>
             <IconeChevronDroite className="h-4 w-4 text-brume" />
           </Link>
         </Colonne>

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { DM_Sans, Outfit } from "next/font/google";
 import "./globals.css";
 import { Fournisseurs } from "./fournisseurs";
+import { SCRIPT_LANGUE } from "@/composants/langue";
 import { SCRIPT_THEME } from "@/composants/theme";
 
 /* Outfit pour les titres et les chiffres, DM Sans pour le texte. */
@@ -20,7 +21,9 @@ const policeCorps = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "MySport — journal d'entraînement",
+  // Le titre ne dépend pas de la langue : il est écrit au build, avant que
+  // l'appareil ait dit laquelle il parle.
+  title: "MySport",
   description:
     "Journal des séances de sport : exercices, temps passé et calories dépensées, avec un chronomètre d'intervalles.",
   applicationName: "MySport",
@@ -40,16 +43,19 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    // Le script de thème écrit data-theme sur cette balise avant que React ne
-    // s'hydrate : l'écart est voulu, React n'a pas à le signaler.
+    // Les scripts d'amorçage écrivent data-theme et lang sur cette balise
+    // avant que React ne s'hydrate : l'écart est voulu, React n'a pas à le
+    // signaler.
     <html
       lang="fr"
       className={`${policeTitre.variable} ${policeCorps.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="grain min-h-full">
-        {/* Avant tout le reste : le thème doit être posé avant le premier rendu. */}
+        {/* Avant tout le reste : thème et langue doivent être posés avant le
+            premier rendu. */}
         <script dangerouslySetInnerHTML={{ __html: SCRIPT_THEME }} />
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_LANGUE }} />
         <Fournisseurs>{children}</Fournisseurs>
       </body>
     </html>

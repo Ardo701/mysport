@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
+import { useLangue } from "./langue";
 
 /**
  * Groupe de contenu : un titre, puis ce qu'il annonce. Ne dessine rien
@@ -129,8 +130,8 @@ export function Champ({
  * compris sur fond sombre.
  *
  * Facultatif, un choix se retire en touchant à nouveau l'option retenue. À
- * cinq colonnes — une échelle tenue sur une ligne de téléphone —, les
- * libellés se centrent et les marges se resserrent.
+ * cinq colonnes, une échelle tenue sur une ligne de téléphone, les libellés
+ * se centrent et les marges se resserrent.
  */
 export function GroupeOptions<T extends string>({
   libelle,
@@ -252,11 +253,12 @@ export function Etiquette({
   );
 }
 
-export function Chargement({ texte = "Chargement" }: { texte?: string }) {
+export function Chargement({ texte }: { texte?: string }) {
+  const { t } = useLangue();
   return (
     <div className="flex items-center gap-2.5 py-8 text-[13px] text-brume">
       <span className="pulsation h-2 w-2 rounded-full bg-accent" />
-      {texte}…
+      {texte ?? t("Chargement", "Loading")}…
     </div>
   );
 }

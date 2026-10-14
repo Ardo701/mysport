@@ -10,6 +10,7 @@ import {
   ID_PERSO,
   MATERIELS,
   exerciceDuCatalogue,
+  libelleGroupe,
   materielParDefaut,
   type Materiel,
 } from "@/convex/data/exercices";
@@ -24,6 +25,7 @@ import {
 import { ChampNombre } from "@/composants/champ-nombre";
 import { ChoixExercices, type ExerciceChoisi } from "@/composants/choix-exercices";
 import { IconeChevronDroite, IconeChevronGauche, IconeCroix, IconePlus } from "@/composants/icones";
+import { useLangue } from "@/composants/langue";
 import {
   Bouton,
   BoutonLien,
@@ -36,10 +38,7 @@ import {
   TitreSection,
 } from "@/composants/ui";
 import { aujourdhuiISO, libelleRelatif } from "@/lib/dates";
-import { libelleDuree, nombre, type ExerciceSaisi } from "@/lib/seances";
-
-const OPTIONS_AVANT = RESSENTIS_AVANT.map((r) => ({ valeur: r.cle, libelle: r.libelle }));
-const OPTIONS_APRES = RESSENTIS_APRES.map((r) => ({ valeur: r.cle, libelle: r.libelle }));
+import { libelleDuree, nombre, nomExercice, type ExerciceSaisi } from "@/lib/seances";
 
 /** Un exercice en cours de saisie ; la clé ne sert qu'à React et n'est pas enregistrée. */
 type Ligne = ExerciceSaisi & { cle: string };
@@ -58,6 +57,7 @@ export default function PageSeance() {
 }
 
 function Formulaire() {
+  const { langue, t } = useLangue();
   const id = useSearchParams().get("id");
   const router = useRouter();
 
@@ -109,11 +109,11 @@ function Formulaire() {
     return (
       <EtatVide
         className="lg:max-w-[640px]"
-        titre="Séance introuvable"
-        detail="Elle a peut-être été supprimée."
+        titre={t("Séance introuvable", "Workout not found")}
+        detail={t("Elle a peut-être été supprimée.", "It may have been deleted.")}
         action={
           <BoutonLien href="/journal" variante="secondaire">
-            Retour au journal
+            {t("Retour au journal", "Back to the log")}
           </BoutonLien>
         }
       />
@@ -158,7 +158,12 @@ function Formulaire() {
       });
       router.push("/journal");
     } catch {
-      setErreur("L'enregistrement a échoué. Vérifie ta connexion et réessaie.");
+      setErreur(
+        t(
+          "L'enregistrement a échoué. Vérifie ta connexion et réessaie.",
+          "Saving failed. Check your connection and try again.",
+        ),
+      );
       setEnvoi(false);
     }
   }
@@ -178,18 +183,20 @@ function Formulaire() {
             className="mb-3 inline-flex items-center gap-1 text-[14px] font-medium text-brume transition-colors hover:text-encre"
           >
             <IconeChevronGauche className="h-4 w-4" />
-            Journal
+            {t("Journal", "Log")}
           </Link>
         }
-        surtitre={date ? libelleRelatif(date) : undefined}
-        titre={existante ? "Modifier la séance" : "Nouvelle séance"}
+        surtitre={date ? libelleRelatif(date, langue) : undefined}
+        titre={
+          existante ? t("Modifier la séance", "Edit workout") : t("Nouvelle séance", "New workout")
+        }
       />
 
       <div className="space-y-8">
         <div className="boite p-4">
           <div className="grid grid-cols-2 gap-3">
             <label className="block">
-              <span className="surtitre mb-2 block">Date</span>
+              <span className="surtitre mb-2 block">{t("Date", "Date")}</span>
               <input
                 type="date"
                 value={date}
@@ -199,7 +206,7 @@ function Formulaire() {
               />
             </label>
             <ChampNombre
-              libelle="Durée"
+              libelle={t("Durée", "Duration")}
               suffixe="min"
               placeholder="45"
               valeur={dureeMin}
@@ -209,22 +216,26 @@ function Formulaire() {
           </div>
           {connue && duree > (dureeMin ?? 0) && (
             <p className="mt-2.5 text-[12px] leading-relaxed text-brume">
-              Comptée {libelleDuree(duree)} : les exercices notés prennent plus de
-              temps que la durée saisie.
+              {t(
+                `Comptée ${libelleDuree(duree, langue)} : les exercices notés prennent plus de temps que la durée saisie.`,
+                `Counted as ${libelleDuree(duree, langue)}: the exercises logged take longer than the duration entered.`,
+              )}
             </p>
           )}
         </div>
 
         <Carte>
           <TitreSection
-            titre="Exercices"
+            titre={t("Exercices", "Exercises")}
             action={lignes.length > 0 ? <span className="chiffres">{lignes.length}</span> : undefined}
           />
 
           {lignes.length === 0 ? (
             <p className="boite mb-3 px-4 py-4 text-[13px] leading-relaxed text-brume">
-              Ajoute ce que tu as fait. Le détail (séries, charges, distance) est
-              facultatif, mais il affine l&apos;estimation des calories.
+              {t(
+                "Ajoute ce que tu as fait. Le détail (séries, charges, distance) est facultatif, mais il affine l'estimation des calories.",
+                "Add what you did. The details (sets, loads, distance) are optional, but they sharpen the calorie estimate.",
+              )}
             </p>
           ) : (
             <ul className="boite mb-3 divide-y divide-trait">
@@ -245,62 +256,72 @@ function Formulaire() {
             onClick={() => setChoixOuvert(true)}
           >
             <IconePlus className="h-[18px] w-[18px]" />
-            Ajouter des exercices
+            {t("Ajouter des exercices", "Add exercises")}
           </Bouton>
         </Carte>
 
         <Carte>
-          <TitreSection titre="Ressenti" action="facultatif" />
+          <TitreSection titre={t("Ressenti", "How it felt")} action={t("facultatif", "optional")} />
           <div className="boite space-y-4 p-4">
             <GroupeOptions
-              libelle="Avant la séance"
-              options={OPTIONS_AVANT}
+              libelle={t("Avant la séance", "Before the workout")}
+              options={RESSENTIS_AVANT.map((r) => ({ valeur: r.cle, libelle: r.libelle[langue] }))}
               valeur={ressentiAvant}
               onChange={setRessentiAvant}
               colonnes={5}
               facultatif
             />
             <GroupeOptions
-              libelle="Après la séance"
-              options={OPTIONS_APRES}
+              libelle={t("Après la séance", "After the workout")}
+              options={RESSENTIS_APRES.map((r) => ({ valeur: r.cle, libelle: r.libelle[langue] }))}
               valeur={ressentiApres}
               onChange={setRessentiApres}
               colonnes={5}
               facultatif
             />
             <p className="text-[12px] text-brume">
-              Touche à nouveau un choix pour l&apos;effacer.
+              {t("Touche à nouveau un choix pour l'effacer.", "Tap a choice again to clear it.")}
             </p>
           </div>
         </Carte>
 
         <Carte>
-          <TitreSection titre="Notes" action="facultatif" />
+          <TitreSection titre={t("Notes", "Notes")} action={t("facultatif", "optional")} />
           <textarea
-            aria-label="Notes"
+            aria-label={t("Notes", "Notes")}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
-            placeholder="Sensations, douleur, record…"
+            placeholder={t("Sensations, douleur, record…", "How you felt, any pain, a record…")}
             className="champ resize-none !font-sans"
           />
         </Carte>
 
         <div>
           <div className="boite p-4">
-            <p className="text-[13px] font-medium text-brume">Calories dépensées</p>
+            <p className="text-[13px] font-medium text-brume">
+              {t("Calories dépensées", "Calories burned")}
+            </p>
             <p className="titre mt-1 text-[32px] font-bold leading-none">
-              {connue ? kcal.toLocaleString("fr-FR") : "—"}
+              {connue ? nombre(kcal, langue) : "—"}
               <span className="ml-1.5 text-[14px] font-medium text-brume">kcal</span>
             </p>
             <p className="mt-2 text-[12px] leading-relaxed text-brume">
-              Selon les exercices, les séries, la durée et ton poids à cette date
-              {poidsKg !== undefined && ` (${nombre(poidsKg)} kg)`}.
+              {t(
+                "Selon les exercices, les séries, la durée et ton poids à cette date",
+                "Based on the exercises, the sets, the duration and your weight on that date",
+              )}
+              {poidsKg !== undefined && ` (${nombre(poidsKg, langue)} kg)`}.
             </p>
           </div>
 
           {!connue && (
-            <Message className="mt-3">Indique la durée de la séance pour l&apos;enregistrer.</Message>
+            <Message className="mt-3">
+              {t(
+                "Indique la durée de la séance pour l'enregistrer.",
+                "Enter the workout's duration to save it.",
+              )}
+            </Message>
           )}
           {erreur && <Message ton="erreur" className="mt-3">{erreur}</Message>}
 
@@ -310,7 +331,11 @@ function Formulaire() {
             disabled={envoi || !connue || !date}
             onClick={valider}
           >
-            {envoi ? "Enregistrement…" : existante ? "Enregistrer les modifications" : "Enregistrer la séance"}
+            {envoi
+              ? t("Enregistrement…", "Saving…")
+              : existante
+                ? t("Enregistrer les modifications", "Save changes")
+                : t("Enregistrer la séance", "Save workout")}
           </Bouton>
 
           {existante && (
@@ -323,7 +348,9 @@ function Formulaire() {
                 confirmerSuppression ? effacer(existante._id) : setConfirmerSuppression(true)
               }
             >
-              {confirmerSuppression ? "Confirmer la suppression" : "Supprimer la séance"}
+              {confirmerSuppression
+                ? t("Confirmer la suppression", "Confirm deletion")
+                : t("Supprimer la séance", "Delete workout")}
             </Bouton>
           )}
         </div>
@@ -348,6 +375,8 @@ function LigneExercice({
   onModifier: (champs: Partial<ExerciceSaisi>) => void;
   onRetirer: () => void;
 }) {
+  const { langue, t } = useLangue();
+  const nom = nomExercice(ligne, langue);
   const catalogue = ligne.exerciceId === ID_PERSO ? undefined : exerciceDuCatalogue(ligne.exerciceId);
   // La distance n'a de sens que pour ce qui avance : une course, une sortie à
   // vélo. Pour un match de foot ou une séance de yoga, le champ serait du bruit.
@@ -357,13 +386,15 @@ function LigneExercice({
     <li className="px-4 py-3.5">
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
-          <p className="text-[15px] font-semibold leading-snug">{ligne.nom}</p>
-          <p className="mt-0.5 text-[12px] text-brume">{catalogue?.groupe ?? "Hors liste"}</p>
+          <p className="text-[15px] font-semibold leading-snug">{nom}</p>
+          <p className="mt-0.5 text-[12px] text-brume">
+            {catalogue ? libelleGroupe(catalogue.groupe, langue) : t("Hors liste", "Not in the list")}
+          </p>
         </div>
         <button
           type="button"
           onClick={onRetirer}
-          aria-label={`Retirer ${ligne.nom}`}
+          aria-label={t(`Retirer ${nom}`, `Remove ${nom}`)}
           className="-mr-2 -mt-1 flex h-9 w-9 items-center justify-center rounded-doux text-brume transition-colors hover:bg-creux hover:text-rouge"
         >
           <IconeCroix className="h-4 w-4" />
@@ -373,18 +404,18 @@ function LigneExercice({
       {ligne.mesure === "duree" ? (
         <div className="grid grid-cols-2 gap-2">
           <ChampNombre
-            aria-label={`${ligne.nom}, durée`}
+            aria-label={t(`${nom}, durée`, `${nom}, duration`)}
             suffixe="min"
-            placeholder="Durée"
+            placeholder={t("Durée", "Duration")}
             valeur={ligne.dureeMin}
             max={600}
             onValeur={(n) => onModifier({ dureeMin: n })}
           />
           {avecDistance && (
             <ChampNombre
-              aria-label={`${ligne.nom}, distance`}
+              aria-label={`${nom}, distance`}
               suffixe="km"
-              placeholder="Distance"
+              placeholder={t("Distance", "Distance")}
               decimales
               valeur={ligne.distanceKm}
               max={500}
@@ -395,8 +426,8 @@ function LigneExercice({
       ) : (
         <div className="grid grid-cols-2 gap-2">
           <ChampNombre
-            aria-label={`${ligne.nom}, séries`}
-            suffixe="séries"
+            aria-label={t(`${nom}, séries`, `${nom}, sets`)}
+            suffixe={t("séries", "sets")}
             placeholder="3"
             valeur={ligne.series}
             max={99}
@@ -404,7 +435,7 @@ function LigneExercice({
           />
           {ligne.mesure === "series" ? (
             <ChampNombre
-              aria-label={`${ligne.nom}, répétitions`}
+              aria-label={t(`${nom}, répétitions`, `${nom}, reps`)}
               suffixe="reps"
               placeholder="10"
               valeur={ligne.repetitions}
@@ -413,7 +444,7 @@ function LigneExercice({
             />
           ) : (
             <ChampNombre
-              aria-label={`${ligne.nom}, secondes par série`}
+              aria-label={t(`${nom}, secondes par série`, `${nom}, seconds per set`)}
               suffixe="s"
               placeholder="45"
               valeur={ligne.secondes}
@@ -426,7 +457,7 @@ function LigneExercice({
               n'apparaît qu'avec du matériel, et la liste prend alors la
               moitié de la ligne pour le lui laisser. */}
           <ChoixMateriel
-            nom={ligne.nom}
+            nom={nom}
             valeur={ligne.materiel ?? "poids-du-corps"}
             className={ligne.materiel === "poids-du-corps" ? "col-span-2" : ""}
             onChange={(materiel) =>
@@ -439,9 +470,15 @@ function LigneExercice({
           />
           {ligne.materiel !== "poids-du-corps" && (
             <ChampNombre
-              aria-label={`${ligne.nom}, ${ligne.materiel === "lest" ? "lest" : "charge"}`}
+              aria-label={
+                ligne.materiel === "lest"
+                  ? t(`${nom}, lest`, `${nom}, added load`)
+                  : t(`${nom}, charge`, `${nom}, load`)
+              }
               suffixe="kg"
-              placeholder={ligne.materiel === "lest" ? "Lest" : "Charge"}
+              placeholder={
+                ligne.materiel === "lest" ? t("Lest", "Added") : t("Charge", "Load")
+              }
               decimales
               valeur={ligne.chargeKg}
               max={999}
@@ -465,17 +502,18 @@ function ChoixMateriel({
   onChange: (m: Materiel) => void;
   className?: string;
 }) {
+  const { langue, t } = useLangue();
   return (
     <label className={`relative block ${className}`}>
       <select
-        aria-label={`${nom}, matériel`}
+        aria-label={t(`${nom}, matériel`, `${nom}, equipment`)}
         value={valeur}
         onChange={(e) => onChange(e.target.value as Materiel)}
         className="champ appearance-none truncate !pr-9 !font-sans"
       >
         {MATERIELS.map((m) => (
           <option key={m.cle} value={m.cle}>
-            {m.libelle}
+            {m.libelle[langue]}
           </option>
         ))}
       </select>

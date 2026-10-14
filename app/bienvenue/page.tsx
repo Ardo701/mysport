@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { api } from "@/convex/_generated/api";
 import { POIDS_MAX, poidsValide } from "@/convex/lib/poids";
 import { ChampNombre } from "@/composants/champ-nombre";
+import { useLangue } from "@/composants/langue";
 import { Bouton, Champ, Chargement, Message } from "@/composants/ui";
 import { aujourdhuiISO } from "@/lib/dates";
 
@@ -16,6 +17,7 @@ import { aujourdhuiISO } from "@/lib/dates";
  * reste se déduit des séances qu'on note ensuite.
  */
 export default function PageBienvenue() {
+  const { t } = useLangue();
   const { isLoading, isAuthenticated } = useConvexAuth();
   const profil = useQuery(api.profils.monProfil, isAuthenticated ? {} : "skip");
   const creerProfil = useMutation(api.profils.creerProfil);
@@ -47,10 +49,14 @@ export default function PageBienvenue() {
     setErreur(null);
     setEnCours(true);
     try {
-      await creerProfil({ prenom: prenom.trim() || "Toi", poidsKg, date: aujourdhuiISO() });
+      await creerProfil({
+        prenom: prenom.trim() || t("Toi", "You"),
+        poidsKg,
+        date: aujourdhuiISO(),
+      });
       router.replace("/");
     } catch {
-      setErreur("L'enregistrement a échoué. Réessaie dans un instant.");
+      setErreur(t("L'enregistrement a échoué. Réessaie dans un instant.", "Saving failed. Try again in a moment."));
       setEnCours(false);
     }
   }
@@ -58,22 +64,22 @@ export default function PageBienvenue() {
   return (
     <main className="mx-auto min-h-dvh max-w-[560px] px-6 pb-10 pt-[max(3rem,env(safe-area-inset-top))] lg:pb-16 lg:pt-16">
       <header className="mb-8">
-        <p className="mb-1.5 text-[13px] font-medium text-brume">Bienvenue</p>
+        <p className="mb-1.5 text-[13px] font-medium text-brume">{t("Bienvenue", "Welcome")}</p>
         <h1 className="titre text-[30px] font-bold leading-[1.05]">
-          Deux questions, et c&apos;est parti
+          {t("Deux questions, et c'est parti", "Two questions, and you're in")}
         </h1>
       </header>
 
       <div className="apparition boite space-y-3.5 p-5">
         <Champ
-          libelle="Prénom"
+          libelle={t("Prénom", "First name")}
           value={prenom}
           onChange={(e) => setPrenom(e.target.value)}
-          placeholder="Comment on t'appelle ?"
+          placeholder={t("Comment on t'appelle ?", "What should we call you?")}
           className="!font-sans"
         />
         <ChampNombre
-          libelle="Poids"
+          libelle={t("Poids", "Weight")}
           suffixe="kg"
           placeholder="80"
           decimales
@@ -82,8 +88,10 @@ export default function PageBienvenue() {
           onValeur={setPoidsKg}
         />
         <p className="text-[12px] leading-relaxed text-brume">
-          Le poids sert uniquement à estimer les calories dépensées pendant tes
-          séances. Tu pourras noter son évolution depuis le profil.
+          {t(
+            "Le poids sert uniquement à estimer les calories dépensées pendant tes séances. Tu pourras noter son évolution depuis le profil.",
+            "Your weight is only used to estimate the calories burned during your workouts. You can log how it changes from your profile.",
+          )}
         </p>
       </div>
 
@@ -95,7 +103,7 @@ export default function PageBienvenue() {
         disabled={enCours || !poidsValide(poidsKg)}
         onClick={commencer}
       >
-        {enCours ? "Un instant…" : "Commencer"}
+        {enCours ? t("Un instant…", "One moment…") : t("Commencer", "Get started")}
       </Bouton>
     </main>
   );

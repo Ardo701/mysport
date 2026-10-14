@@ -3,21 +3,29 @@
 import { useEffect, useMemo, useState } from "react";
 import { Feuille } from "./feuille";
 import { IconeCoche } from "./icones";
+import { useLangue } from "./langue";
 import { Bouton } from "./ui";
 import {
   EXERCICES,
   GROUPES,
   ID_PERSO,
+  libelleGroupe,
   type Groupe,
   type Mesure,
 } from "@/convex/data/exercices";
+import type { Texte } from "@/convex/data/langues";
 
+/**
+ * `nom` est le nom enregistré : le français pour un exercice du catalogue,
+ * qui s'affiche ensuite dans la langue de l'interface ; le nom tapé pour un
+ * exercice hors liste.
+ */
 export type ExerciceChoisi = { exerciceId: string; nom: string; mesure: Mesure };
 
-const LIBELLE_MESURE: Record<Mesure, string> = {
-  series: "séries",
-  maintien: "en secondes",
-  duree: "durée",
+const LIBELLE_MESURE: Record<Mesure, Texte> = {
+  series: { fr: "séries", en: "sets" },
+  maintien: { fr: "en secondes", en: "timed hold" },
+  duree: { fr: "durée", en: "duration" },
 };
 
 /** Sans accents ni majuscules : « developpe » doit trouver « Développé ». */
@@ -41,6 +49,7 @@ export function ChoixExercices({
   onFermer: () => void;
   onAjouter: (exercices: ExerciceChoisi[]) => void;
 }) {
+  const { langue, t } = useLangue();
   const [recherche, setRecherche] = useState("");
   const [groupe, setGroupe] = useState<Groupe | null>(null);
   const [selection, setSelection] = useState<ExerciceChoisi[]>([]);
@@ -57,9 +66,9 @@ export function ChoixExercices({
     return EXERCICES.filter(
       (e) =>
         (groupe === null || e.groupe === groupe) &&
-        mots.every((m) => normaliser(e.nom).includes(m)),
+        mots.every((m) => normaliser(e.nom[langue]).includes(m)),
     );
-  }, [recherche, groupe]);
+  }, [recherche, groupe, langue]);
 
   // Regroupés dans l'ordre du catalogue, pour qu'on parcoure la liste comme
   // on parcourt une salle : les pectoraux ensemble, le cardio ensemble.
@@ -82,14 +91,18 @@ export function ChoixExercices({
   const nomLibre = recherche.trim();
 
   return (
-    <Feuille ouverte={ouverte} onFermer={onFermer} titre="Ajouter des exercices">
+    <Feuille
+      ouverte={ouverte}
+      onFermer={onFermer}
+      titre={t("Ajouter des exercices", "Add exercises")}
+    >
       <input
         type="search"
         value={recherche}
         onChange={(e) => setRecherche(e.target.value)}
-        placeholder="Rechercher : squat, course, pompes…"
+        placeholder={t("Rechercher : squat, course, pompes…", "Search: squat, running, push-ups…")}
         className="champ !font-sans"
-        aria-label="Rechercher un exercice"
+        aria-label={t("Rechercher un exercice", "Search for an exercise")}
       />
 
       <div className="-mx-5 mt-3 flex gap-1.5 overflow-x-auto px-5 pb-1">
@@ -105,7 +118,7 @@ export function ChoixExercices({
                 : "bg-creux font-medium text-brume hover:text-encre"
             }`}
           >
-            {g ?? "Tous"}
+            {g === null ? t("Tous", "All") : libelleGroupe(g, langue)}
           </button>
         ))}
       </div>
@@ -113,16 +126,16 @@ export function ChoixExercices({
       <div className="mt-4 space-y-6">
         {parGroupe.map(({ groupe: g, exercices }) => (
           <div key={g}>
-            <p className="mb-1 text-[13px] font-semibold">{g}</p>
+            <p className="mb-1 text-[13px] font-semibold">{libelleGroupe(g, langue)}</p>
             <ul>
               {exercices.map((e) => {
-                const actif = choisi(e.id, e.nom);
+                const actif = choisi(e.id, e.nom.fr);
                 return (
                   <li key={e.id}>
                     <button
                       type="button"
                       aria-pressed={actif}
-                      onClick={() => basculer({ exerciceId: e.id, nom: e.nom, mesure: e.mesure })}
+                      onClick={() => basculer({ exerciceId: e.id, nom: e.nom.fr, mesure: e.mesure })}
                       className="flex w-full items-center gap-3 border-t border-trait py-3 text-left"
                     >
                       <span
@@ -133,10 +146,10 @@ export function ChoixExercices({
                         {actif && <IconeCoche className="h-3.5 w-3.5" />}
                       </span>
                       <span className={`flex-1 text-[15px] ${actif ? "font-semibold" : ""}`}>
-                        {e.nom}
+                        {e.nom[langue]}
                       </span>
                       <span className="text-[12px] text-brume">
-                        {LIBELLE_MESURE[e.mesure]}
+                        {LIBELLE_MESURE[e.mesure][langue]}
                       </span>
                     </button>
                   </li>
@@ -149,8 +162,17 @@ export function ChoixExercices({
         {nomLibre && (
           <div className="rounded-boite bg-creux px-4 py-4">
             <p className="text-[13px] text-brume">
-              {trouves.length === 0 ? "Rien dans la liste pour " : "Pas tout à fait ça ? Ajoute "}
-              <span className="text-encre">« {nomLibre} »</span> tel quel.
+              {langue === "fr" ? (
+                <>
+                  {trouves.length === 0 ? "Rien dans la liste pour " : "Pas tout à fait ça ? Ajoute "}
+                  <span className="text-encre">« {nomLibre} »</span> tel quel.
+                </>
+              ) : (
+                <>
+                  {trouves.length === 0 ? "Nothing in the list for " : "Not quite it? Add "}
+                  <span className="text-encre">“{nomLibre}”</span> as is.
+                </>
+              )}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {(["series", "duree"] as const).map((mesure) => (
@@ -163,7 +185,7 @@ export function ChoixExercices({
                     setRecherche("");
                   }}
                 >
-                  {mesure === "series" ? "En séries" : "En durée"}
+                  {mesure === "series" ? t("En séries", "As sets") : t("En durée", "As duration")}
                 </Bouton>
               ))}
             </div>
@@ -175,7 +197,7 @@ export function ChoixExercices({
           ne le verrait plus qu'au compteur du bouton. */}
       {selection.some((s) => s.exerciceId === ID_PERSO) && (
         <div className="mt-6">
-          <p className="mb-1 text-[13px] font-semibold">Hors liste</p>
+          <p className="mb-1 text-[13px] font-semibold">{t("Hors liste", "Not in the list")}</p>
           <ul>
             {selection
               .filter((s) => s.exerciceId === ID_PERSO)
@@ -192,7 +214,7 @@ export function ChoixExercices({
                     </span>
                     <span className="flex-1 text-[15px] font-semibold">{s.nom}</span>
                     <span className="text-[12px] text-brume">
-                      {LIBELLE_MESURE[s.mesure]}
+                      {LIBELLE_MESURE[s.mesure][langue]}
                     </span>
                   </button>
                 </li>
@@ -211,8 +233,11 @@ export function ChoixExercices({
           }}
         >
           {selection.length === 0
-            ? "Coche un ou plusieurs exercices"
-            : `Ajouter ${selection.length} exercice${selection.length > 1 ? "s" : ""}`}
+            ? t("Coche un ou plusieurs exercices", "Tick one or more exercises")
+            : t(
+                `Ajouter ${selection.length} exercice${selection.length > 1 ? "s" : ""}`,
+                `Add ${selection.length} exercise${selection.length > 1 ? "s" : ""}`,
+              )}
         </Bouton>
       </div>
     </Feuille>

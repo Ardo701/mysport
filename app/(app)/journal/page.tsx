@@ -3,6 +3,7 @@
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { IconePlus } from "@/composants/icones";
+import { useLangue } from "@/composants/langue";
 import { LigneSeance } from "@/composants/seance";
 import {
   ActionTete,
@@ -14,9 +15,10 @@ import {
   TitreSection,
 } from "@/composants/ui";
 import { libelleMois } from "@/lib/dates";
-import { totaux, type Seance } from "@/lib/seances";
+import { compteSeances, nombre, totaux, type Seance } from "@/lib/seances";
 
 export default function PageJournal() {
+  const { langue, t } = useLangue();
   const seances = useQuery(api.seances.mesSeances);
   if (seances === undefined) return <Chargement />;
 
@@ -30,7 +32,7 @@ export default function PageJournal() {
   }
 
   const ajouter = (
-    <ActionTete href="/seance" libelle="Ajouter une séance">
+    <ActionTete href="/seance" libelle={t("Ajouter une séance", "Add a workout")}>
       <IconePlus className="h-[22px] w-[22px]" />
     </ActionTete>
   );
@@ -38,32 +40,31 @@ export default function PageJournal() {
   return (
     <div className="lg:max-w-[640px]">
       <EnTetePage
-        surtitre={
-          seances.length > 0
-            ? `${seances.length} séance${seances.length > 1 ? "s" : ""}`
-            : undefined
-        }
-        titre="Journal"
+        surtitre={seances.length > 0 ? compteSeances(seances.length, langue) : undefined}
+        titre={t("Journal", "Log")}
         action={seances.length > 0 ? ajouter : undefined}
       />
 
       {seances.length === 0 ? (
         <EtatVide
-          titre="Aucune séance pour l'instant"
-          detail="Note ta première séance : ce que tu as fait, combien de temps. Les statistiques se construisent à partir de là."
-          action={<BoutonLien href="/seance">Ajouter une séance</BoutonLien>}
+          titre={t("Aucune séance pour l'instant", "No workouts yet")}
+          detail={t(
+            "Note ta première séance : ce que tu as fait, combien de temps. Les statistiques se construisent à partir de là.",
+            "Log your first workout: what you did, and for how long. The statistics build up from there.",
+          )}
+          action={<BoutonLien href="/seance">{t("Ajouter une séance", "Add a workout")}</BoutonLien>}
         />
       ) : (
         <div className="space-y-8">
           {mois.map(({ cle, seances: duMois }) => {
-            const t = totaux(duMois);
+            const total = totaux(duMois);
             return (
               <Carte key={cle}>
                 <TitreSection
-                  titre={libelleMois(`${cle}-01`)}
+                  titre={libelleMois(`${cle}-01`, langue)}
                   action={
                     <span className="chiffres">
-                      {t.seances} séance{t.seances > 1 ? "s" : ""} · {t.kcal.toLocaleString("fr-FR")} kcal
+                      {compteSeances(total.seances, langue)} · {nombre(total.kcal, langue)} kcal
                     </span>
                   }
                 />

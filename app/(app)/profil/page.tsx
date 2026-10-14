@@ -10,6 +10,7 @@ import { POIDS_MAX, poidsValide } from "@/convex/lib/poids";
 import { ChampNombre } from "@/composants/champ-nombre";
 import { ChiffreVedette } from "@/composants/jauges";
 import { IconeFleche } from "@/composants/icones";
+import { BasculeLangue, useLangue, type Langue } from "@/composants/langue";
 import { BasculeTheme } from "@/composants/theme";
 import {
   Bouton,
@@ -26,6 +27,7 @@ import { aujourdhuiISO, libelleDateCourt, libelleJour } from "@/lib/dates";
 import { nombre } from "@/lib/seances";
 
 export default function PageProfil() {
+  const { t } = useLangue();
   const profil = useQuery(api.profils.monProfil);
   const pesees = useQuery(api.pesees.mesPesees);
   const enregistrerProfil = useMutation(api.profils.enregistrerProfil);
@@ -63,10 +65,10 @@ export default function PageProfil() {
           <CartePoids pesees={pesees} />
 
           <Carte>
-            <TitreSection titre="Profil" />
+            <TitreSection titre={t("Profil", "Profile")} />
             <div className="boite p-4">
               <Champ
-                libelle="Prénom"
+                libelle={t("Prénom", "First name")}
                 value={prenom}
                 onChange={(e) => {
                   setPrenom(e.target.value);
@@ -81,14 +83,19 @@ export default function PageProfil() {
                 disabled={!modifie || etat === "envoi"}
                 onClick={sauvegarder}
               >
-                {etat === "envoi" ? "Enregistrement…" : "Enregistrer"}
+                {etat === "envoi" ? t("Enregistrement…", "Saving…") : t("Enregistrer", "Save")}
               </Bouton>
               {etat === "enregistre" && (
-                <Message ton="succes" className="mt-3">Profil enregistré.</Message>
+                <Message ton="succes" className="mt-3">
+                  {t("Profil enregistré.", "Profile saved.")}
+                </Message>
               )}
               {etat === "erreur" && (
                 <Message ton="erreur" className="mt-3">
-                  L&apos;enregistrement a échoué. Réessaie dans un instant.
+                  {t(
+                    "L'enregistrement a échoué. Réessaie dans un instant.",
+                    "Saving failed. Try again in a moment.",
+                  )}
                 </Message>
               )}
             </div>
@@ -96,13 +103,27 @@ export default function PageProfil() {
         </Colonne>
 
         <Colonne>
+          <Carte>
+            <TitreSection titre={t("Langue", "Language")} />
+            <BasculeLangue />
+            <p className="mt-2.5 text-[12px] leading-relaxed text-brume">
+              {t(
+                "Par défaut, celle du téléphone. Le choix reste sur cet appareil.",
+                "By default, your phone's language. The choice stays on this device.",
+              )}
+            </p>
+          </Carte>
+
           {/* Sur ordinateur la bascule vit dans la barre latérale ; le
               téléphone n'en a pas, il lui faut donc son propre accès. */}
           <Carte className="lg:hidden">
-            <TitreSection titre="Thème" />
+            <TitreSection titre={t("Thème", "Theme")} />
             <BasculeTheme />
             <p className="mt-2.5 text-[12px] leading-relaxed text-brume">
-              Le choix reste sur cet appareil, et sur celui-là seulement.
+              {t(
+                "Le choix reste sur cet appareil, et sur celui-là seulement.",
+                "The choice stays on this device, and this one only.",
+              )}
             </p>
           </Carte>
 
@@ -113,15 +134,17 @@ export default function PageProfil() {
             }}
             className="boite flex w-full items-center justify-between px-4 py-3.5 text-[15px] font-medium text-rouge transition-colors hover:bg-creux"
           >
-            Se déconnecter
+            {t("Se déconnecter", "Sign out")}
             <IconeFleche className="h-4 w-4" />
           </button>
         </Colonne>
       </Colonnes>
 
       <p className="mt-10 max-w-[62ch] text-[12px] leading-relaxed text-brume">
-        MySport · les calories sont une estimation à partir de valeurs moyennes
-        par activité, pas une mesure.
+        {t(
+          "MySport · les calories sont une estimation à partir de valeurs moyennes par activité, pas une mesure.",
+          "MySport · calories are an estimate based on average values per activity, not a measurement.",
+        )}
       </p>
     </div>
   );
@@ -136,6 +159,7 @@ const PESEES_VISIBLES = 6;
  * corriger ou la supprimer.
  */
 function CartePoids({ pesees }: { pesees: Doc<"pesees">[] }) {
+  const { langue, t } = useLangue();
   const enregistrer = useMutation(api.pesees.enregistrer);
   const supprimer = useMutation(api.pesees.supprimer);
 
@@ -195,15 +219,24 @@ function CartePoids({ pesees }: { pesees: Doc<"pesees">[] }) {
   return (
     <Carte>
       {actuelle && (
-        <ChiffreVedette libelle="Poids actuel" valeur={nombre(actuelle.poidsKg)} unite="kg">
-          <p className="mt-2 text-[13px] text-brume">Pesée du {libelleJour(actuelle.date)}</p>
+        <ChiffreVedette
+          libelle={t("Poids actuel", "Current weight")}
+          valeur={nombre(actuelle.poidsKg, langue)}
+          unite="kg"
+        >
+          <p className="mt-2 text-[13px] text-brume">
+            {t(
+              `Pesée du ${libelleJour(actuelle.date, langue)}`,
+              `Weighed on ${libelleJour(actuelle.date, langue)}`,
+            )}
+          </p>
         </ChiffreVedette>
       )}
 
       <div className="boite mt-6 p-4">
         <div className="grid grid-cols-2 gap-3">
           <label className="block">
-            <span className="surtitre mb-2 block">Date</span>
+            <span className="surtitre mb-2 block">{t("Date", "Date")}</span>
             <input
               type="date"
               value={date}
@@ -216,10 +249,10 @@ function CartePoids({ pesees }: { pesees: Doc<"pesees">[] }) {
             />
           </label>
           <ChampNombre
-            libelle="Poids"
+            libelle={t("Poids", "Weight")}
             suffixe="kg"
             decimales
-            placeholder={actuelle ? nombre(actuelle.poidsKg) : "80"}
+            placeholder={actuelle ? nombre(actuelle.poidsKg, langue) : "80"}
             valeur={poidsKg}
             max={POIDS_MAX}
             onValeur={(n) => {
@@ -236,10 +269,13 @@ function CartePoids({ pesees }: { pesees: Doc<"pesees">[] }) {
           onClick={valider}
         >
           {etat.cle === "envoi"
-            ? "Enregistrement…"
+            ? t("Enregistrement…", "Saving…")
             : existante
-              ? `Remplacer la pesée du ${libelleDateCourt(date)}`
-              : "Ajouter la pesée"}
+              ? t(
+                  `Remplacer la pesée du ${libelleDateCourt(date, langue)}`,
+                  `Replace the ${libelleDateCourt(date, langue)} weigh-in`,
+                )
+              : t("Ajouter la pesée", "Add weigh-in")}
         </Bouton>
         {aSupprimer && pesees.length > 1 && (
           <Bouton
@@ -249,35 +285,44 @@ function CartePoids({ pesees }: { pesees: Doc<"pesees">[] }) {
             disabled={etat.cle === "envoi"}
             onClick={effacer}
           >
-            Supprimer cette pesée
+            {t("Supprimer cette pesée", "Delete this weigh-in")}
           </Bouton>
         )}
 
         {etat.cle === "enregistre" && (
           <Message ton="succes" className="mt-3">
-            Pesée enregistrée.{texteRecalcul(etat.recalculees)}
+            {t("Pesée enregistrée.", "Weigh-in saved.")}
+            {texteRecalcul(etat.recalculees, langue)}
           </Message>
         )}
         {etat.cle === "supprime" && (
           <Message ton="succes" className="mt-3">
-            Pesée supprimée.{texteRecalcul(etat.recalculees)}
+            {t("Pesée supprimée.", "Weigh-in deleted.")}
+            {texteRecalcul(etat.recalculees, langue)}
           </Message>
         )}
         {etat.cle === "erreur" && (
           <Message ton="erreur" className="mt-3">
-            L&apos;enregistrement a échoué. Réessaie dans un instant.
+            {t(
+              "L'enregistrement a échoué. Réessaie dans un instant.",
+              "Saving failed. Try again in a moment.",
+            )}
           </Message>
         )}
 
         <p className="mt-3 text-[12px] leading-relaxed text-brume">
-          Chaque séance compte avec le poids de sa date : la dernière pesée faite
-          ce jour-là ou avant. Une pesée ajoutée ou corrigée dans le passé
-          recalcule les séances qu&apos;elle concerne.
+          {t(
+            "Chaque séance compte avec le poids de sa date : la dernière pesée faite ce jour-là ou avant. Une pesée ajoutée ou corrigée dans le passé recalcule les séances qu'elle concerne.",
+            "Each workout uses the weight on its date: the last weigh-in on or before that day. Adding or correcting a past weigh-in recalculates the workouts it affects.",
+          )}
         </p>
       </div>
 
       <div className="mt-8">
-        <TitreSection titre="Historique" action="touche une pesée pour la corriger" />
+        <TitreSection
+          titre={t("Historique", "History")}
+          action={t("touche une pesée pour la corriger", "tap a weigh-in to correct it")}
+        />
         <ul className="boite divide-y divide-trait overflow-hidden">
           {visibles.map((p) => {
             // La suivante dans la liste est la pesée précédente dans le temps.
@@ -294,12 +339,12 @@ function CartePoids({ pesees }: { pesees: Doc<"pesees">[] }) {
                     choisie ? "bg-creux" : ""
                   }`}
                 >
-                  <span className="flex-1 text-[14px]">{libelleJour(p.date)}</span>
+                  <span className="flex-1 text-[14px]">{libelleJour(p.date, langue)}</span>
                   <span className="chiffres w-14 text-right text-[13px] text-brume">
-                    {ecart === null || ecart === 0 ? "" : ecartSigne(ecart)}
+                    {ecart === null || ecart === 0 ? "" : ecartSigne(ecart, langue)}
                   </span>
                   <span className="titre w-16 text-right text-[15px] font-semibold">
-                    {nombre(p.poidsKg)} kg
+                    {nombre(p.poidsKg, langue)} kg
                   </span>
                 </button>
               </li>
@@ -312,7 +357,12 @@ function CartePoids({ pesees }: { pesees: Doc<"pesees">[] }) {
                 onClick={() => setToutVoir((v) => !v)}
                 className="w-full px-4 py-3 text-left text-[13px] font-medium text-accent-texte transition-colors hover:bg-creux"
               >
-                {toutVoir ? "Replier" : `Voir les ${pesees.length - PESEES_VISIBLES} plus anciennes`}
+                {toutVoir
+                  ? t("Replier", "Show less")
+                  : t(
+                      `Voir les ${pesees.length - PESEES_VISIBLES} plus anciennes`,
+                      `Show ${pesees.length - PESEES_VISIBLES} older`,
+                    )}
               </button>
             </li>
           )}
@@ -323,11 +373,12 @@ function CartePoids({ pesees }: { pesees: Doc<"pesees">[] }) {
 }
 
 /** +0,5 ou −1,2 : le vrai signe moins, de la largeur du plus. */
-function ecartSigne(ecart: number) {
-  return `${ecart > 0 ? "+" : "−"}${nombre(Math.abs(ecart))}`;
+function ecartSigne(ecart: number, langue: Langue) {
+  return `${ecart > 0 ? "+" : "−"}${nombre(Math.abs(ecart), langue)}`;
 }
 
-function texteRecalcul(n: number) {
+function texteRecalcul(n: number, langue: Langue) {
   if (n === 0) return "";
+  if (langue === "en") return n === 1 ? " 1 workout recalculated." : ` ${n} workouts recalculated.`;
   return n === 1 ? " 1 séance recalculée." : ` ${n} séances recalculées.`;
 }
