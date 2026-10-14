@@ -1,4 +1,4 @@
-# Cadence
+# MySport
 
 Journal d'entraînement personnel. On note après coup ce qu'on a fait — les
 exercices, le temps passé —, et l'application en tire le reste : quel jour on
@@ -18,6 +18,8 @@ deux colonnes à partir de 1024 px.
 - **Chronomètre** — minuteur d'intervalles : temps d'effort, temps de pause,
   nombre de tours. Il sonne à chaque changement, avec un décompte sur les trois
   dernières secondes, et garde l'écran allumé jusqu'à la fin.
+- **Poids** — noté au fil du temps depuis le profil, une pesée datée à la fois.
+  Chaque séance s'estime avec le poids de sa date.
 
 ## Calories
 
@@ -41,10 +43,14 @@ le levier principal.
 
 Le calcul vit dans `convex/lib/calories.ts`, que le serveur applique à
 l'enregistrement et l'écran de saisie à chaque frappe : le chiffre annoncé
-avant d'enregistrer est celui qui s'affiche ensuite. Il est figé avec la
-séance, au poids du moment, que la séance garde : changer son poids dans le
-profil ne réécrit pas les séances passées, et une formule corrigée peut les
-recalculer avec le poids qui était le leur.
+avant d'enregistrer est celui qui s'affiche ensuite.
+
+Le poids retenu est celui **de la date de la séance** : la dernière pesée faite
+ce jour-là ou avant, ou la toute première pour une séance plus ancienne que
+toutes les pesées (`convex/lib/poids.ts`). Une pesée plus récente ne touche donc
+pas les séances passées ; une pesée ajoutée, corrigée ou supprimée dans le passé
+recalcule les séances qu'elle concerne. Chaque séance garde le poids qui a servi
+à son estimation.
 
 ## Pile technique
 
@@ -117,13 +123,14 @@ de build de Vercel le dit explicitement.
 app/
   (app)/          pages connectées : tableau de bord, journal, saisie d'une
                   séance, statistiques, chronomètre, profil
-  bienvenue/      premier passage : prénom et poids
+  bienvenue/      premier passage : prénom et première pesée
   connexion/      connexion
 composants/       interface : sélecteur d'exercices, feuille glissante, champs…
 convex/
   data/           catalogue des exercices, avec leur MET
-  lib/            estimation des calories, session
+  lib/            estimation des calories, poids à une date, session
   seances.ts      lecture et enregistrement des séances
+  pesees.ts       pesées, et recalcul des séances qu'elles touchent
   schema.ts       modèle de données
 lib/              utilitaires côté client : dates, totaux, minuteur, sons
 scripts/          déploiement Vercel, clés d'authentification, icônes
@@ -196,6 +203,12 @@ compte est refusée côté serveur par le point d'entrée `createOrUpdateUser` d
 
 Pour créer le premier compte d'un déploiement neuf, ou en ouvrir un autre,
 retirer temporairement ce point d'entrée, se connecter, puis le remettre.
+
+Le site est aussi fermé aux moteurs de recherche : chaque réponse porte
+`X-Robots-Tag: noindex, nofollow` (`next.config.ts`), doublé d'une balise
+`robots` dans `app/layout.tsx`. `robots.txt` laisse volontairement les robots
+entrer : un robot à qui on interdit la page ne lit pas son « noindex », et peut
+alors lister l'adresse seule.
 
 ## Précision
 

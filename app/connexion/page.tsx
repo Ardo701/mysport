@@ -37,7 +37,7 @@ export default function PageConnexion() {
     <main className="mx-auto flex min-h-dvh max-w-[560px] flex-col px-6 pb-10 pt-[max(3rem,env(safe-area-inset-top))] lg:justify-center lg:pb-16 lg:pt-16">
       <header>
         <h1 className="titre text-[44px] font-bold leading-[0.95] tracking-tight">
-          Cadence
+          MySport
         </h1>
         <p className="mt-4 max-w-[30ch] text-[15px] leading-relaxed text-brume">
           Tes séances, notées en quelques gestes. Les jours, le temps passé et les

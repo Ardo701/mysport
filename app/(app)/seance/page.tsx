@@ -14,6 +14,7 @@ import {
   type Materiel,
 } from "@/convex/data/exercices";
 import { dureeConnue, dureeRetenue, estimerKcal } from "@/convex/lib/calories";
+import { poidsALaDate } from "@/convex/lib/poids";
 import { ChampNombre } from "@/composants/champ-nombre";
 import { ChoixExercices, type ExerciceChoisi } from "@/composants/choix-exercices";
 import { IconeChevronDroite, IconeChevronGauche, IconeCroix, IconePlus } from "@/composants/icones";
@@ -27,7 +28,7 @@ import {
   TitreSection,
 } from "@/composants/ui";
 import { aujourdhuiISO, libelleRelatif } from "@/lib/dates";
-import { libelleDuree, type ExerciceSaisi } from "@/lib/seances";
+import { libelleDuree, nombre, type ExerciceSaisi } from "@/lib/seances";
 
 /** Un exercice en cours de saisie ; la clé ne sert qu'à React et n'est pas enregistrée. */
 type Ligne = ExerciceSaisi & { cle: string };
@@ -49,7 +50,7 @@ function Formulaire() {
   const id = useSearchParams().get("id");
   const router = useRouter();
 
-  const profil = useQuery(api.profils.monProfil);
+  const pesees = useQuery(api.pesees.mesPesees);
   const existante = useQuery(api.seances.seance, id ? { id } : "skip");
   const enregistrer = useMutation(api.seances.enregistrer);
   const supprimer = useMutation(api.seances.supprimer);
@@ -88,7 +89,7 @@ function Formulaire() {
     }
   }, [id, existante, pret]);
 
-  if (profil === undefined || (id && existante === undefined)) return <Chargement />;
+  if (pesees === undefined || (id && existante === undefined)) return <Chargement />;
   if (id && existante === null) {
     return (
       <EtatVide
@@ -103,12 +104,14 @@ function Formulaire() {
       />
     );
   }
-  if (!profil || !pret) return <Chargement />;
+  if (!pret) return <Chargement />;
 
   const exercices = lignes.map(({ cle: _cle, ...e }) => e);
   const connue = dureeConnue(dureeMin ?? 0, exercices);
   const duree = dureeRetenue(dureeMin ?? 0, exercices);
-  const kcal = estimerKcal({ dureeMin: duree, exercices }, profil.poidsKg);
+  // Le poids en vigueur à la date choisie : c'est celui que le serveur prendra.
+  const poidsKg = poidsALaDate(pesees, date);
+  const kcal = poidsKg === undefined ? 0 : estimerKcal({ dureeMin: duree, exercices }, poidsKg);
 
   function modifier(cle: string, champs: Partial<ExerciceSaisi>) {
     setLignes((ls) => ls.map((l) => (l.cle === cle ? { ...l, ...champs } : l)));
@@ -260,7 +263,8 @@ function Formulaire() {
             <p className="text-right text-[12px] leading-relaxed text-brume-faible">
               selon les exercices, les séries,
               <br />
-              la durée et ton poids ({profil.poidsKg} kg)
+              la durée et ton poids à cette date
+              {poidsKg !== undefined && ` (${nombre(poidsKg)} kg)`}
             </p>
           </div>
 

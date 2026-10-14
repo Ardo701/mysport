@@ -3,6 +3,7 @@ import { mutation, query, type QueryCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { dureeConnue, dureeRetenue, estimerKcal } from "./lib/calories";
 import { utilisateurConnecte } from "./lib/session";
+import { poidsDuJour } from "./pesees";
 import { exerciceValidator } from "./schema";
 
 /**
@@ -56,14 +57,16 @@ export const enregistrer = mutation({
     const duree = dureeRetenue(saisie, propres);
     if (duree > 24 * 60) throw new Error("Durée hors limites");
 
-    const profil = await profilDe(ctx, userId);
+    // Le poids du jour de la séance, pas celui d'aujourd'hui : une séance
+    // notée après coup s'estime avec ce qu'on pesait à l'époque.
+    const poidsKg = await poidsDuJour(ctx, userId, date);
     const ligne = {
       date,
       dureeMin: duree,
       exercices: propres,
       notes: notes?.trim() || undefined,
-      kcal: estimerKcal({ dureeMin: duree, exercices: propres }, profil.poidsKg),
-      poidsKg: profil.poidsKg,
+      kcal: estimerKcal({ dureeMin: duree, exercices: propres }, poidsKg),
+      poidsKg,
     };
 
     if (id) {
@@ -83,15 +86,6 @@ export const supprimer = mutation({
     await ctx.db.delete(id);
   },
 });
-
-async function profilDe(ctx: QueryCtx, userId: Id<"users">) {
-  const profil = await ctx.db
-    .query("profils")
-    .withIndex("by_user", (q) => q.eq("userId", userId))
-    .unique();
-  if (!profil) throw new Error("Profil introuvable");
-  return profil;
-}
 
 async function verifierProprietaire(ctx: QueryCtx, userId: Id<"users">, id: Id<"seances">) {
   const existante = await ctx.db.get(id);

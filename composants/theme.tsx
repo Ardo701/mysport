@@ -6,7 +6,13 @@ import { IconeLune, IconeSoleil } from "./icones";
 export type Theme = "clair" | "sombre";
 
 /** Lue par le script d'amorçage comme par la bascule : une seule vérité. */
-export const CLE_THEME = "cadence-theme";
+export const CLE_THEME = "mysport-theme";
+
+/**
+ * La clé du temps où l'application s'appelait Cadence : relue tant que le
+ * thème n'a pas été rechoisi, pour que le renommage ne le remette pas à zéro.
+ */
+const ANCIENNE_CLE_THEME = "cadence-theme";
 
 /**
  * Aligne la barre d'état du téléphone sur le fond de page.
@@ -42,7 +48,7 @@ function alignerBarreEtat() {
  */
 export const SCRIPT_THEME = `(function(){try{
 document.documentElement.setAttribute("data-theme",
-  localStorage.getItem(${JSON.stringify(CLE_THEME)})==="clair"?"clair":"sombre");
+  (localStorage.getItem(${JSON.stringify(CLE_THEME)})||localStorage.getItem(${JSON.stringify(ANCIENNE_CLE_THEME)}))==="clair"?"clair":"sombre");
 (${alignerBarreEtat.toString()})();
 }catch(e){document.documentElement.setAttribute("data-theme","sombre");}})()`;
 

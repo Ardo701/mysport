@@ -12,8 +12,10 @@ import type * as auth from "../auth.js";
 import type * as data_exercices from "../data/exercices.js";
 import type * as http from "../http.js";
 import type * as lib_calories from "../lib/calories.js";
+import type * as lib_poids from "../lib/poids.js";
 import type * as lib_session from "../lib/session.js";
 import type * as migrations from "../migrations.js";
+import type * as pesees from "../pesees.js";
 import type * as profils from "../profils.js";
 import type * as seances from "../seances.js";
 
@@ -28,8 +30,10 @@ declare const fullApi: ApiFromModules<{
   "data/exercices": typeof data_exercices;
   http: typeof http;
   "lib/calories": typeof lib_calories;
+  "lib/poids": typeof lib_poids;
   "lib/session": typeof lib_session;
   migrations: typeof migrations;
+  pesees: typeof pesees;
   profils: typeof profils;
   seances: typeof seances;
 }>;

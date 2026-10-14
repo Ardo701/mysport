@@ -1,6 +1,6 @@
 {
-  "name": "Cadence — journal d'entraînement",
-  "short_name": "Cadence",
+  "name": "MySport — journal d'entraînement",
+  "short_name": "MySport",
   "description": "Journal des séances de sport et chronomètre d'intervalles.",
   "lang": "fr",
   "start_url": "/",

@@ -39,6 +39,17 @@ export function libelleDate(dateISO: string): string {
   });
 }
 
+/** « 12 octobre », avec l'année quand ce n'est pas celle en cours : « 3 mars 2025 ». */
+export function libelleJour(dateISO: string): string {
+  const d = new Date(`${dateISO}T12:00:00`);
+  const autreAnnee = d.getFullYear() !== new Date().getFullYear();
+  return d.toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: autreAnnee ? "numeric" : undefined,
+  });
+}
+
 export function libelleDateCourt(dateISO: string): string {
   const d = new Date(`${dateISO}T12:00:00`);
   return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });

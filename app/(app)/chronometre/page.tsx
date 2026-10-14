@@ -19,7 +19,9 @@ import {
 import { Sonnerie } from "@/lib/sonnerie";
 
 /** Les derniers réglages reviennent à la visite suivante : on refait souvent le même circuit. */
-const CLE_REGLAGES = "cadence-chronometre";
+const CLE_REGLAGES = "mysport-chronometre";
+/** Clé du temps où l'application s'appelait Cadence, relue à défaut de la nouvelle. */
+const ANCIENNE_CLE_REGLAGES = "cadence-chronometre";
 
 type Course = {
   phases: Phase[];
@@ -45,7 +47,8 @@ export default function PageChronometre() {
 
   useEffect(() => {
     try {
-      const brut = localStorage.getItem(CLE_REGLAGES);
+      const brut =
+        localStorage.getItem(CLE_REGLAGES) ?? localStorage.getItem(ANCIENNE_CLE_REGLAGES);
       if (brut) setReglages(bornerReglages(JSON.parse(brut)));
     } catch {
       // Stockage refusé ou valeur illisible : les réglages par défaut font l'affaire.

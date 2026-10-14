@@ -19,12 +19,15 @@ const policeCorps = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Cadence — journal d'entraînement",
+  title: "MySport — journal d'entraînement",
   description:
     "Journal des séances de sport : exercices, temps passé et calories dépensées, avec un chronomètre d'intervalles.",
-  applicationName: "Cadence",
-  appleWebApp: { capable: true, title: "Cadence", statusBarStyle: "black-translucent" },
+  applicationName: "MySport",
+  appleWebApp: { capable: true, title: "MySport", statusBarStyle: "black-translucent" },
   manifest: "/manifest.webmanifest",
+  // Application privée : rien à trouver dans un moteur de recherche. L'en-tête
+  // X-Robots-Tag de next.config.ts couvre aussi ce qui n'est pas une page.
+  robots: { index: false, follow: false },
 };
 
 export const viewport: Viewport = {

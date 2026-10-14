@@ -109,7 +109,7 @@ export function BarreLaterale({ prenom }: { prenom?: string }) {
     <aside className="fixed inset-y-0 left-0 z-40 hidden w-[248px] flex-col border-r border-trait bg-surface lg:flex">
       <div className="border-b border-trait px-6 pb-6 pt-8">
         <p className="titre text-[21px] font-bold leading-none tracking-[-0.03em]">
-          Cadence
+          MySport
         </p>
         <p className="mt-2 text-[11px] text-brume-faible">
           Journal d'entraînement

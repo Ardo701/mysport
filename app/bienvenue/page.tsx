@@ -4,8 +4,10 @@ import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api } from "@/convex/_generated/api";
+import { POIDS_MAX, poidsValide } from "@/convex/lib/poids";
 import { ChampNombre } from "@/composants/champ-nombre";
 import { Bouton, Champ, Chargement, Message } from "@/composants/ui";
+import { aujourdhuiISO } from "@/lib/dates";
 
 /**
  * Premier passage : deux questions, pas davantage.
@@ -16,7 +18,7 @@ import { Bouton, Champ, Chargement, Message } from "@/composants/ui";
 export default function PageBienvenue() {
   const { isLoading, isAuthenticated } = useConvexAuth();
   const profil = useQuery(api.profils.monProfil, isAuthenticated ? {} : "skip");
-  const enregistrerProfil = useMutation(api.profils.enregistrerProfil);
+  const creerProfil = useMutation(api.profils.creerProfil);
   const router = useRouter();
 
   const [prenom, setPrenom] = useState("");
@@ -40,14 +42,12 @@ export default function PageBienvenue() {
     );
   }
 
-  const poidsValide = poidsKg !== undefined && poidsKg >= 30 && poidsKg <= 250;
-
   async function commencer() {
-    if (!poidsValide) return;
+    if (!poidsValide(poidsKg)) return;
     setErreur(null);
     setEnCours(true);
     try {
-      await enregistrerProfil({ prenom: prenom.trim() || "Toi", poidsKg });
+      await creerProfil({ prenom: prenom.trim() || "Toi", poidsKg, date: aujourdhuiISO() });
       router.replace("/");
     } catch {
       setErreur("L'enregistrement a échoué. Réessaie dans un instant.");
@@ -78,12 +78,12 @@ export default function PageBienvenue() {
           placeholder="80"
           decimales
           valeur={poidsKg}
-          max={250}
+          max={POIDS_MAX}
           onValeur={setPoidsKg}
         />
         <p className="text-[11px] leading-relaxed text-brume-faible">
           Le poids sert uniquement à estimer les calories dépensées pendant tes
-          séances. Il se change depuis le profil.
+          séances. Tu pourras noter son évolution depuis le profil.
         </p>
       </div>
 
@@ -92,7 +92,7 @@ export default function PageBienvenue() {
       <Bouton
         taille="large"
         className="mt-8"
-        disabled={enCours || !poidsValide}
+        disabled={enCours || !poidsValide(poidsKg)}
         onClick={commencer}
       >
         {enCours ? "Un instant…" : "Commencer"}

@@ -18,35 +18,36 @@
  */
 
 import { internalMutation, type MutationCtx } from "./_generated/server";
-import { dureeRetenue, estimerKcal } from "./lib/calories";
+import { recalculerSeances } from "./pesees";
 
 const RATTRAPAGES: { nom: string; executer: (ctx: MutationCtx) => Promise<string> }[] = [
   {
-    // Les premières séances ont été estimées en répartissant la durée entre
-    // les exercices au prorata des séries, sans les répétitions ni la charge.
-    // Elles sont recalculées avec le modèle travail + récupération, pour que
-    // les statistiques ne mélangent pas deux formules. Ces séances ne
-    // gardaient pas leur poids : celui du profil, saisi le même jour, le
-    // remplace sans erreur notable.
-    nom: "kcal-travail-et-recuperation",
+    // Le poids était une valeur unique du profil. Il devient une suite de
+    // pesées datées : la valeur du profil devient la première, au jour de la
+    // création du profil, puis quitte le profil. Les séances sont ensuite
+    // réestimées selon la règle des pesées.
+    nom: "pesees-depuis-profils",
     async executer(ctx) {
-      let touchees = 0;
-      for (const seance of await ctx.db.query("seances").collect()) {
-        const profil = await ctx.db
-          .query("profils")
-          .withIndex("by_user", (q) => q.eq("userId", seance.userId))
-          .unique();
-        const poidsKg = seance.poidsKg ?? profil?.poidsKg;
-        if (!poidsKg) continue;
-        const dureeMin = dureeRetenue(seance.dureeMin, seance.exercices);
-        await ctx.db.patch(seance._id, {
-          dureeMin,
-          poidsKg,
-          kcal: estimerKcal({ dureeMin, exercices: seance.exercices }, poidsKg),
-        });
-        touchees += 1;
+      let profils = 0;
+      let seances = 0;
+      for (const profil of await ctx.db.query("profils").collect()) {
+        if (profil.poidsKg === undefined) continue;
+        const dejaPese = await ctx.db
+          .query("pesees")
+          .withIndex("by_user_date", (q) => q.eq("userId", profil.userId))
+          .first();
+        if (!dejaPese) {
+          await ctx.db.insert("pesees", {
+            userId: profil.userId,
+            date: new Date(profil._creationTime).toISOString().slice(0, 10),
+            poidsKg: profil.poidsKg,
+          });
+        }
+        await ctx.db.patch(profil._id, { poidsKg: undefined });
+        seances += await recalculerSeances(ctx, profil.userId);
+        profils += 1;
       }
-      return `${touchees} séance(s)`;
+      return `${profils} profil(s), ${seances} séance(s) recalculée(s)`;
     },
   },
 ];

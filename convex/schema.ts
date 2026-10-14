@@ -28,12 +28,27 @@ export const exerciceValidator = v.object({
 export default defineSchema({
   ...authTables,
 
-  /** Le strict nécessaire : un prénom pour l'accueil, un poids pour les calories. */
+  /** Le strict nécessaire : un prénom pour l'accueil. Le poids vit dans `pesees`. */
   profils: defineTable({
     userId: v.id("users"),
     prenom: v.string(),
-    poidsKg: v.number(),
+    /**
+     * L'ancien poids unique, recopié en première pesée puis vidé par le
+     * rattrapage « pesees-depuis-profils ». À retirer une fois ce dernier
+     * passé en production.
+     */
+    poidsKg: v.optional(v.number()),
   }).index("by_user", ["userId"]),
+
+  /**
+   * Le poids au fil du temps, une valeur par jour au plus. Chaque séance est
+   * estimée avec la pesée en vigueur à sa date (voir `convex/lib/poids.ts`).
+   */
+  pesees: defineTable({
+    userId: v.id("users"),
+    date: v.string(), // YYYY-MM-DD
+    poidsKg: v.number(),
+  }).index("by_user_date", ["userId", "date"]),
 
   /** Séances saisies à la main, après coup. */
   seances: defineTable({
@@ -43,14 +58,15 @@ export default defineSchema({
     exercices: v.array(exerciceValidator),
     notes: v.optional(v.string()),
     /**
-     * Estimation figée à l'enregistrement, avec le poids du moment : une
-     * pesée ultérieure ne doit pas réécrire ce qu'a coûté une séance passée.
+     * Estimation faite avec le poids en vigueur à la date de la séance. Une
+     * pesée ajoutée ou corrigée la recalcule ; une pesée plus récente que la
+     * séance ne la touche pas.
      */
     kcal: v.number(),
     /**
-     * Le poids qui a servi à l'estimation. Gardé pour pouvoir la refaire si la
-     * formule change, sans la fausser avec le poids d'aujourd'hui. Absent des
-     * toutes premières séances, rattrapées depuis le profil.
+     * Le poids qui a servi à l'estimation : il dit quelles séances une pesée
+     * modifiée oblige à recalculer. Absent des toutes premières séances,
+     * rattrapées depuis.
      */
     poidsKg: v.optional(v.number()),
   }).index("by_user_date", ["userId", "date"]),
