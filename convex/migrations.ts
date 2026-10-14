@@ -82,6 +82,44 @@ const RATTRAPAGES: { nom: string; executer: (ctx: MutationCtx) => Promise<string
       return `${touches} programme(s)`;
     },
   },
+  {
+    // L'application se réduit au journal des séances : repas, menus, courses,
+    // programme, planning, sommeil, pas et pesées disparaissent. Ce ne sont
+    // que des données d'essai, et le nouveau schéma ne les accepterait pas :
+    // les tables sont vidées avant qu'il soit déployé. Le profil part aussi,
+    // l'accueil en recrée un plus court. Les tables de connexion restent, le
+    // compte existant doit pouvoir se reconnecter.
+    nom: "vider-donnees-avant-refonte",
+    async executer(ctx) {
+      const tables = [
+        "profils",
+        "plannings",
+        "programmes",
+        "seancesLog",
+        "menus",
+        "repasLog",
+        "sommeilLog",
+        "pasLog",
+        "courses",
+        "mesures",
+      ] as const;
+
+      const resume: string[] = [];
+      for (const table of tables) {
+        const lignes = await ctx.db.query(table).collect();
+        for (const ligne of lignes) await ctx.db.delete(ligne._id);
+        resume.push(`${table} ${lignes.length}`);
+      }
+
+      // Les photos de repas vivent dans le stockage de fichiers, pas dans une
+      // table : supprimer les lignes ne les supprime pas.
+      const fichiers = await ctx.db.system.query("_storage").collect();
+      for (const fichier of fichiers) await ctx.storage.delete(fichier._id);
+      resume.push(`fichiers ${fichiers.length}`);
+
+      return resume.join(", ");
+    },
+  },
 ];
 
 export const appliquer = internalMutation({
