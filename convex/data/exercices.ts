@@ -40,7 +40,7 @@ export const MATERIELS = [
   },
   {
     cle: "lest",
-    libelle: { fr: "Poids du corps + lest", en: "Bodyweight + added load" },
+    libelle: { fr: "Poids du corps + lest", en: "Weighted" },
     court: { fr: "lest", en: "weighted" },
   },
   { cle: "barre", libelle: { fr: "Barre", en: "Barbell" }, court: { fr: "barre", en: "barbell" } },
