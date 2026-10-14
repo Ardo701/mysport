@@ -4,13 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   IconeAccueil,
-  IconeAssiette,
   IconeCalendrier,
   IconeChrono,
   IconeCourbe,
-  IconeHaltere,
-  IconeLune,
-  IconePanier,
   IconeProfil,
 } from "./icones";
 import { BasculeTheme } from "./theme";
@@ -21,48 +17,42 @@ type Onglet = {
   Icone: (p: { className?: string }) => React.ReactElement;
 };
 
-/** Les cinq destinations du pouce : ce sont les gestes quotidiens. */
+/** Les cinq destinations du pouce : toute l'application tient dans la barre. */
 const ONGLETS: Onglet[] = [
   { href: "/", libelle: "Aujourd'hui", Icone: IconeAccueil },
-  { href: "/seance", libelle: "Séance", Icone: IconeHaltere },
-  { href: "/repas", libelle: "Repas", Icone: IconeAssiette },
-  { href: "/planning", libelle: "Planning", Icone: IconeCalendrier },
+  { href: "/journal", libelle: "Journal", Icone: IconeCalendrier },
+  { href: "/statistiques", libelle: "Stats", Icone: IconeCourbe },
+  { href: "/chronometre", libelle: "Chrono", Icone: IconeChrono },
   { href: "/profil", libelle: "Profil", Icone: IconeProfil },
 ];
 
 /**
- * Sur grand écran, la place ne manque plus : tout est atteignable en un clic,
- * y compris les pages que le téléphone range derrière un lien de contenu.
+ * Sur grand écran, les mêmes pages, rangées par usage : ce qu'on fait pendant
+ * l'entraînement, et ce qu'on relit après.
  */
 const GROUPES: { titre: string; onglets: Onglet[] }[] = [
   {
-    titre: "Aujourd'hui",
+    titre: "Entraînement",
     onglets: [
       { href: "/", libelle: "Tableau de bord", Icone: IconeAccueil },
-      { href: "/seance", libelle: "Séance", Icone: IconeHaltere },
+      { href: "/journal", libelle: "Journal", Icone: IconeCalendrier },
       { href: "/chronometre", libelle: "Chronomètre", Icone: IconeChrono },
-      { href: "/repas", libelle: "Repas", Icone: IconeAssiette },
-    ],
-  },
-  {
-    titre: "Organisation",
-    onglets: [
-      { href: "/planning", libelle: "Planning", Icone: IconeCalendrier },
-      { href: "/courses", libelle: "Courses", Icone: IconePanier },
     ],
   },
   {
     titre: "Suivi",
     onglets: [
-      { href: "/sommeil", libelle: "Sommeil", Icone: IconeLune },
-      { href: "/progression", libelle: "Progression", Icone: IconeCourbe },
+      { href: "/statistiques", libelle: "Statistiques", Icone: IconeCourbe },
       { href: "/profil", libelle: "Profil", Icone: IconeProfil },
     ],
   },
 ];
 
 function estActif(chemin: string, href: string) {
-  return href === "/" ? chemin === "/" : chemin.startsWith(href);
+  if (href === "/") return chemin === "/";
+  // La saisie d'une séance n'a pas d'onglet à elle : c'est une page du journal.
+  if (href === "/journal" && chemin.startsWith("/seance")) return true;
+  return chemin.startsWith(href);
 }
 
 /** Navigation basse, réservée au téléphone et à la tablette en portrait. */
@@ -122,7 +112,7 @@ export function BarreLaterale({ prenom }: { prenom?: string }) {
           Cadence
         </p>
         <p className="mt-2 text-[11px] text-brume-faible">
-          Sport, repas et sommeil
+          Journal d'entraînement
         </p>
       </div>
 

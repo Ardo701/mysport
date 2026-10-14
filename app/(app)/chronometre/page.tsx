@@ -1,9 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState, type ComponentProps } from "react";
 import { Bouton, Carte, Champ, EnTetePage, Message, TitreSection } from "@/composants/ui";
-import { IconeChevronGauche } from "@/composants/icones";
 import {
   LIMITES,
   PREPARATION_S,
@@ -226,7 +224,6 @@ function Reglage({
   return (
     <div>
       <EnTetePage
-        avant={<RetourProfil />}
         surtitre="Minuteur d'intervalles"
         titre="Chronomètre"
         detail="Un temps d'effort, un temps de pause, autant de tours que tu veux. Ça sonne à chaque changement, avec un décompte sur les trois dernières secondes."
@@ -441,19 +438,6 @@ function Fin({
         </Bouton>
       </div>
     </div>
-  );
-}
-
-/** Sur téléphone, la page s'ouvre depuis le profil : c'est là qu'on revient. */
-function RetourProfil() {
-  return (
-    <Link
-      href="/profil"
-      className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-brume transition-colors hover:text-encre lg:hidden"
-    >
-      <IconeChevronGauche className="h-4 w-4" />
-      Profil
-    </Link>
   );
 }
 

@@ -8,57 +8,56 @@
  * @module
  */
 
+import type * as auth from "../auth.js";
+import type * as data_exercices from "../data/exercices.js";
+import type * as http from "../http.js";
+import type * as lib_calories from "../lib/calories.js";
+import type * as lib_session from "../lib/session.js";
+import type * as migrations from "../migrations.js";
+import type * as profils from "../profils.js";
+import type * as seances from "../seances.js";
+
 import type {
   ApiFromModules,
   FilterApi,
   FunctionReference,
 } from "convex/server";
-import type * as auth from "../auth.js";
-import type * as courses from "../courses.js";
-import type * as fichiers from "../fichiers.js";
-import type * as http from "../http.js";
-import type * as ia from "../ia.js";
-import type * as internes from "../internes.js";
-import type * as mesures from "../mesures.js";
-import type * as migrations from "../migrations.js";
-import type * as pas from "../pas.js";
-import type * as planning from "../planning.js";
-import type * as profils from "../profils.js";
-import type * as programme from "../programme.js";
-import type * as repas from "../repas.js";
-import type * as seances from "../seances.js";
-import type * as sommeil from "../sommeil.js";
+
+declare const fullApi: ApiFromModules<{
+  auth: typeof auth;
+  "data/exercices": typeof data_exercices;
+  http: typeof http;
+  "lib/calories": typeof lib_calories;
+  "lib/session": typeof lib_session;
+  migrations: typeof migrations;
+  profils: typeof profils;
+  seances: typeof seances;
+}>;
 
 /**
- * A utility for referencing Convex functions in your app's API.
+ * A utility for referencing Convex functions in your app's public API.
  *
  * Usage:
  * ```js
  * const myFunctionReference = api.myModule.myFunction;
  * ```
  */
-declare const fullApi: ApiFromModules<{
-  auth: typeof auth;
-  courses: typeof courses;
-  fichiers: typeof fichiers;
-  http: typeof http;
-  ia: typeof ia;
-  internes: typeof internes;
-  mesures: typeof mesures;
-  migrations: typeof migrations;
-  pas: typeof pas;
-  planning: typeof planning;
-  profils: typeof profils;
-  programme: typeof programme;
-  repas: typeof repas;
-  seances: typeof seances;
-  sommeil: typeof sommeil;
-}>;
 export declare const api: FilterApi<
   typeof fullApi,
   FunctionReference<any, "public">
 >;
+
+/**
+ * A utility for referencing Convex functions in your app's internal API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = internal.myModule.myFunction;
+ * ```
+ */
 export declare const internal: FilterApi<
   typeof fullApi,
   FunctionReference<any, "internal">
 >;
+
+export declare const components: {};

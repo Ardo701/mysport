@@ -6,12 +6,11 @@
  *
  *   1. génère la paire de clés de Convex Auth si elle manque ;
  *   2. cale SITE_URL sur l'URL du déploiement Vercel ;
- *   3. synchronise OPENAI_API_KEY depuis les variables Vercel vers Convex ;
- *   4. déploie les fonctions Convex, puis lance le build Next.
+ *   3. déploie les fonctions Convex, puis lance le build Next ;
+ *   4. applique les rattrapages de données en attente.
  *
  * Les clés de session ne sont jamais réécrites : en regénérer déconnecterait
- * tous les comptes. Les variables OpenAI, elles, suivent Vercel, qui est
- * l'endroit où on les saisit.
+ * tous les comptes.
  */
 
 import { execFileSync } from "node:child_process";
@@ -58,8 +57,7 @@ function variablesExistantes() {
     process.exit(1);
   }
 
-  // Les valeurs servent à repérer une clé changée dans Vercel ; elles restent
-  // en mémoire et ne sont jamais journalisées.
+  // Les valeurs restent en mémoire et ne sont jamais journalisées.
   const variables = new Map();
   for (const ligne of sortie.split("\n")) {
     const separateur = ligne.indexOf("=");
@@ -68,25 +66,6 @@ function variablesExistantes() {
     }
   }
   return variables;
-}
-
-/**
- * Écrit une variable Vercel côté Convex quand elle y manque ou y diffère.
- *
- * Sans la comparaison, une clé changée dans Vercel n'atteindrait jamais Convex
- * et l'application continuerait d'appeler OpenAI avec l'ancienne, sans rien
- * dire. Un collage laisse souvent traîner un saut de ligne, qui casserait
- * l'en-tête d'autorisation : la valeur est donc élaguée avant comparaison.
- */
-function synchroniser(nom, existantes) {
-  const valeur = process.env[nom]?.trim();
-  if (!valeur) return false;
-  if (existantes.get(nom) === valeur) {
-    journal(`${nom} déjà à jour côté Convex.`);
-    return true;
-  }
-  definir(nom, valeur);
-  return true;
 }
 
 function definir(nom, valeur) {
@@ -132,26 +111,13 @@ if (domaine && (process.env.VERCEL_ENV === "production" || !existantes.has("SITE
   journal("SITE_URL inconnue : ni URL Vercel ni valeur déjà définie.");
 }
 
-// 3. Les variables OpenAI sont saisies dans Vercel ; les actions Convex les
-//    lisent depuis leur propre environnement, il faut donc les y porter.
-if (!synchroniser("OPENAI_API_KEY", existantes)) {
-  journal(
-    existantes.has("OPENAI_API_KEY")
-      ? "OPENAI_API_KEY absente des variables Vercel, celle de Convex est conservée."
-      : "OPENAI_API_KEY absente : l'application fonctionnera, mais l'analyse des " +
-          "repas par photo ou par description restera en erreur.",
-  );
-}
-
-synchroniser("OPENAI_MODEL", existantes);
-
-// 4. Publication des fonctions Convex, puis build de l'application.
+// 3. Publication des fonctions Convex, puis build de l'application.
 journal("Déploiement des fonctions Convex et build de l'application.");
 execFileSync("npx", ["convex", "deploy", "--cmd", "npm run build"], {
   stdio: "inherit",
 });
 
-// 5. Rattrapages sur les données déjà en base, une fois les fonctions publiées.
+// 4. Rattrapages sur les données déjà en base, une fois les fonctions publiées.
 //
 //    Une valeur par défaut ne vaut que pour un compte qui n'a rien enregistré ;
 //    les autres gardent ce qui a été copié en base à leur inscription. Les

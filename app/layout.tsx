@@ -19,9 +19,9 @@ const policeCorps = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Cadence — sport, repas et sommeil",
+  title: "Cadence — journal d'entraînement",
   description:
-    "Suivi quotidien des séances, des repas et du sommeil, avec estimation des repas par photo ou par description.",
+    "Journal des séances de sport : exercices, temps passé et calories dépensées, avec un chronomètre d'intervalles.",
   applicationName: "Cadence",
   appleWebApp: { capable: true, title: "Cadence", statusBarStyle: "black-translucent" },
   manifest: "/manifest.webmanifest",
@@ -36,9 +36,12 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
+    // Le script de thème écrit data-theme sur cette balise avant que React ne
+    // s'hydrate : l'écart est voulu, React n'a pas à le signaler.
     <html
       lang="fr"
       className={`${policeTitre.variable} ${policeCorps.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="grain min-h-full">
         {/* Avant tout le reste : le thème doit être posé avant le premier rendu. */}

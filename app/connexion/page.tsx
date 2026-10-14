@@ -40,8 +40,8 @@ export default function PageConnexion() {
           Cadence
         </h1>
         <p className="mt-4 max-w-[30ch] text-[15px] leading-relaxed text-brume">
-          Tes séances, tes repas et tes nuits, au même endroit. Le midi, une photo
-          ou deux phrases suffisent.
+          Tes séances, notées en quelques gestes. Les jours, le temps passé et les
+          calories dépensées se comptent tout seuls.
         </p>
       </header>
 
@@ -76,8 +76,7 @@ export default function PageConnexion() {
       </form>
 
       <footer className="mt-auto pt-12 text-[11px] leading-relaxed text-brume-faible lg:mt-14 lg:pt-0">
-        Application privée, sans inscription. Les photos de repas servent
-        uniquement à l&apos;estimation nutritionnelle.
+        Application privée, sans inscription.
       </footer>
     </main>
   );

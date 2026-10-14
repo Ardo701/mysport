@@ -1,96 +1,40 @@
 # Cadence
 
-Application de suivi quotidien : séances de musculation, repas, grignotage et
-sommeil. Interface en français : colonne unique et barre d'onglets en bas sur
-téléphone, barre latérale et mise en page sur deux colonnes à partir de 1024 px.
+Journal d'entraînement personnel. On note après coup ce qu'on a fait — les
+exercices, le temps passé —, et l'application en tire le reste : quel jour on
+s'est entraîné, à quoi, et combien de calories on a dépensé en moyenne.
+Interface en français : barre d'onglets en bas sur téléphone, barre latérale et
+deux colonnes à partir de 1024 px.
 
-- **Séances** — programme de 12 semaines, 4 séances par semaine, orienté haut du
-  corps. Chaque exercice existe en version **salle** (machines, charges libres)
-  et en version **maison** (poids du corps, élastique, sac à dos, chaise), et la
-  bascule se fait exercice par exercice pendant la séance. Chaque variante est
-  **illustrée** par un schéma au trait qui montre les deux bouts du mouvement et
-  son sens (voir plus bas). **Les douze semaines sont écrites une par une** : ce
-  n'est pas la même séance répétée douze fois, le volume et l'intensité changent
-  chaque semaine (voir plus bas). Chaque séance annonce sa **durée estimée**,
-  recalculée pour la semaine en cours (voir plus bas).
-- **Repas** — menus programmés le matin, en collation et le soir. Le midi (ou
-  n'importe quel repas sauté) est enregistré par **photo** ou par **description
-  écrite** : OpenAI reconnaît les aliments et estime calories et macros.
-- **Grignotage et boissons** — ajout en un geste de ce qui se prend entre les
-  repas (café, soda, bière, chips, chocolat…), ou description libre analysée par
-  l'IA.
-- **Liste de courses** — construite automatiquement à partir des menus des 3, 7
-  ou 14 prochains jours : quantités cumulées, classement par rayon, date à
-  laquelle acheter chaque produit (les produits frais s'achètent au dernier
-  moment), cases à cocher pour ce qui est déjà acheté, et ajouts manuels.
-- **Pas** — le compteur du téléphone ou de la montre se recopie dans la journée.
-  La distance et la dépense s'en déduisent (foulée estimée depuis la taille,
-  0,5 kcal par kilo et par kilomètre), et **seul l'écart avec le rythme déjà
-  supposé par le niveau d'activité** ouvre des calories sur la cible du jour :
-  compter la marche entière la compterait deux fois, puisque le multiplicateur
-  du profil la contient déjà.
-- **Planning** — calendrier à trois échelles (jour, semaine, mois) qui montre
-  la journée type, la semaine d'entraînement et le mois d'un coup d'œil, et se
-  met à jour en direct pendant qu'on modifie les horaires : heures de coucher
-  et de lever, heures des repas, créneaux d'entraînement de la semaine. Le
-  **détail d'une séance** s'ouvre depuis n'importe quel jour : à venir, la liste
-  des exercices avec la prescription de la semaine en cours ; passée, les
-  charges et répétitions réellement enregistrées, série par série. Chaque
-  exercice y porte sa vignette, dans la variante suivie ce jour-là, et la séance
-  à venir sa durée estimée.
-- **Thème** — sombre par défaut, clair au choix. La bascule est en bas de la
-  barre latérale sur ordinateur, et sur la page Profil pour le téléphone, qui
-  n'a pas de barre latérale. Le choix est propre à l'appareil.
-- **Sommeil** — durée, qualité, dette de sommeil sur 14 jours.
-- **Progression** — courbe de poids, tour de taille, régularité des séances,
-  volume soulevé, marche des 14 derniers jours.
+- **Journal** — chaque séance se saisit en quelques gestes : la date, la durée,
+  puis les exercices cochés dans un catalogue d'environ 150 mouvements (muscu,
+  gainage, cardio, sports, mobilité). Le détail est facultatif : séries,
+  répétitions et charge pour la musculation, secondes pour le gainage, durée et
+  distance pour le cardio. Un exercice absent du catalogue s'ajoute par son nom.
+- **Statistiques** — sur 4 semaines, 3 mois, 12 mois ou tout l'historique :
+  dépense moyenne par semaine, par séance et par jour, nombre de séances et de
+  jours actifs, temps total, calories semaine par semaine, calendrier du mois
+  où chaque jour d'entraînement s'ouvre sur sa séance, exercices les plus faits.
+- **Chronomètre** — minuteur d'intervalles : temps d'effort, temps de pause,
+  nombre de tours. Il sonne à chaque changement, avec un décompte sur les trois
+  dernières secondes, et garde l'écran allumé jusqu'à la fin.
 
-## Comment le programme progresse
+## Calories
 
-Les séances disent **quoi** faire, les semaines disent **combien**. Séparer les
-deux évite d'écrire quarante-huit séances dont quarante-quatre seraient des
-copies, et rend la progression lisible d'un coup d'œil dans
-`convex/data/programme.ts`.
+Elles sont toujours **estimées**, jamais saisies : `kcal = MET × poids × durée`,
+la formule du Compendium of Physical Activities. Chaque exercice du catalogue
+(`convex/data/exercices.ts`) porte son MET ; pour la course, il se recalcule à
+partir de l'allure quand la distance est saisie.
 
-| Semaines | Bloc | Ce qui change |
-| --- | --- | --- |
-| 1 à 5 | Fondations | Le volume monte : 3 séries puis 4, puis 5 sur les gros mouvements. Les fourchettes descendent de 10-12 à 8-10, la réserve de 3 à 2 répétitions. |
-| 6 | Décharge | Volume divisé par deux, 4 répétitions en réserve, pas de finisher. C'est cette semaine qui fixe les progrès des cinq précédentes. |
-| 7 à 11 | Intensité | Les répétitions descendent jusqu'à 5-6, les repos montent jusqu'à 3 minutes, la réserve tombe à 0-1. La semaine 11 est la plus dure du cycle. |
-| 12 | Décharge et test | Trois séries légères, puis une série lourde de référence à comparer à la semaine 1. |
+Seule la durée de la séance est connue, plus celle des exercices chronométrés.
+Le temps restant se répartit entre les autres exercices au prorata de leurs
+séries, et le temps qu'aucun exercice n'occupe compte comme une activité légère
+(échauffement, transitions). Le calcul vit dans `convex/lib/calories.ts`, que
+le serveur applique à l'enregistrement et l'écran de saisie à chaque frappe :
+le chiffre annoncé avant d'enregistrer est celui qui s'affiche ensuite.
 
-Chaque exercice porte un **rôle** qui décide de ce qu'il reçoit :
-
-- `principal` — les gros mouvements (développés, tractions, rowing, squat,
-  soulevé roumain, superset poussée/tirage) prennent la prescription
-  « principaux » de la semaine ;
-- `accessoire` — isolations et bras prennent la prescription « accessoires »,
-  dans des fourchettes plus hautes ;
-- `fixe` — gainage et circuits abdos gardent la leur toute l'année, parce que
-  « 5 × 5-6 » ne veut rien dire sur une planche.
-
-La jointure se fait dans `convex/lib/programme.ts`, à un seul endroit : le
-serveur s'en sert pour créer le bon nombre de séries au démarrage, la page de
-séance pour afficher la consigne. Deux copies dériveraient, et on
-s'entraînerait sur une prescription différente de celle affichée.
-
-Un programme **généré par l'IA** n'a pas cette couche : ses exercices gardent
-alors la prescription écrite sur eux, et rien ne casse.
-
-### Durée estimée
-
-La durée d'une séance suit la même règle : elle se calcule, elle ne s'écrit
-pas. `dureeEstimeeMin` la reconstruit à partir de la prescription affichée —
-échauffement, puis pour chaque exercice `séries × (effort + repos)`, puis le
-finisher quand la semaine le prévoit — et arrondit à cinq minutes près. Une
-répétition contrôlée compte quatre secondes ; une prescription déjà en
-secondes (« 40-60 sec ») se lit telle quelle ; « 12 + 12 » additionne les deux
-mouvements d'un superset, « 10 par jambe » double la série.
-
-Le même « Poussée » passe ainsi de **40 minutes en semaine 1 à 85 en semaine
-11**, sans qu'aucun chiffre soit écrit à la main. Le champ `dureeMin` des
-séances existe toujours — les programmes enregistrés le contiennent — mais il
-n'est plus affiché : figé, il aurait été faux onze semaines sur douze.
+L'estimation est figée avec la séance, au poids du moment : changer son poids
+dans le profil ne réécrit pas ce qu'ont coûté les séances passées.
 
 ## Pile technique
 
@@ -100,7 +44,6 @@ n'est plus affiché : figé, il aurait été faux onze semaines sur douze.
 | Styles | Tailwind CSS 4, palette noir et jaune, tout en sans-serif |
 | Base de données et temps réel | Convex |
 | Authentification | Convex Auth (email et mot de passe), inscriptions fermées |
-| IA | OpenAI (vision pour les photos, texte pour les descriptions et la génération de programmes et de menus) |
 | Hébergement | Vercel |
 
 ## Mise en route
@@ -119,13 +62,8 @@ npx convex dev          # crée le projet Convex, génère convex/_generated et 
 
 ```bash
 npx @convex-dev/auth                       # génère les clés JWT de Convex Auth
-npx convex env set OPENAI_API_KEY sk-...   # clé OpenAI
 npx convex env set SITE_URL http://localhost:3000
-# facultatif : modèle utilisé (par défaut gpt-4o)
-npx convex env set OPENAI_MODEL gpt-4o
 ```
-
-En production, `SITE_URL` vaut l'URL Vercel du projet.
 
 `JWT_PRIVATE_KEY` et `JWKS` ne se récupèrent nulle part : ce sont une clé privée
 et sa clé publique, créées à la volée par `npx @convex-dev/auth`, qui les écrit
@@ -149,55 +87,36 @@ Ce script fait tout le travail de configuration à chaque déploiement :
 1. génère la paire `JWT_PRIVATE_KEY` / `JWKS` de Convex Auth si elle manque —
    jamais autrement, la regénérer déconnecterait tous les comptes ;
 2. cale `SITE_URL` sur l'URL du déploiement Vercel ;
-3. porte `OPENAI_API_KEY` et `OPENAI_MODEL` des variables Vercel vers Convex,
-   quand elles y manquent **ou qu'elles y diffèrent** : Vercel est l'endroit où
-   on les saisit, une clé changée là doit donc suivre. Sans cette comparaison,
-   une rotation de clé laisserait l'application appeler OpenAI avec l'ancienne,
-   sans rien dire ;
-4. déploie les fonctions Convex, puis construit l'application en lui injectant
+3. déploie les fonctions Convex, puis construit l'application en lui injectant
    `NEXT_PUBLIC_CONVEX_URL` ;
-5. applique les rattrapages de données de `convex/migrations.ts`.
+4. applique les rattrapages de données de `convex/migrations.ts`.
 
-Ce dernier point existe parce qu'une valeur par défaut ne vaut que pour un
-compte qui n'a rien enregistré : `creerPlanningParDefaut` en recopie une
-version en base à l'inscription, et changer la constante ensuite ne rattrape
-rien. Chaque rattrapage laisse sa trace dans la table `migrations` et ne
-repasse jamais, sinon il réécrirait à chaque déploiement des valeurs
-volontairement changées depuis. L'étape n'est pas bloquante : un build ne doit
-pas échouer parce qu'une retouche de données a raté.
+Ce dernier point sert quand une modification touche des lignes déjà en base :
+un rattrapage s'écrit une fois, passe au déploiement suivant, laisse sa trace
+dans la table `migrations` et ne repasse jamais. L'étape n'est pas bloquante :
+un build ne doit pas échouer parce qu'une retouche de données a raté.
 
-Une variable modifiée dans Vercel n'atteint Convex qu'au déploiement suivant :
-après l'avoir changée, relancer un build (Vercel → Deployments → Redeploy).
-
-Deux valeurs seulement sont à saisir une fois dans Vercel (Settings →
-Environment Variables), parce qu'elles n'existent que dans tes comptes :
-
-| Variable | Où la prendre |
-| --- | --- |
-| `CONVEX_DEPLOY_KEY` | tableau de bord Convex → Settings → Deploy keys |
-| `OPENAI_API_KEY` | tableau de bord OpenAI |
-
-Tout le reste est posé par le script. Si l'une des deux manque, le journal de
-build de Vercel le dit explicitement.
+Une seule valeur est à saisir dans Vercel (Settings → Environment Variables) :
+`CONVEX_DEPLOY_KEY`, à générer dans le tableau de bord Convex → Settings →
+Deploy keys. Tout le reste est posé par le script ; si elle manque, le journal
+de build de Vercel le dit explicitement.
 
 ## Organisation du code
 
 ```
 app/
-  (app)/          pages connectées : aujourd'hui, séance, repas, courses,
-                  planning, sommeil, progression, profil
-  bienvenue/      questionnaire d'installation (profil et cibles)
-  connexion/      inscription et connexion
-composants/       interface : jauges, feuille glissante, analyseur de repas…
-  illustrations/  les schémas d'exercices : primitives, poses, scènes
+  (app)/          pages connectées : tableau de bord, journal, saisie d'une
+                  séance, statistiques, chronomètre, profil
+  bienvenue/      premier passage : prénom et poids
+  connexion/      connexion
+composants/       interface : sélecteur d'exercices, feuille glissante, champs…
 convex/
-  data/           programme d'entraînement et banque de repas
-  lib/            calculs (nutrition, dates, menus) et validateurs
-  courses.ts      liste de courses construite depuis les menus
-  ia.ts           actions OpenAI : photo, texte, menus, programme
+  data/           catalogue des exercices, avec leur MET
+  lib/            estimation des calories, session
+  seances.ts      lecture et enregistrement des séances
   schema.ts       modèle de données
-lib/              utilitaires côté client
-scripts/          déploiement Vercel, icônes, vérification des illustrations
+lib/              utilitaires côté client : dates, totaux, minuteur, sons
+scripts/          déploiement Vercel, clés d'authentification, icônes
 ```
 
 ## Parti pris visuel
@@ -248,60 +167,6 @@ verrait passer un éclair noir à chaque chargement. Le défaut reste le sombre,
 même quand le système est en clair — l'application a toujours eu cette
 apparence, basculer sans qu'on l'ait demandé serait la surprise.
 
-## Illustrations des exercices
-
-Chaque exercice est dessiné, dans ses deux variantes : quarante-deux schémas au
-trait, écrits en SVG dans `composants/illustrations/`. Rien n'est téléchargé —
-ils suivent donc le thème, restent nets à n'importe quelle taille et n'ajoutent
-aucune requête. Les banques de photos d'exercices, elles, ne connaissent aucune
-des variantes maison : personne n'a photographié un rowing australien sous une
-table de cuisine.
-
-Le dessin obéit à une grammaire fixe, pour se lire sans qu'on l'explique :
-
-| Élément | Sens |
-| --- | --- |
-| Silhouette pleine | la position qui **nomme** l'exercice : le bas d'un squat, le haut d'une traction |
-| Silhouette pâle | l'autre bout du mouvement |
-| Flèche jaune | le sens de l'**effort**, celui où l'on pousse ou tire |
-| Axe jaune pointillé | l'**alignement** à tenir, sur les exercices qui ne bougent pas |
-| Gris | le matériel, jamais le corps |
-
-Trois fichiers, dans cet ordre de dépendance :
-
-- **`figure.tsx`** — les primitives. La silhouette (neuf articulations reliées
-  par des traits épais), la flèche, l'axe, et les glyphes de matériel : barre,
-  haltère, banc, poulie, élastique, sac à dos, chaise, table, marche, machine.
-  Le repère fait 240 × 150, sol à 134, silhouette debout haute de 118 — valeurs
-  partagées par toutes les scènes, sans quoi deux dessins voisins n'auraient
-  pas la même échelle.
-- **`poses.ts`** — les positions du corps. On n'y donne que les extrémités des
-  membres ; le genou et le coude se calculent par intersection de deux cercles,
-  à longueur de segment constante. C'était la seule façon d'écrire quarante-deux
-  poses sans qu'un membre s'allonge d'un dessin à l'autre — le défaut le plus
-  visible d'une silhouette au trait.
-- **`scenes.tsx`** — les quarante-deux scènes, une par exercice et par variante.
-
-Deux exercices sur trois se dessinent de profil ; les élévations latérales, le
-face pull et les écartés passent **de face**, parce que de profil leurs deux
-bras se superposent exactement et que le mouvement disparaît. Les supersets
-montrent deux silhouettes réduites séparées d'un « + » : c'est ce qu'ils sont.
-Quand la position de départ ne peut pas se dessiner honnêtement — faute de place
-dans le cadre, ou parce qu'elle se confondrait avec l'arrivée — on ne dessine
-qu'une position et la flèche dit le reste.
-
-Après toute retouche des exercices ou des scènes :
-
-```bash
-node scripts/verifier-illustrations.mjs
-```
-
-Un dessin manquant ne casse rien — le composant ne rend alors rien du tout —
-mais ne se voit pas non plus tant qu'on n'ouvre pas la bonne séance dans la
-bonne variante. Les programmes générés par l'IA inventent leurs propres
-exercices et n'ont donc pas d'illustration : on ne peut pas dessiner ce qu'on
-ne connaît pas d'avance.
-
 ## Icônes
 
 Le logo vit dans `app/icon.svg`. Les PNG qui en dérivent — `app/apple-icon.png`
@@ -324,5 +189,5 @@ retirer temporairement ce point d'entrée, se connecter, puis le remettre.
 
 ## Précision
 
-Les estimations nutritionnelles et les programmes proposés sont des repères
-d'entraînement, pas un avis médical.
+Les calories affichées sont une estimation à partir de valeurs moyennes par
+activité, pas une mesure.

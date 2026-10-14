@@ -28,24 +28,6 @@ export function IconeAccueil(p: Props) {
   );
 }
 
-export function IconeHaltere(p: Props) {
-  return (
-    <Svg {...p}>
-      <path d="M3 10v4M6 8v8M18 8v8M21 10v4" />
-      <path d="M6 12h12" />
-    </Svg>
-  );
-}
-
-export function IconeAssiette(p: Props) {
-  return (
-    <Svg {...p}>
-      <circle cx="12" cy="12" r="8" />
-      <circle cx="12" cy="12" r="3.4" />
-    </Svg>
-  );
-}
-
 export function IconeLune(p: Props) {
   return (
     <Svg {...p}>
@@ -88,31 +70,6 @@ export function IconeCourbe(p: Props) {
       <path d="M4 19V5" />
       <path d="M4 19h16" />
       <path d="m7 15 3.5-4 3 2.2L20 7" />
-    </Svg>
-  );
-}
-
-export function IconeAppareilPhoto(p: Props) {
-  return (
-    <Svg {...p}>
-      <path d="M3.5 8.5h3l1.6-2.3h7.8L17.5 8.5h3v10h-17Z" />
-      <circle cx="12" cy="13" r="3.4" />
-    </Svg>
-  );
-}
-
-export function IconeTexte(p: Props) {
-  return (
-    <Svg {...p}>
-      <path d="M4 6h16M4 11h16M4 16h10" />
-    </Svg>
-  );
-}
-
-export function IconeEclair(p: Props) {
-  return (
-    <Svg {...p}>
-      <path d="M13.5 3 6 13.5h5L10.5 21 18 10.5h-5Z" />
     </Svg>
   );
 }
@@ -165,23 +122,6 @@ export function IconeCroix(p: Props) {
   );
 }
 
-export function IconeCorbeille(p: Props) {
-  return (
-    <Svg {...p}>
-      <path d="M4.5 6.5h15M9 6.5V4.5h6v2M6.5 6.5 7.5 20h9l1-13.5" />
-    </Svg>
-  );
-}
-
-export function IconeHorloge(p: Props) {
-  return (
-    <Svg {...p}>
-      <circle cx="12" cy="12" r="8.2" />
-      <path d="M12 7.5V12l3 1.8" />
-    </Svg>
-  );
-}
-
 export function IconeChrono(p: Props) {
   return (
     <Svg {...p}>
@@ -191,43 +131,3 @@ export function IconeChrono(p: Props) {
   );
 }
 
-export function IconeReglages(p: Props) {
-  return (
-    <Svg {...p}>
-      <path d="M4 7h10M18 7h2M4 17h4M12 17h8" />
-      <circle cx="16" cy="7" r="2.2" />
-      <circle cx="10" cy="17" r="2.2" />
-    </Svg>
-  );
-}
-
-export function IconeBalance(p: Props) {
-  return (
-    <Svg {...p}>
-      <rect x="3.5" y="4.5" width="17" height="15" rx="3" />
-      <path d="M8 10.5a4.6 4.6 0 0 1 8 0" />
-      <path d="m12 10.5-1.6 2.4" />
-    </Svg>
-  );
-}
-
-export function IconePanier(p: Props) {
-  return (
-    <Svg {...p}>
-      <path d="M3.5 7.5h17l-1.7 10a2 2 0 0 1-2 1.7H7.2a2 2 0 0 1-2-1.7Z" />
-      <path d="M8.5 7.5 10 3.5M15.5 7.5 14 3.5" />
-      <path d="M9.5 11.5v4M14.5 11.5v4" />
-    </Svg>
-  );
-}
-
-export function IconePas(p: Props) {
-  return (
-    <Svg {...p}>
-      <circle cx="13.6" cy="4.6" r="1.9" />
-      <path d="M13.4 7.6 11.6 12.3l2.7 2.5.7 4.9" />
-      <path d="m11.6 12.3-2.9 4.1-.8 3.3" />
-      <path d="m13.9 8.6 3 1.9 1.4 2.6" />
-    </Svg>
-  );
-}

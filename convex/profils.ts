@@ -1,7 +1,6 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { calculerCibles } from "./lib/nutrition";
 import { utilisateurConnecte } from "./lib/session";
 
 export const monProfil = query({
@@ -21,64 +20,23 @@ export const monProfil = query({
 });
 
 export const enregistrerProfil = mutation({
-  args: {
-    prenom: v.string(),
-    age: v.number(),
-    sexe: v.string(),
-    tailleCm: v.number(),
-    poidsKg: v.number(),
-    objectif: v.string(),
-    joursParSemaine: v.number(),
-    lieu: v.string(),
-    niveauActivite: v.number(),
-    legumesAimes: v.array(v.string()),
-    contraintes: v.array(v.string()),
-  },
-  handler: async (ctx, args) => {
+  args: { prenom: v.string(), poidsKg: v.number() },
+  handler: async (ctx, { prenom, poidsKg }) => {
     const userId = await utilisateurConnecte(ctx);
-    const cibles = calculerCibles(args);
+    const nom = prenom.trim();
+    if (!nom) throw new Error("Prénom manquant");
+    // Les bornes d'un adulte, pas davantage : le poids ne sert qu'à estimer
+    // les calories, et un zéro les annulerait toutes en silence.
+    if (!(poidsKg >= 30 && poidsKg <= 250)) throw new Error("Poids hors limites");
+
     const existant = await ctx.db
       .query("profils")
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .unique();
-
     if (existant) {
-      await ctx.db.patch(existant._id, { ...args, ...cibles });
+      await ctx.db.patch(existant._id, { prenom: nom, poidsKg });
       return existant._id;
     }
-
-    const id = await ctx.db.insert("profils", {
-      userId,
-      ...args,
-      ...cibles,
-      onboardingFait: true,
-    });
-
-    // Première pesée, pour démarrer la courbe de progression.
-    await ctx.db.insert("mesures", {
-      userId,
-      date: new Date().toISOString().slice(0, 10),
-      poidsKg: args.poidsKg,
-    });
-
-    return id;
-  },
-});
-
-export const modifierCibles = mutation({
-  args: {
-    kcalCible: v.number(),
-    proteinesCible: v.number(),
-    glucidesCible: v.number(),
-    lipidesCible: v.number(),
-  },
-  handler: async (ctx, args) => {
-    const userId = await utilisateurConnecte(ctx);
-    const profil = await ctx.db
-      .query("profils")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
-      .unique();
-    if (!profil) throw new Error("Profil introuvable");
-    await ctx.db.patch(profil._id, args);
+    return await ctx.db.insert("profils", { userId, prenom: nom, poidsKg });
   },
 });

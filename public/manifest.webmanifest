@@ -1,7 +1,7 @@
 {
-  "name": "Cadence — sport, repas et sommeil",
+  "name": "Cadence — journal d'entraînement",
   "short_name": "Cadence",
-  "description": "Suivi quotidien des séances, des repas et du sommeil.",
+  "description": "Journal des séances de sport et chronomètre d'intervalles.",
   "lang": "fr",
   "start_url": "/",
   "display": "standalone",
