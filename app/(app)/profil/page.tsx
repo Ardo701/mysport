@@ -19,6 +19,7 @@ import {
   TitreSection,
 } from "@/composants/ui";
 import {
+  IconeChrono,
   IconeCourbe,
   IconeEclair,
   IconeFleche,
@@ -357,6 +358,12 @@ export default function PageProfil() {
               <div className="flex h-full items-center justify-between border-t border-trait px-4 py-3.5 transition-colors hover:border-trait-vif">
                 <span className="text-[14px]">Sommeil</span>
                 <IconeLune className="h-4.5 w-4.5 text-jaune" />
+              </div>
+            </Link>
+            <Link href="/chronometre" className="block">
+              <div className="flex h-full items-center justify-between border-t border-trait px-4 py-3.5 transition-colors hover:border-trait-vif">
+                <span className="text-[14px]">Chronomètre</span>
+                <IconeChrono className="h-4.5 w-4.5 text-jaune" />
               </div>
             </Link>
           </div>

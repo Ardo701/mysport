@@ -6,6 +6,7 @@ import {
   IconeAccueil,
   IconeAssiette,
   IconeCalendrier,
+  IconeChrono,
   IconeCourbe,
   IconeHaltere,
   IconeLune,
@@ -39,6 +40,7 @@ const GROUPES: { titre: string; onglets: Onglet[] }[] = [
     onglets: [
       { href: "/", libelle: "Tableau de bord", Icone: IconeAccueil },
       { href: "/seance", libelle: "Séance", Icone: IconeHaltere },
+      { href: "/chronometre", libelle: "Chronomètre", Icone: IconeChrono },
       { href: "/repas", libelle: "Repas", Icone: IconeAssiette },
     ],
   },

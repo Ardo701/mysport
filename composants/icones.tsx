@@ -182,6 +182,15 @@ export function IconeHorloge(p: Props) {
   );
 }
 
+export function IconeChrono(p: Props) {
+  return (
+    <Svg {...p}>
+      <circle cx="12" cy="13.5" r="7" />
+      <path d="M12 13.5V10M10 3.5h4M12 3.5v3M17.6 7.9l1.4-1.4" />
+    </Svg>
+  );
+}
+
 export function IconeReglages(p: Props) {
   return (
     <Svg {...p}>
