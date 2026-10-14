@@ -32,12 +32,6 @@ export default defineSchema({
   profils: defineTable({
     userId: v.id("users"),
     prenom: v.string(),
-    /**
-     * L'ancien poids unique, recopié en première pesée puis vidé par le
-     * rattrapage « pesees-depuis-profils ». À retirer une fois ce dernier
-     * passé en production.
-     */
-    poidsKg: v.optional(v.number()),
   }).index("by_user", ["userId"]),
 
   /**

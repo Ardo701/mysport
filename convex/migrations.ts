@@ -13,44 +13,14 @@
  * ne change plus jamais. Le script de déploiement n'a pas à être touché.
  *
  * Les rattrapages déjà passés sont retirés de la liste une fois appliqués en
- * production : ils visaient des tables qui n'existent plus. Leur nom reste
- * dans la table `migrations`, ce qui suffit à ne jamais les rejouer.
+ * production : ils visaient des données qui n'existent plus sous cette forme.
+ * Leur nom reste dans la table `migrations`, ce qui suffit à ne jamais les
+ * rejouer.
  */
 
 import { internalMutation, type MutationCtx } from "./_generated/server";
-import { recalculerSeances } from "./pesees";
 
-const RATTRAPAGES: { nom: string; executer: (ctx: MutationCtx) => Promise<string> }[] = [
-  {
-    // Le poids était une valeur unique du profil. Il devient une suite de
-    // pesées datées : la valeur du profil devient la première, au jour de la
-    // création du profil, puis quitte le profil. Les séances sont ensuite
-    // réestimées selon la règle des pesées.
-    nom: "pesees-depuis-profils",
-    async executer(ctx) {
-      let profils = 0;
-      let seances = 0;
-      for (const profil of await ctx.db.query("profils").collect()) {
-        if (profil.poidsKg === undefined) continue;
-        const dejaPese = await ctx.db
-          .query("pesees")
-          .withIndex("by_user_date", (q) => q.eq("userId", profil.userId))
-          .first();
-        if (!dejaPese) {
-          await ctx.db.insert("pesees", {
-            userId: profil.userId,
-            date: new Date(profil._creationTime).toISOString().slice(0, 10),
-            poidsKg: profil.poidsKg,
-          });
-        }
-        await ctx.db.patch(profil._id, { poidsKg: undefined });
-        seances += await recalculerSeances(ctx, profil.userId);
-        profils += 1;
-      }
-      return `${profils} profil(s), ${seances} séance(s) recalculée(s)`;
-    },
-  },
-];
+const RATTRAPAGES: { nom: string; executer: (ctx: MutationCtx) => Promise<string> }[] = [];
 
 export const appliquer = internalMutation({
   args: {},
