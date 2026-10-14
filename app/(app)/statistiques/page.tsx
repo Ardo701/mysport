@@ -232,6 +232,7 @@ function VueSemaine({
   onLundi: (lundi: string) => void;
 }) {
   const dimanche = ajouterJours(lundi, 6);
+  /** Semaines écoulées depuis celle affichée : 0 pour la semaine en cours. */
   const ecart = differenceEnJours(lundi, lundiDeLaSemaine(aujourdhui)) / 7;
   const enCours = ecart === 0;
   // La semaine en cours se juge sur les jours déjà passés : le jeudi, la
@@ -268,7 +269,7 @@ function VueSemaine({
         <div className="text-center">
           <p className="text-[16px] font-semibold">{libelleSemaine(lundi)}</p>
           <p className="text-[13px] text-brume">
-            {enCours ? "Cette semaine" : ecart === -1 ? "Semaine dernière" : `Il y a ${-ecart} semaines`}
+            {enCours ? "Cette semaine" : ecart === 1 ? "Semaine dernière" : `Il y a ${ecart} semaines`}
           </p>
         </div>
         <BoutonFleche
