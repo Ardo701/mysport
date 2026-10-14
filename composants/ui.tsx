@@ -189,7 +189,9 @@ export function Onglets<T extends string>({
   className?: string;
 }) {
   return (
-    <div className={`flex gap-6 border-b border-trait ${className}`}>
+    // Plus serré sur téléphone : cinq onglets tiennent alors sur une ligne
+    // de 375 px, sans qu'aucun libellé ne se coupe en deux.
+    <div className={`flex gap-4 border-b border-trait sm:gap-6 ${className}`}>
       {options.map(({ cle, libelle, Icone, desactive }) => {
         const actif = valeur === cle;
         return (
@@ -199,7 +201,7 @@ export function Onglets<T extends string>({
             disabled={desactive}
             aria-pressed={actif}
             onClick={() => onChange(cle)}
-            className={`-mb-px flex items-center gap-2 border-b-2 pb-2.5 text-[13px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+            className={`-mb-px flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 pb-2.5 text-[13px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
               actif
                 ? "border-b-jaune-vif text-encre"
                 : "border-b-transparent text-brume hover:text-encre"

@@ -13,7 +13,9 @@ deux colonnes à partir de 1024 px.
   distance pour le cardio. Un exercice absent du catalogue s'ajoute par son nom.
   Deux échelles, facultatives elles aussi, notent le ressenti avant la séance
   (de « à fond » à « fatigué ») et après (de « au top » à « vidé »).
-- **Statistiques** — sur 4 semaines, 3 mois, 12 mois ou tout l'historique :
+- **Statistiques** — semaine par semaine : la dépense de la semaine, les
+  calories jour par jour et le détail de chaque jour, repos compris. Ou sur
+  4 semaines, 3 mois, 12 mois ou tout l'historique :
   dépense moyenne par semaine, par séance et par jour, nombre de séances et de
   jours actifs, temps total, calories semaine par semaine, calendrier du mois
   où chaque jour d'entraînement s'ouvre sur sa séance, exercices les plus faits.
