@@ -290,7 +290,19 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
 }
 
+/*
+ * Aucune barre de défilement visible : installée sur l'écran d'accueil ou en
+ * application de bureau, la page ne doit pas trahir qu'elle est une page web.
+ * La propriété standard vaut pour Firefox, Chrome récent et Safari 18.2 et
+ * plus ; le pseudo-élément, pour les versions qui l'ont précédée.
+ */
+html,
+* {
+  scrollbar-width: none;
+}
+
 ::-webkit-scrollbar {
+  display: none;
   width: 0;
   height: 0;
 }
